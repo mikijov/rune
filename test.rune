@@ -54,3 +54,10 @@ func someFibNumbers() :int[]
         fibbonaci(4),
         fibbonaci(5),
     ]
+
+lambdas := func(x, y :int) {
+  increase := func(a :int) :int {
+    return x + a
+  }
+}
+
