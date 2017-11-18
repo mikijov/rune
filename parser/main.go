@@ -89,16 +89,16 @@ type integerLiteral struct {
 	value vm.Integer
 }
 
-func (i *integerLiteral) Type() vm.Type {
+func (this *integerLiteral) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerLiteral) Value() vm.Object {
-	return &i.value
+func (this *integerLiteral) Value() vm.Object {
+	return &this.value
 }
 
-func (i *integerLiteral) ToString() string {
-	return fmt.Sprintf("%d", i.value.Value)
+func (this *integerLiteral) ToString() string {
+	return fmt.Sprintf("%d", this.value.Value)
 }
 
 func NewIntegerLiteral(s string) Expression {
@@ -107,6 +107,32 @@ func NewIntegerLiteral(s string) Expression {
 		panic(err)
 	}
 	var retVal Expression = &integerLiteral{value: vm.Integer{Value: vm.VmInteger(val)}}
+	fmt.Println(retVal.ToString())
+	return retVal
+}
+
+type realLiteral struct {
+	value vm.Real
+}
+
+func (this *realLiteral) Type() vm.Type {
+	return vm.REAL
+}
+
+func (this *realLiteral) Value() vm.Object {
+	return &this.value
+}
+
+func (this *realLiteral) ToString() string {
+	return fmt.Sprintf("%f", this.value.Value)
+}
+
+func NewRealLiteral(s string) Expression {
+	val, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		panic(err)
+	}
+	var retVal Expression = &realLiteral{value: vm.Real{Value: vm.VmReal(val)}}
 	fmt.Println(retVal.ToString())
 	return retVal
 }
@@ -121,26 +147,55 @@ type integerAddition struct {
 	right Expression
 }
 
-func (i *integerAddition) Type() vm.Type {
+func (this *integerAddition) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerAddition) Value() vm.Object {
-	left := i.left.Value().(*vm.Integer)
-	right := i.right.Value().(*vm.Integer)
+func (this *integerAddition) Value() vm.Object {
+	left := this.left.Value().(*vm.Integer)
+	right := this.right.Value().(*vm.Integer)
 	return &vm.Integer{left.Value + right.Value}
 }
 
-func (i *integerAddition) Left() Expression {
-	return i.left
+func (this *integerAddition) Left() Expression {
+	return this.left
 }
 
-func (i *integerAddition) Right() Expression {
-	return i.right
+func (this *integerAddition) Right() Expression {
+	return this.right
 }
 
-func (i *integerAddition) ToString() string {
-	return fmt.Sprintf("%s %s %s", i.left.ToString(), "+", i.right.ToString())
+func (this *integerAddition) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "+", this.right.ToString())
+}
+
+// +
+
+type realAddition struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realAddition) Type() vm.Type {
+	return vm.REAL
+}
+
+func (this *realAddition) Value() vm.Object {
+	left := this.left.Value().(*vm.Real)
+	right := this.right.Value().(*vm.Real)
+	return &vm.Real{left.Value + right.Value}
+}
+
+func (this *realAddition) Left() Expression {
+	return this.left
+}
+
+func (this *realAddition) Right() Expression {
+	return this.right
+}
+
+func (this *realAddition) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "+", this.right.ToString())
 }
 
 // -
@@ -150,26 +205,55 @@ type integerSubstraction struct {
 	right Expression
 }
 
-func (i *integerSubstraction) Type() vm.Type {
+func (this *integerSubstraction) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerSubstraction) Value() vm.Object {
-	left := i.left.Value().(*vm.Integer)
-	right := i.right.Value().(*vm.Integer)
+func (this *integerSubstraction) Value() vm.Object {
+	left := this.left.Value().(*vm.Integer)
+	right := this.right.Value().(*vm.Integer)
 	return &vm.Integer{left.Value - right.Value}
 }
 
-func (i *integerSubstraction) Left() Expression {
-	return i.left
+func (this *integerSubstraction) Left() Expression {
+	return this.left
 }
 
-func (i *integerSubstraction) Right() Expression {
-	return i.right
+func (this *integerSubstraction) Right() Expression {
+	return this.right
 }
 
-func (i *integerSubstraction) ToString() string {
-	return fmt.Sprintf("%s %s %s", i.left.ToString(), "-", i.right.ToString())
+func (this *integerSubstraction) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "-", this.right.ToString())
+}
+
+// -
+
+type realSubstraction struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realSubstraction) Type() vm.Type {
+	return vm.REAL
+}
+
+func (this *realSubstraction) Value() vm.Object {
+	left := this.left.Value().(*vm.Real)
+	right := this.right.Value().(*vm.Real)
+	return &vm.Real{left.Value - right.Value}
+}
+
+func (this *realSubstraction) Left() Expression {
+	return this.left
+}
+
+func (this *realSubstraction) Right() Expression {
+	return this.right
+}
+
+func (this *realSubstraction) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "-", this.right.ToString())
 }
 
 // *
@@ -179,18 +263,39 @@ type integerMultiplication struct {
 	right Expression
 }
 
-func (i *integerMultiplication) Type() vm.Type {
+func (this *integerMultiplication) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerMultiplication) Value() vm.Object {
-	left := i.left.Value().(*vm.Integer)
-	right := i.right.Value().(*vm.Integer)
+func (this *integerMultiplication) Value() vm.Object {
+	left := this.left.Value().(*vm.Integer)
+	right := this.right.Value().(*vm.Integer)
 	return &vm.Integer{left.Value * right.Value}
 }
 
-func (i *integerMultiplication) ToString() string {
-	return fmt.Sprintf("%s %s %s", i.left.ToString(), "*", i.right.ToString())
+func (this *integerMultiplication) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "*", this.right.ToString())
+}
+
+// *
+
+type realMultiplication struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realMultiplication) Type() vm.Type {
+	return vm.REAL
+}
+
+func (this *realMultiplication) Value() vm.Object {
+	left := this.left.Value().(*vm.Real)
+	right := this.right.Value().(*vm.Real)
+	return &vm.Real{left.Value * right.Value}
+}
+
+func (this *realMultiplication) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "*", this.right.ToString())
 }
 
 // /
@@ -200,18 +305,39 @@ type integerDivision struct {
 	right Expression
 }
 
-func (i *integerDivision) Type() vm.Type {
+func (this *integerDivision) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerDivision) Value() vm.Object {
-	left := i.left.Value().(*vm.Integer)
-	right := i.right.Value().(*vm.Integer)
+func (this *integerDivision) Value() vm.Object {
+	left := this.left.Value().(*vm.Integer)
+	right := this.right.Value().(*vm.Integer)
 	return &vm.Integer{left.Value / right.Value}
 }
 
-func (i *integerDivision) ToString() string {
-	return fmt.Sprintf("%s %s %s", i.left.ToString(), "/", i.right.ToString())
+func (this *integerDivision) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "/", this.right.ToString())
+}
+
+// /
+
+type realDivision struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realDivision) Type() vm.Type {
+	return vm.REAL
+}
+
+func (this *realDivision) Value() vm.Object {
+	left := this.left.Value().(*vm.Real)
+	right := this.right.Value().(*vm.Real)
+	return &vm.Real{left.Value / right.Value}
+}
+
+func (this *realDivision) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "/", this.right.ToString())
 }
 
 // %
@@ -221,18 +347,18 @@ type integerModulo struct {
 	right Expression
 }
 
-func (i *integerModulo) Type() vm.Type {
+func (this *integerModulo) Type() vm.Type {
 	return vm.INTEGER
 }
 
-func (i *integerModulo) Value() vm.Object {
-	left := i.left.Value().(*vm.Integer)
-	right := i.right.Value().(*vm.Integer)
+func (this *integerModulo) Value() vm.Object {
+	left := this.left.Value().(*vm.Integer)
+	right := this.right.Value().(*vm.Integer)
 	return &vm.Integer{left.Value % right.Value}
 }
 
-func (i *integerModulo) ToString() string {
-	return fmt.Sprintf("%s %s %s", i.left.ToString(), "%", i.right.ToString())
+func (this *integerModulo) ToString() string {
+	return fmt.Sprintf("%s %s %s", this.left.ToString(), "%", this.right.ToString())
 }
 
 func NewBinaryExpression(left Expression, op string, right Expression) Expression {
@@ -248,24 +374,32 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 	case "+":
 		if lType == vm.INTEGER {
 			retVal = &integerAddition{left: left, right: right}
+		} else if lType == vm.REAL {
+			retVal = &realAddition{left: left, right: right}
 		} else {
 			panic("unsupported type")
 		}
 	case "-":
 		if lType == vm.INTEGER {
 			retVal = &integerSubstraction{left: left, right: right}
+		} else if lType == vm.REAL {
+			retVal = &realSubstraction{left: left, right: right}
 		} else {
 			panic("unsupported type")
 		}
 	case "*":
 		if lType == vm.INTEGER {
 			retVal = &integerMultiplication{left, right}
+		} else if lType == vm.REAL {
+			retVal = &realMultiplication{left: left, right: right}
 		} else {
 			panic("unsupported type")
 		}
 	case "/":
 		if lType == vm.INTEGER {
 			retVal = &integerDivision{left, right}
+		} else if lType == vm.REAL {
+			retVal = &realDivision{left: left, right: right}
 		} else {
 			panic("unsupported type")
 		}

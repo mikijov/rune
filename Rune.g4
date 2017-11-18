@@ -41,23 +41,24 @@ expression returns [expr :Expression]
 arithExpr returns [expr :Expression]
     : e=term
     { $expr = $e.expr }
-    | left=term op=('+'|'-') right=term
+    | left=arithExpr op=('+'|'-') right=term
     { $expr = NewBinaryExpression($left.expr, $op.text, $right.expr) }
     ;
 term returns [expr :Expression]
     : e=atom
     { $expr = $e.expr }
-    | left=atom op=('*'|'/'|'%') right=atom
+    | left=term op=('*'|'/'|'%') right=atom
     { $expr = NewBinaryExpression($left.expr, $op.text, $right.expr) }
     ;
 atom returns [expr :Expression]
-    : val=NUMBER
+    : val=INTEGER_LITERAL
     { $expr = NewIntegerLiteral($val.text) }
+    | val=REAL_LITERAL
+    { $expr = NewRealLiteral($val.text) }
     ;
 
-NUMBER
-    : [0-9]+
-    ;
+INTEGER_LITERAL: [0-9]+ ;
+REAL_LITERAL: [0-9]* '.' [0-9]+ ;
 
 LINENDING: '\r'? '\n' -> skip;
 

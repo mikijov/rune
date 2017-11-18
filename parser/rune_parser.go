@@ -16,28 +16,33 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 12, 59, 4,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 13, 70, 4,
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
 	8, 9, 8, 3, 2, 7, 2, 18, 10, 2, 12, 2, 14, 2, 21, 11, 2, 3, 2, 3, 2, 3,
 	3, 3, 3, 3, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5, 3, 5, 3, 5, 3, 6, 3,
-	6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 5, 6, 44, 10, 6, 3, 7, 3, 7, 3,
-	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 54, 10, 7, 3, 8, 3, 8, 3, 8, 3,
-	8, 2, 2, 9, 2, 4, 6, 8, 10, 12, 14, 2, 4, 3, 2, 4, 5, 3, 2, 6, 8, 2, 54,
-	2, 19, 3, 2, 2, 2, 4, 24, 3, 2, 2, 2, 6, 27, 3, 2, 2, 2, 8, 32, 3, 2, 2,
-	2, 10, 43, 3, 2, 2, 2, 12, 53, 3, 2, 2, 2, 14, 55, 3, 2, 2, 2, 16, 18,
-	5, 4, 3, 2, 17, 16, 3, 2, 2, 2, 18, 21, 3, 2, 2, 2, 19, 17, 3, 2, 2, 2,
-	19, 20, 3, 2, 2, 2, 20, 22, 3, 2, 2, 2, 21, 19, 3, 2, 2, 2, 22, 23, 7,
-	2, 2, 3, 23, 3, 3, 2, 2, 2, 24, 25, 5, 6, 4, 2, 25, 26, 8, 3, 1, 2, 26,
-	5, 3, 2, 2, 2, 27, 28, 5, 8, 5, 2, 28, 29, 8, 4, 1, 2, 29, 30, 3, 2, 2,
-	2, 30, 31, 7, 3, 2, 2, 31, 7, 3, 2, 2, 2, 32, 33, 5, 10, 6, 2, 33, 34,
-	8, 5, 1, 2, 34, 9, 3, 2, 2, 2, 35, 36, 5, 12, 7, 2, 36, 37, 8, 6, 1, 2,
-	37, 44, 3, 2, 2, 2, 38, 39, 5, 12, 7, 2, 39, 40, 9, 2, 2, 2, 40, 41, 5,
-	12, 7, 2, 41, 42, 8, 6, 1, 2, 42, 44, 3, 2, 2, 2, 43, 35, 3, 2, 2, 2, 43,
-	38, 3, 2, 2, 2, 44, 11, 3, 2, 2, 2, 45, 46, 5, 14, 8, 2, 46, 47, 8, 7,
-	1, 2, 47, 54, 3, 2, 2, 2, 48, 49, 5, 14, 8, 2, 49, 50, 9, 3, 2, 2, 50,
-	51, 5, 14, 8, 2, 51, 52, 8, 7, 1, 2, 52, 54, 3, 2, 2, 2, 53, 45, 3, 2,
-	2, 2, 53, 48, 3, 2, 2, 2, 54, 13, 3, 2, 2, 2, 55, 56, 7, 9, 2, 2, 56, 57,
-	8, 8, 1, 2, 57, 15, 3, 2, 2, 2, 5, 19, 43, 53,
+	6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 7, 6, 45, 10, 6, 12, 6, 14,
+	6, 48, 11, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7,
+	7, 59, 10, 7, 12, 7, 14, 7, 62, 11, 7, 3, 8, 3, 8, 3, 8, 3, 8, 5, 8, 68,
+	10, 8, 3, 8, 2, 4, 10, 12, 9, 2, 4, 6, 8, 10, 12, 14, 2, 4, 3, 2, 4, 5,
+	3, 2, 6, 8, 2, 66, 2, 19, 3, 2, 2, 2, 4, 24, 3, 2, 2, 2, 6, 27, 3, 2, 2,
+	2, 8, 32, 3, 2, 2, 2, 10, 35, 3, 2, 2, 2, 12, 49, 3, 2, 2, 2, 14, 67, 3,
+	2, 2, 2, 16, 18, 5, 4, 3, 2, 17, 16, 3, 2, 2, 2, 18, 21, 3, 2, 2, 2, 19,
+	17, 3, 2, 2, 2, 19, 20, 3, 2, 2, 2, 20, 22, 3, 2, 2, 2, 21, 19, 3, 2, 2,
+	2, 22, 23, 7, 2, 2, 3, 23, 3, 3, 2, 2, 2, 24, 25, 5, 6, 4, 2, 25, 26, 8,
+	3, 1, 2, 26, 5, 3, 2, 2, 2, 27, 28, 5, 8, 5, 2, 28, 29, 8, 4, 1, 2, 29,
+	30, 3, 2, 2, 2, 30, 31, 7, 3, 2, 2, 31, 7, 3, 2, 2, 2, 32, 33, 5, 10, 6,
+	2, 33, 34, 8, 5, 1, 2, 34, 9, 3, 2, 2, 2, 35, 36, 8, 6, 1, 2, 36, 37, 5,
+	12, 7, 2, 37, 38, 8, 6, 1, 2, 38, 46, 3, 2, 2, 2, 39, 40, 12, 3, 2, 2,
+	40, 41, 9, 2, 2, 2, 41, 42, 5, 12, 7, 2, 42, 43, 8, 6, 1, 2, 43, 45, 3,
+	2, 2, 2, 44, 39, 3, 2, 2, 2, 45, 48, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 46,
+	47, 3, 2, 2, 2, 47, 11, 3, 2, 2, 2, 48, 46, 3, 2, 2, 2, 49, 50, 8, 7, 1,
+	2, 50, 51, 5, 14, 8, 2, 51, 52, 8, 7, 1, 2, 52, 60, 3, 2, 2, 2, 53, 54,
+	12, 3, 2, 2, 54, 55, 9, 3, 2, 2, 55, 56, 5, 14, 8, 2, 56, 57, 8, 7, 1,
+	2, 57, 59, 3, 2, 2, 2, 58, 53, 3, 2, 2, 2, 59, 62, 3, 2, 2, 2, 60, 58,
+	3, 2, 2, 2, 60, 61, 3, 2, 2, 2, 61, 13, 3, 2, 2, 2, 62, 60, 3, 2, 2, 2,
+	63, 64, 7, 9, 2, 2, 64, 68, 8, 8, 1, 2, 65, 66, 7, 10, 2, 2, 66, 68, 8,
+	8, 1, 2, 67, 63, 3, 2, 2, 2, 67, 65, 3, 2, 2, 2, 68, 15, 3, 2, 2, 2, 6,
+	19, 46, 60, 67,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
@@ -46,7 +51,8 @@ var literalNames = []string{
 	"", "';'", "'+'", "'-'", "'*'", "'/'", "'%'",
 }
 var symbolicNames = []string{
-	"", "", "", "", "", "", "", "NUMBER", "LINENDING", "WHITESPACE", "COMMENT",
+	"", "", "", "", "", "", "", "INTEGER_LITERAL", "REAL_LITERAL", "LINENDING",
+	"WHITESPACE", "COMMENT",
 }
 
 var ruleNames = []string{
@@ -80,17 +86,18 @@ func NewRuneParser(input antlr.TokenStream) *RuneParser {
 
 // RuneParser tokens.
 const (
-	RuneParserEOF        = antlr.TokenEOF
-	RuneParserT__0       = 1
-	RuneParserT__1       = 2
-	RuneParserT__2       = 3
-	RuneParserT__3       = 4
-	RuneParserT__4       = 5
-	RuneParserT__5       = 6
-	RuneParserNUMBER     = 7
-	RuneParserLINENDING  = 8
-	RuneParserWHITESPACE = 9
-	RuneParserCOMMENT    = 10
+	RuneParserEOF             = antlr.TokenEOF
+	RuneParserT__0            = 1
+	RuneParserT__1            = 2
+	RuneParserT__2            = 3
+	RuneParserT__3            = 4
+	RuneParserT__4            = 5
+	RuneParserT__5            = 6
+	RuneParserINTEGER_LITERAL = 7
+	RuneParserREAL_LITERAL    = 8
+	RuneParserLINENDING       = 9
+	RuneParserWHITESPACE      = 10
+	RuneParserCOMMENT         = 11
 )
 
 // RuneParser rules.
@@ -229,7 +236,7 @@ func (p *RuneParser) Module() (localctx IModuleContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == RuneParserNUMBER {
+	for _la == RuneParserINTEGER_LITERAL || _la == RuneParserREAL_LITERAL {
 		{
 			p.SetState(14)
 			p.Stmt()
@@ -618,7 +625,7 @@ func (p *RuneParser) Expression() (localctx IExpressionContext) {
 	{
 		p.SetState(30)
 
-		var _x = p.ArithExpr()
+		var _x = p.arithExpr(0)
 
 		localctx.(*ExpressionContext).e = _x
 	}
@@ -640,20 +647,20 @@ type IArithExprContext interface {
 	// SetOp sets the op token.
 	SetOp(antlr.Token)
 
+	// GetLeft returns the left rule contexts.
+	GetLeft() IArithExprContext
+
 	// GetE returns the e rule contexts.
 	GetE() ITermContext
-
-	// GetLeft returns the left rule contexts.
-	GetLeft() ITermContext
 
 	// GetRight returns the right rule contexts.
 	GetRight() ITermContext
 
+	// SetLeft sets the left rule contexts.
+	SetLeft(IArithExprContext)
+
 	// SetE sets the e rule contexts.
 	SetE(ITermContext)
-
-	// SetLeft sets the left rule contexts.
-	SetLeft(ITermContext)
 
 	// SetRight sets the right rule contexts.
 	SetRight(ITermContext)
@@ -672,8 +679,8 @@ type ArithExprContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
 	expr   Expression
+	left   IArithExprContext
 	e      ITermContext
-	left   ITermContext
 	op     antlr.Token
 	right  ITermContext
 }
@@ -704,15 +711,15 @@ func (s *ArithExprContext) GetOp() antlr.Token { return s.op }
 
 func (s *ArithExprContext) SetOp(v antlr.Token) { s.op = v }
 
-func (s *ArithExprContext) GetE() ITermContext { return s.e }
+func (s *ArithExprContext) GetLeft() IArithExprContext { return s.left }
 
-func (s *ArithExprContext) GetLeft() ITermContext { return s.left }
+func (s *ArithExprContext) GetE() ITermContext { return s.e }
 
 func (s *ArithExprContext) GetRight() ITermContext { return s.right }
 
-func (s *ArithExprContext) SetE(v ITermContext) { s.e = v }
+func (s *ArithExprContext) SetLeft(v IArithExprContext) { s.left = v }
 
-func (s *ArithExprContext) SetLeft(v ITermContext) { s.left = v }
+func (s *ArithExprContext) SetE(v ITermContext) { s.e = v }
 
 func (s *ArithExprContext) SetRight(v ITermContext) { s.right = v }
 
@@ -720,27 +727,24 @@ func (s *ArithExprContext) GetExpr() Expression { return s.expr }
 
 func (s *ArithExprContext) SetExpr(v Expression) { s.expr = v }
 
-func (s *ArithExprContext) AllTerm() []ITermContext {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*ITermContext)(nil)).Elem())
-	var tst = make([]ITermContext, len(ts))
-
-	for i, t := range ts {
-		if t != nil {
-			tst[i] = t.(ITermContext)
-		}
-	}
-
-	return tst
-}
-
-func (s *ArithExprContext) Term(i int) ITermContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITermContext)(nil)).Elem(), i)
+func (s *ArithExprContext) Term() ITermContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITermContext)(nil)).Elem(), 0)
 
 	if t == nil {
 		return nil
 	}
 
 	return t.(ITermContext)
+}
+
+func (s *ArithExprContext) ArithExpr() IArithExprContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IArithExprContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IArithExprContext)
 }
 
 func (s *ArithExprContext) GetRuleContext() antlr.RuleContext {
@@ -764,12 +768,21 @@ func (s *ArithExprContext) ExitRule(listener antlr.ParseTreeListener) {
 }
 
 func (p *RuneParser) ArithExpr() (localctx IArithExprContext) {
-	localctx = NewArithExprContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, RuneParserRULE_arithExpr)
+	return p.arithExpr(0)
+}
+
+func (p *RuneParser) arithExpr(_p int) (localctx IArithExprContext) {
+	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
+	_parentState := p.GetState()
+	localctx = NewArithExprContext(p, p.GetParserRuleContext(), _parentState)
+	var _prevctx IArithExprContext = localctx
+	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
+	_startState := 8
+	p.EnterRecursionRule(localctx, 8, RuneParserRULE_arithExpr, _p)
 	var _la int
 
 	defer func() {
-		p.ExitRule()
+		p.UnrollRecursionContexts(_parentctx)
 	}()
 
 	defer func() {
@@ -784,60 +797,72 @@ func (p *RuneParser) ArithExpr() (localctx IArithExprContext) {
 		}
 	}()
 
-	p.SetState(41)
+	var _alt int
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(34)
+
+		var _x = p.term(0)
+
+		localctx.(*ArithExprContext).e = _x
+	}
+	localctx.(*ArithExprContext).expr = localctx.(*ArithExprContext).GetE().GetExpr()
+
+	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+	p.SetState(44)
 	p.GetErrorHandler().Sync(p)
-	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext()) {
-	case 1:
-		p.EnterOuterAlt(localctx, 1)
-		{
-			p.SetState(33)
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 
-			var _x = p.Term()
+	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+		if _alt == 1 {
+			if p.GetParseListeners() != nil {
+				p.TriggerExitRuleEvent()
+			}
+			_prevctx = localctx
+			localctx = NewArithExprContext(p, _parentctx, _parentState)
+			localctx.(*ArithExprContext).left = _prevctx
+			p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_arithExpr)
+			p.SetState(37)
 
-			localctx.(*ArithExprContext).e = _x
-		}
-		localctx.(*ArithExprContext).expr = localctx.(*ArithExprContext).GetE().GetExpr()
-
-	case 2:
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(36)
-
-			var _x = p.Term()
-
-			localctx.(*ArithExprContext).left = _x
-		}
-		p.SetState(37)
-
-		var _lt = p.GetTokenStream().LT(1)
-
-		localctx.(*ArithExprContext).op = _lt
-
-		_la = p.GetTokenStream().LA(1)
-
-		if !(_la == RuneParserT__1 || _la == RuneParserT__2) {
-			var _ri = p.GetErrorHandler().RecoverInline(p)
-
-			localctx.(*ArithExprContext).op = _ri
-		} else {
-			p.GetErrorHandler().ReportMatch(p)
-			p.Consume()
-		}
-		{
+			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
+				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
+			}
 			p.SetState(38)
 
-			var _x = p.Term()
+			var _lt = p.GetTokenStream().LT(1)
 
-			localctx.(*ArithExprContext).right = _x
-		}
-		localctx.(*ArithExprContext).expr = NewBinaryExpression(localctx.(*ArithExprContext).GetLeft().GetExpr(), (func() string {
-			if localctx.(*ArithExprContext).GetOp() == nil {
-				return ""
+			localctx.(*ArithExprContext).op = _lt
+
+			_la = p.GetTokenStream().LA(1)
+
+			if !(_la == RuneParserT__1 || _la == RuneParserT__2) {
+				var _ri = p.GetErrorHandler().RecoverInline(p)
+
+				localctx.(*ArithExprContext).op = _ri
 			} else {
-				return localctx.(*ArithExprContext).GetOp().GetText()
+				p.GetErrorHandler().ReportMatch(p)
+				p.Consume()
 			}
-		}()), localctx.(*ArithExprContext).GetRight().GetExpr())
+			{
+				p.SetState(39)
 
+				var _x = p.term(0)
+
+				localctx.(*ArithExprContext).right = _x
+			}
+			localctx.(*ArithExprContext).expr = NewBinaryExpression(localctx.(*ArithExprContext).GetLeft().GetExpr(), (func() string {
+				if localctx.(*ArithExprContext).GetOp() == nil {
+					return ""
+				} else {
+					return localctx.(*ArithExprContext).GetOp().GetText()
+				}
+			}()), localctx.(*ArithExprContext).GetRight().GetExpr())
+
+		}
+		p.SetState(46)
+		p.GetErrorHandler().Sync(p)
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
 	}
 
 	return localctx
@@ -856,20 +881,20 @@ type ITermContext interface {
 	// SetOp sets the op token.
 	SetOp(antlr.Token)
 
+	// GetLeft returns the left rule contexts.
+	GetLeft() ITermContext
+
 	// GetE returns the e rule contexts.
 	GetE() IAtomContext
-
-	// GetLeft returns the left rule contexts.
-	GetLeft() IAtomContext
 
 	// GetRight returns the right rule contexts.
 	GetRight() IAtomContext
 
+	// SetLeft sets the left rule contexts.
+	SetLeft(ITermContext)
+
 	// SetE sets the e rule contexts.
 	SetE(IAtomContext)
-
-	// SetLeft sets the left rule contexts.
-	SetLeft(IAtomContext)
 
 	// SetRight sets the right rule contexts.
 	SetRight(IAtomContext)
@@ -888,8 +913,8 @@ type TermContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
 	expr   Expression
+	left   ITermContext
 	e      IAtomContext
-	left   IAtomContext
 	op     antlr.Token
 	right  IAtomContext
 }
@@ -920,15 +945,15 @@ func (s *TermContext) GetOp() antlr.Token { return s.op }
 
 func (s *TermContext) SetOp(v antlr.Token) { s.op = v }
 
-func (s *TermContext) GetE() IAtomContext { return s.e }
+func (s *TermContext) GetLeft() ITermContext { return s.left }
 
-func (s *TermContext) GetLeft() IAtomContext { return s.left }
+func (s *TermContext) GetE() IAtomContext { return s.e }
 
 func (s *TermContext) GetRight() IAtomContext { return s.right }
 
-func (s *TermContext) SetE(v IAtomContext) { s.e = v }
+func (s *TermContext) SetLeft(v ITermContext) { s.left = v }
 
-func (s *TermContext) SetLeft(v IAtomContext) { s.left = v }
+func (s *TermContext) SetE(v IAtomContext) { s.e = v }
 
 func (s *TermContext) SetRight(v IAtomContext) { s.right = v }
 
@@ -936,27 +961,24 @@ func (s *TermContext) GetExpr() Expression { return s.expr }
 
 func (s *TermContext) SetExpr(v Expression) { s.expr = v }
 
-func (s *TermContext) AllAtom() []IAtomContext {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IAtomContext)(nil)).Elem())
-	var tst = make([]IAtomContext, len(ts))
-
-	for i, t := range ts {
-		if t != nil {
-			tst[i] = t.(IAtomContext)
-		}
-	}
-
-	return tst
-}
-
-func (s *TermContext) Atom(i int) IAtomContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IAtomContext)(nil)).Elem(), i)
+func (s *TermContext) Atom() IAtomContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IAtomContext)(nil)).Elem(), 0)
 
 	if t == nil {
 		return nil
 	}
 
 	return t.(IAtomContext)
+}
+
+func (s *TermContext) Term() ITermContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITermContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ITermContext)
 }
 
 func (s *TermContext) GetRuleContext() antlr.RuleContext {
@@ -980,12 +1002,21 @@ func (s *TermContext) ExitRule(listener antlr.ParseTreeListener) {
 }
 
 func (p *RuneParser) Term() (localctx ITermContext) {
-	localctx = NewTermContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, RuneParserRULE_term)
+	return p.term(0)
+}
+
+func (p *RuneParser) term(_p int) (localctx ITermContext) {
+	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
+	_parentState := p.GetState()
+	localctx = NewTermContext(p, p.GetParserRuleContext(), _parentState)
+	var _prevctx ITermContext = localctx
+	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
+	_startState := 10
+	p.EnterRecursionRule(localctx, 10, RuneParserRULE_term, _p)
 	var _la int
 
 	defer func() {
-		p.ExitRule()
+		p.UnrollRecursionContexts(_parentctx)
 	}()
 
 	defer func() {
@@ -1000,60 +1031,72 @@ func (p *RuneParser) Term() (localctx ITermContext) {
 		}
 	}()
 
-	p.SetState(51)
+	var _alt int
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(48)
+
+		var _x = p.Atom()
+
+		localctx.(*TermContext).e = _x
+	}
+	localctx.(*TermContext).expr = localctx.(*TermContext).GetE().GetExpr()
+
+	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+	p.SetState(58)
 	p.GetErrorHandler().Sync(p)
-	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext()) {
-	case 1:
-		p.EnterOuterAlt(localctx, 1)
-		{
-			p.SetState(43)
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
 
-			var _x = p.Atom()
-
-			localctx.(*TermContext).e = _x
-		}
-		localctx.(*TermContext).expr = localctx.(*TermContext).GetE().GetExpr()
-
-	case 2:
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(46)
-
-			var _x = p.Atom()
-
-			localctx.(*TermContext).left = _x
-		}
-		p.SetState(47)
-
-		var _lt = p.GetTokenStream().LT(1)
-
-		localctx.(*TermContext).op = _lt
-
-		_la = p.GetTokenStream().LA(1)
-
-		if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__3)|(1<<RuneParserT__4)|(1<<RuneParserT__5))) != 0) {
-			var _ri = p.GetErrorHandler().RecoverInline(p)
-
-			localctx.(*TermContext).op = _ri
-		} else {
-			p.GetErrorHandler().ReportMatch(p)
-			p.Consume()
-		}
-		{
-			p.SetState(48)
-
-			var _x = p.Atom()
-
-			localctx.(*TermContext).right = _x
-		}
-		localctx.(*TermContext).expr = NewBinaryExpression(localctx.(*TermContext).GetLeft().GetExpr(), (func() string {
-			if localctx.(*TermContext).GetOp() == nil {
-				return ""
-			} else {
-				return localctx.(*TermContext).GetOp().GetText()
+	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+		if _alt == 1 {
+			if p.GetParseListeners() != nil {
+				p.TriggerExitRuleEvent()
 			}
-		}()), localctx.(*TermContext).GetRight().GetExpr())
+			_prevctx = localctx
+			localctx = NewTermContext(p, _parentctx, _parentState)
+			localctx.(*TermContext).left = _prevctx
+			p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_term)
+			p.SetState(51)
 
+			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
+				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
+			}
+			p.SetState(52)
+
+			var _lt = p.GetTokenStream().LT(1)
+
+			localctx.(*TermContext).op = _lt
+
+			_la = p.GetTokenStream().LA(1)
+
+			if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__3)|(1<<RuneParserT__4)|(1<<RuneParserT__5))) != 0) {
+				var _ri = p.GetErrorHandler().RecoverInline(p)
+
+				localctx.(*TermContext).op = _ri
+			} else {
+				p.GetErrorHandler().ReportMatch(p)
+				p.Consume()
+			}
+			{
+				p.SetState(53)
+
+				var _x = p.Atom()
+
+				localctx.(*TermContext).right = _x
+			}
+			localctx.(*TermContext).expr = NewBinaryExpression(localctx.(*TermContext).GetLeft().GetExpr(), (func() string {
+				if localctx.(*TermContext).GetOp() == nil {
+					return ""
+				} else {
+					return localctx.(*TermContext).GetOp().GetText()
+				}
+			}()), localctx.(*TermContext).GetRight().GetExpr())
+
+		}
+		p.SetState(60)
+		p.GetErrorHandler().Sync(p)
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
 	}
 
 	return localctx
@@ -1119,8 +1162,12 @@ func (s *AtomContext) GetExpr() Expression { return s.expr }
 
 func (s *AtomContext) SetExpr(v Expression) { s.expr = v }
 
-func (s *AtomContext) NUMBER() antlr.TerminalNode {
-	return s.GetToken(RuneParserNUMBER, 0)
+func (s *AtomContext) INTEGER_LITERAL() antlr.TerminalNode {
+	return s.GetToken(RuneParserINTEGER_LITERAL, 0)
+}
+
+func (s *AtomContext) REAL_LITERAL() antlr.TerminalNode {
+	return s.GetToken(RuneParserREAL_LITERAL, 0)
 }
 
 func (s *AtomContext) GetRuleContext() antlr.RuleContext {
@@ -1163,21 +1210,88 @@ func (p *RuneParser) Atom() (localctx IAtomContext) {
 		}
 	}()
 
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(53)
+	p.SetState(65)
+	p.GetErrorHandler().Sync(p)
 
-		var _m = p.Match(RuneParserNUMBER)
+	switch p.GetTokenStream().LA(1) {
+	case RuneParserINTEGER_LITERAL:
+		p.EnterOuterAlt(localctx, 1)
+		{
+			p.SetState(61)
 
-		localctx.(*AtomContext).val = _m
-	}
-	localctx.(*AtomContext).expr = NewIntegerLiteral((func() string {
-		if localctx.(*AtomContext).GetVal() == nil {
-			return ""
-		} else {
-			return localctx.(*AtomContext).GetVal().GetText()
+			var _m = p.Match(RuneParserINTEGER_LITERAL)
+
+			localctx.(*AtomContext).val = _m
 		}
-	}()))
+		localctx.(*AtomContext).expr = NewIntegerLiteral((func() string {
+			if localctx.(*AtomContext).GetVal() == nil {
+				return ""
+			} else {
+				return localctx.(*AtomContext).GetVal().GetText()
+			}
+		}()))
+
+	case RuneParserREAL_LITERAL:
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(63)
+
+			var _m = p.Match(RuneParserREAL_LITERAL)
+
+			localctx.(*AtomContext).val = _m
+		}
+		localctx.(*AtomContext).expr = NewRealLiteral((func() string {
+			if localctx.(*AtomContext).GetVal() == nil {
+				return ""
+			} else {
+				return localctx.(*AtomContext).GetVal().GetText()
+			}
+		}()))
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+	}
 
 	return localctx
+}
+
+func (p *RuneParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
+	switch ruleIndex {
+	case 4:
+		var t *ArithExprContext = nil
+		if localctx != nil {
+			t = localctx.(*ArithExprContext)
+		}
+		return p.ArithExpr_Sempred(t, predIndex)
+
+	case 5:
+		var t *TermContext = nil
+		if localctx != nil {
+			t = localctx.(*TermContext)
+		}
+		return p.Term_Sempred(t, predIndex)
+
+	default:
+		panic("No predicate with index: " + fmt.Sprint(ruleIndex))
+	}
+}
+
+func (p *RuneParser) ArithExpr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+	switch predIndex {
+	case 0:
+		return p.Precpred(p.GetParserRuleContext(), 1)
+
+	default:
+		panic("No predicate with index: " + fmt.Sprint(predIndex))
+	}
+}
+
+func (p *RuneParser) Term_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+	switch predIndex {
+	case 1:
+		return p.Precpred(p.GetParserRuleContext(), 1)
+
+	default:
+		panic("No predicate with index: " + fmt.Sprint(predIndex))
+	}
 }
