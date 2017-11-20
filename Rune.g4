@@ -2,6 +2,11 @@ grammar Rune;
 
 // put imports here
 @header {
+import (
+    "mikijov/rune-antlr/vm"
+)
+
+var _ vm.Type // inhibit unused import error
 }
 
 // generally not needed at all as everything in current and imported packages is accessible
@@ -10,55 +15,44 @@ grammar Rune;
 
 /* tokens { EOF } */
 
-module
-    returns [m :Module]
-    @init {
-        $m = NewModule()
-    }
-    @after {
-        for _, stmt := range $ctx.AllStmt() {
-            $m.AddStatement(stmt.GetS())
-        }
-    }
-    : stmt* EOF
+program
+    : statement* EOF
     ;
 
-stmt returns [s :Statement]
-    : simpleStmt
-    { $s = $simpleStmt.s }
-    ;
-simpleStmt returns [s :Statement]
-    :
-    ( expression
-    { $s = &expressionStatement{$expression.expr} }
-    ) ';'
+statement
+    : declaration ';'
+    | expression ';'
     ;
 
-expression returns [expr :Expression]
-    : e=arithExpr
-    { $expr = $e.expr }
+declaration
+    : identifier=IDENTIFIER ':=' value=expression
+    | identifier=IDENTIFIER ':' type_=typeName ('=' value=expression)?
     ;
-arithExpr returns [expr :Expression]
-    : e=term
-    { $expr = $e.expr }
-    | left=arithExpr op=('+'|'-') right=term
-    { $expr = NewBinaryExpression($left.expr, $op.text, $right.expr) }
+typeName
+    : 'int' | 'string' | 'bool'
+    // | 'list' | 'map'
     ;
-term returns [expr :Expression]
-    : e=atom
-    { $expr = $e.expr }
-    | left=term op=('*'|'/'|'%') right=atom
-    { $expr = NewBinaryExpression($left.expr, $op.text, $right.expr) }
+
+expression: expression2 ;
+
+expression2
+    : '(' value=expression2 ')' # ExpressionPassthrough
+    | op='-' value=expression2 # UnaryExpression
+    | left=expression2 op=('*'|'/'|'%') right=expression2 # BinaryExpression
+    | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
+    | value=literal # LiteralPassthrough
     ;
-atom returns [expr :Expression]
-    : val=INTEGER_LITERAL
-    { $expr = NewIntegerLiteral($val.text) }
-    | val=REAL_LITERAL
-    { $expr = NewRealLiteral($val.text) }
+
+literal
+    : value=REAL_LITERAL # RealLiteral
+    | value=INTEGER_LITERAL # IntegerLiteral
     ;
 
 INTEGER_LITERAL: [0-9]+ ;
 REAL_LITERAL: [0-9]* '.' [0-9]+ ;
+BOOLEAN_LITERAL: 'true' | 'false' ;
+
+IDENTIFIER: [a-zA-Z_] [a-zA-Z0-9_]* ;
 
 LINENDING: '\r'? '\n' -> skip;
 

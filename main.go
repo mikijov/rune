@@ -1,6 +1,6 @@
 package main
 
-//go:generate java -Xmx500M org.antlr.v4.Tool -Dlanguage=Go -o parser Rune.g4
+//go:generate java -Xmx500M org.antlr.v4.Tool -Dlanguage=Go -visitor -listener -o parser Rune.g4
 
 import (
 	"fmt"
@@ -34,10 +34,12 @@ func main() {
 	p := parser.NewRuneParser(stream)
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
-	tree := p.Module()
+	tree := p.Program()
 	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 
 	fmt.Println("Running...")
-	code := tree.GetM()
-	code.Execute()
+	visitor := parser.NewMyVisitor()
+	context := tree.(*parser.ProgramContext)
+	program := visitor.VisitProgram(context)
+	program.Execute()
 }

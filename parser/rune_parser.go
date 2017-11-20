@@ -10,53 +10,65 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
+import (
+	"mikijov/rune-antlr/vm"
+)
+
+var _ vm.Type // inhibit unused import error
+
 // Suppress unused import errors
 var _ = fmt.Printf
 var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 13, 70, 4,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 23, 74, 4,
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
 	8, 9, 8, 3, 2, 7, 2, 18, 10, 2, 12, 2, 14, 2, 21, 11, 2, 3, 2, 3, 2, 3,
-	3, 3, 3, 3, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5, 3, 5, 3, 5, 3, 6, 3,
-	6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 3, 6, 7, 6, 45, 10, 6, 12, 6, 14,
-	6, 48, 11, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7,
-	7, 59, 10, 7, 12, 7, 14, 7, 62, 11, 7, 3, 8, 3, 8, 3, 8, 3, 8, 5, 8, 68,
-	10, 8, 3, 8, 2, 4, 10, 12, 9, 2, 4, 6, 8, 10, 12, 14, 2, 4, 3, 2, 4, 5,
-	3, 2, 6, 8, 2, 66, 2, 19, 3, 2, 2, 2, 4, 24, 3, 2, 2, 2, 6, 27, 3, 2, 2,
-	2, 8, 32, 3, 2, 2, 2, 10, 35, 3, 2, 2, 2, 12, 49, 3, 2, 2, 2, 14, 67, 3,
-	2, 2, 2, 16, 18, 5, 4, 3, 2, 17, 16, 3, 2, 2, 2, 18, 21, 3, 2, 2, 2, 19,
-	17, 3, 2, 2, 2, 19, 20, 3, 2, 2, 2, 20, 22, 3, 2, 2, 2, 21, 19, 3, 2, 2,
-	2, 22, 23, 7, 2, 2, 3, 23, 3, 3, 2, 2, 2, 24, 25, 5, 6, 4, 2, 25, 26, 8,
-	3, 1, 2, 26, 5, 3, 2, 2, 2, 27, 28, 5, 8, 5, 2, 28, 29, 8, 4, 1, 2, 29,
-	30, 3, 2, 2, 2, 30, 31, 7, 3, 2, 2, 31, 7, 3, 2, 2, 2, 32, 33, 5, 10, 6,
-	2, 33, 34, 8, 5, 1, 2, 34, 9, 3, 2, 2, 2, 35, 36, 8, 6, 1, 2, 36, 37, 5,
-	12, 7, 2, 37, 38, 8, 6, 1, 2, 38, 46, 3, 2, 2, 2, 39, 40, 12, 3, 2, 2,
-	40, 41, 9, 2, 2, 2, 41, 42, 5, 12, 7, 2, 42, 43, 8, 6, 1, 2, 43, 45, 3,
-	2, 2, 2, 44, 39, 3, 2, 2, 2, 45, 48, 3, 2, 2, 2, 46, 44, 3, 2, 2, 2, 46,
-	47, 3, 2, 2, 2, 47, 11, 3, 2, 2, 2, 48, 46, 3, 2, 2, 2, 49, 50, 8, 7, 1,
-	2, 50, 51, 5, 14, 8, 2, 51, 52, 8, 7, 1, 2, 52, 60, 3, 2, 2, 2, 53, 54,
-	12, 3, 2, 2, 54, 55, 9, 3, 2, 2, 55, 56, 5, 14, 8, 2, 56, 57, 8, 7, 1,
-	2, 57, 59, 3, 2, 2, 2, 58, 53, 3, 2, 2, 2, 59, 62, 3, 2, 2, 2, 60, 58,
-	3, 2, 2, 2, 60, 61, 3, 2, 2, 2, 61, 13, 3, 2, 2, 2, 62, 60, 3, 2, 2, 2,
-	63, 64, 7, 9, 2, 2, 64, 68, 8, 8, 1, 2, 65, 66, 7, 10, 2, 2, 66, 68, 8,
-	8, 1, 2, 67, 63, 3, 2, 2, 2, 67, 65, 3, 2, 2, 2, 68, 15, 3, 2, 2, 2, 6,
-	19, 46, 60, 67,
+	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 31, 10, 3, 3, 4, 3, 4, 3, 4, 3,
+	4, 3, 4, 3, 4, 3, 4, 3, 4, 5, 4, 41, 10, 4, 5, 4, 43, 10, 4, 3, 5, 3, 5,
+	3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 57, 10,
+	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 65, 10, 7, 12, 7, 14, 7, 68,
+	11, 7, 3, 8, 3, 8, 5, 8, 72, 10, 8, 3, 8, 2, 3, 12, 9, 2, 4, 6, 8, 10,
+	12, 14, 2, 5, 3, 2, 7, 9, 3, 2, 13, 15, 4, 2, 12, 12, 16, 16, 2, 75, 2,
+	19, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 42, 3, 2, 2, 2, 8, 44, 3, 2, 2, 2,
+	10, 46, 3, 2, 2, 2, 12, 56, 3, 2, 2, 2, 14, 71, 3, 2, 2, 2, 16, 18, 5,
+	4, 3, 2, 17, 16, 3, 2, 2, 2, 18, 21, 3, 2, 2, 2, 19, 17, 3, 2, 2, 2, 19,
+	20, 3, 2, 2, 2, 20, 22, 3, 2, 2, 2, 21, 19, 3, 2, 2, 2, 22, 23, 7, 2, 2,
+	3, 23, 3, 3, 2, 2, 2, 24, 25, 5, 6, 4, 2, 25, 26, 7, 3, 2, 2, 26, 31, 3,
+	2, 2, 2, 27, 28, 5, 10, 6, 2, 28, 29, 7, 3, 2, 2, 29, 31, 3, 2, 2, 2, 30,
+	24, 3, 2, 2, 2, 30, 27, 3, 2, 2, 2, 31, 5, 3, 2, 2, 2, 32, 33, 7, 20, 2,
+	2, 33, 34, 7, 4, 2, 2, 34, 43, 5, 10, 6, 2, 35, 36, 7, 20, 2, 2, 36, 37,
+	7, 5, 2, 2, 37, 40, 5, 8, 5, 2, 38, 39, 7, 6, 2, 2, 39, 41, 5, 10, 6, 2,
+	40, 38, 3, 2, 2, 2, 40, 41, 3, 2, 2, 2, 41, 43, 3, 2, 2, 2, 42, 32, 3,
+	2, 2, 2, 42, 35, 3, 2, 2, 2, 43, 7, 3, 2, 2, 2, 44, 45, 9, 2, 2, 2, 45,
+	9, 3, 2, 2, 2, 46, 47, 5, 12, 7, 2, 47, 11, 3, 2, 2, 2, 48, 49, 8, 7, 1,
+	2, 49, 50, 7, 10, 2, 2, 50, 51, 5, 12, 7, 2, 51, 52, 7, 11, 2, 2, 52, 57,
+	3, 2, 2, 2, 53, 54, 7, 12, 2, 2, 54, 57, 5, 12, 7, 6, 55, 57, 5, 14, 8,
+	2, 56, 48, 3, 2, 2, 2, 56, 53, 3, 2, 2, 2, 56, 55, 3, 2, 2, 2, 57, 66,
+	3, 2, 2, 2, 58, 59, 12, 5, 2, 2, 59, 60, 9, 3, 2, 2, 60, 65, 5, 12, 7,
+	6, 61, 62, 12, 4, 2, 2, 62, 63, 9, 4, 2, 2, 63, 65, 5, 12, 7, 5, 64, 58,
+	3, 2, 2, 2, 64, 61, 3, 2, 2, 2, 65, 68, 3, 2, 2, 2, 66, 64, 3, 2, 2, 2,
+	66, 67, 3, 2, 2, 2, 67, 13, 3, 2, 2, 2, 68, 66, 3, 2, 2, 2, 69, 72, 7,
+	18, 2, 2, 70, 72, 7, 17, 2, 2, 71, 69, 3, 2, 2, 2, 71, 70, 3, 2, 2, 2,
+	72, 15, 3, 2, 2, 2, 10, 19, 30, 40, 42, 56, 64, 66, 71,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "';'", "'+'", "'-'", "'*'", "'/'", "'%'",
+	"", "';'", "':='", "':'", "'='", "'int'", "'string'", "'bool'", "'('",
+	"')'", "'-'", "'*'", "'/'", "'%'", "'+'",
 }
 var symbolicNames = []string{
-	"", "", "", "", "", "", "", "INTEGER_LITERAL", "REAL_LITERAL", "LINENDING",
-	"WHITESPACE", "COMMENT",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "INTEGER_LITERAL",
+	"REAL_LITERAL", "BOOLEAN_LITERAL", "IDENTIFIER", "LINENDING", "WHITESPACE",
+	"COMMENT",
 }
 
 var ruleNames = []string{
-	"module", "stmt", "simpleStmt", "expression", "arithExpr", "term", "atom",
+	"program", "statement", "declaration", "typeName", "expression", "expression2",
+	"literal",
 }
 var decisionToDFA = make([]*antlr.DFA, len(deserializedATN.DecisionToState))
 
@@ -93,126 +105,132 @@ const (
 	RuneParserT__3            = 4
 	RuneParserT__4            = 5
 	RuneParserT__5            = 6
-	RuneParserINTEGER_LITERAL = 7
-	RuneParserREAL_LITERAL    = 8
-	RuneParserLINENDING       = 9
-	RuneParserWHITESPACE      = 10
-	RuneParserCOMMENT         = 11
+	RuneParserT__6            = 7
+	RuneParserT__7            = 8
+	RuneParserT__8            = 9
+	RuneParserT__9            = 10
+	RuneParserT__10           = 11
+	RuneParserT__11           = 12
+	RuneParserT__12           = 13
+	RuneParserT__13           = 14
+	RuneParserINTEGER_LITERAL = 15
+	RuneParserREAL_LITERAL    = 16
+	RuneParserBOOLEAN_LITERAL = 17
+	RuneParserIDENTIFIER      = 18
+	RuneParserLINENDING       = 19
+	RuneParserWHITESPACE      = 20
+	RuneParserCOMMENT         = 21
 )
 
 // RuneParser rules.
 const (
-	RuneParserRULE_module     = 0
-	RuneParserRULE_stmt       = 1
-	RuneParserRULE_simpleStmt = 2
-	RuneParserRULE_expression = 3
-	RuneParserRULE_arithExpr  = 4
-	RuneParserRULE_term       = 5
-	RuneParserRULE_atom       = 6
+	RuneParserRULE_program     = 0
+	RuneParserRULE_statement   = 1
+	RuneParserRULE_declaration = 2
+	RuneParserRULE_typeName    = 3
+	RuneParserRULE_expression  = 4
+	RuneParserRULE_expression2 = 5
+	RuneParserRULE_literal     = 6
 )
 
-// IModuleContext is an interface to support dynamic dispatch.
-type IModuleContext interface {
+// IProgramContext is an interface to support dynamic dispatch.
+type IProgramContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetM returns the m attribute.
-	GetM() Module
-
-	// SetM sets the m attribute.
-	SetM(Module)
-
-	// IsModuleContext differentiates from other interfaces.
-	IsModuleContext()
+	// IsProgramContext differentiates from other interfaces.
+	IsProgramContext()
 }
 
-type ModuleContext struct {
+type ProgramContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	m      Module
 }
 
-func NewEmptyModuleContext() *ModuleContext {
-	var p = new(ModuleContext)
+func NewEmptyProgramContext() *ProgramContext {
+	var p = new(ProgramContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_module
+	p.RuleIndex = RuneParserRULE_program
 	return p
 }
 
-func (*ModuleContext) IsModuleContext() {}
+func (*ProgramContext) IsProgramContext() {}
 
-func NewModuleContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ModuleContext {
-	var p = new(ModuleContext)
+func NewProgramContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ProgramContext {
+	var p = new(ProgramContext)
 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = RuneParserRULE_module
+	p.RuleIndex = RuneParserRULE_program
 
 	return p
 }
 
-func (s *ModuleContext) GetParser() antlr.Parser { return s.parser }
+func (s *ProgramContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ModuleContext) GetM() Module { return s.m }
-
-func (s *ModuleContext) SetM(v Module) { s.m = v }
-
-func (s *ModuleContext) EOF() antlr.TerminalNode {
+func (s *ProgramContext) EOF() antlr.TerminalNode {
 	return s.GetToken(RuneParserEOF, 0)
 }
 
-func (s *ModuleContext) AllStmt() []IStmtContext {
-	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IStmtContext)(nil)).Elem())
-	var tst = make([]IStmtContext, len(ts))
+func (s *ProgramContext) AllStatement() []IStatementContext {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IStatementContext)(nil)).Elem())
+	var tst = make([]IStatementContext, len(ts))
 
 	for i, t := range ts {
 		if t != nil {
-			tst[i] = t.(IStmtContext)
+			tst[i] = t.(IStatementContext)
 		}
 	}
 
 	return tst
 }
 
-func (s *ModuleContext) Stmt(i int) IStmtContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IStmtContext)(nil)).Elem(), i)
+func (s *ProgramContext) Statement(i int) IStatementContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IStatementContext)(nil)).Elem(), i)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(IStmtContext)
+	return t.(IStatementContext)
 }
 
-func (s *ModuleContext) GetRuleContext() antlr.RuleContext {
+func (s *ProgramContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *ModuleContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *ProgramContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *ModuleContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *ProgramContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterModule(s)
+		listenerT.EnterProgram(s)
 	}
 }
 
-func (s *ModuleContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *ProgramContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitModule(s)
+		listenerT.ExitProgram(s)
 	}
 }
 
-func (p *RuneParser) Module() (localctx IModuleContext) {
-	localctx = NewModuleContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 0, RuneParserRULE_module)
+func (s *ProgramContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitProgram(s)
 
-	localctx.(*ModuleContext).m = NewModule()
+	default:
+		return t.VisitChildren(s)
+	}
+}
 
+func (p *RuneParser) Program() (localctx IProgramContext) {
+	localctx = NewProgramContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 0, RuneParserRULE_program)
 	var _la int
 
 	defer func() {
@@ -236,10 +254,10 @@ func (p *RuneParser) Module() (localctx IModuleContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == RuneParserINTEGER_LITERAL || _la == RuneParserREAL_LITERAL {
+	for ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__7)|(1<<RuneParserT__9)|(1<<RuneParserINTEGER_LITERAL)|(1<<RuneParserREAL_LITERAL)|(1<<RuneParserIDENTIFIER))) != 0 {
 		{
 			p.SetState(14)
-			p.Stmt()
+			p.Statement()
 		}
 
 		p.SetState(19)
@@ -251,199 +269,58 @@ func (p *RuneParser) Module() (localctx IModuleContext) {
 		p.Match(RuneParserEOF)
 	}
 
-	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-
-	for _, stmt := range localctx.(*ModuleContext).AllStmt() {
-		localctx.(*ModuleContext).m.AddStatement(stmt.GetS())
-	}
-
 	return localctx
 }
 
-// IStmtContext is an interface to support dynamic dispatch.
-type IStmtContext interface {
+// IStatementContext is an interface to support dynamic dispatch.
+type IStatementContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// Get_simpleStmt returns the _simpleStmt rule contexts.
-	Get_simpleStmt() ISimpleStmtContext
-
-	// Set_simpleStmt sets the _simpleStmt rule contexts.
-	Set_simpleStmt(ISimpleStmtContext)
-
-	// GetS returns the s attribute.
-	GetS() Statement
-
-	// SetS sets the s attribute.
-	SetS(Statement)
-
-	// IsStmtContext differentiates from other interfaces.
-	IsStmtContext()
+	// IsStatementContext differentiates from other interfaces.
+	IsStatementContext()
 }
 
-type StmtContext struct {
+type StatementContext struct {
 	*antlr.BaseParserRuleContext
-	parser      antlr.Parser
-	s           Statement
-	_simpleStmt ISimpleStmtContext
+	parser antlr.Parser
 }
 
-func NewEmptyStmtContext() *StmtContext {
-	var p = new(StmtContext)
+func NewEmptyStatementContext() *StatementContext {
+	var p = new(StatementContext)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_stmt
+	p.RuleIndex = RuneParserRULE_statement
 	return p
 }
 
-func (*StmtContext) IsStmtContext() {}
+func (*StatementContext) IsStatementContext() {}
 
-func NewStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StmtContext {
-	var p = new(StmtContext)
+func NewStatementContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *StatementContext {
+	var p = new(StatementContext)
 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = RuneParserRULE_stmt
+	p.RuleIndex = RuneParserRULE_statement
 
 	return p
 }
 
-func (s *StmtContext) GetParser() antlr.Parser { return s.parser }
+func (s *StatementContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *StmtContext) Get_simpleStmt() ISimpleStmtContext { return s._simpleStmt }
-
-func (s *StmtContext) Set_simpleStmt(v ISimpleStmtContext) { s._simpleStmt = v }
-
-func (s *StmtContext) GetS() Statement { return s.s }
-
-func (s *StmtContext) SetS(v Statement) { s.s = v }
-
-func (s *StmtContext) SimpleStmt() ISimpleStmtContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*ISimpleStmtContext)(nil)).Elem(), 0)
+func (s *StatementContext) Declaration() IDeclarationContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IDeclarationContext)(nil)).Elem(), 0)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(ISimpleStmtContext)
+	return t.(IDeclarationContext)
 }
 
-func (s *StmtContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *StmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *StmtContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterStmt(s)
-	}
-}
-
-func (s *StmtContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitStmt(s)
-	}
-}
-
-func (p *RuneParser) Stmt() (localctx IStmtContext) {
-	localctx = NewStmtContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 2, RuneParserRULE_stmt)
-
-	defer func() {
-		p.ExitRule()
-	}()
-
-	defer func() {
-		if err := recover(); err != nil {
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-		}
-	}()
-
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(22)
-
-		var _x = p.SimpleStmt()
-
-		localctx.(*StmtContext)._simpleStmt = _x
-	}
-	localctx.(*StmtContext).s = localctx.(*StmtContext).Get_simpleStmt().GetS()
-
-	return localctx
-}
-
-// ISimpleStmtContext is an interface to support dynamic dispatch.
-type ISimpleStmtContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Get_expression returns the _expression rule contexts.
-	Get_expression() IExpressionContext
-
-	// Set_expression sets the _expression rule contexts.
-	Set_expression(IExpressionContext)
-
-	// GetS returns the s attribute.
-	GetS() Statement
-
-	// SetS sets the s attribute.
-	SetS(Statement)
-
-	// IsSimpleStmtContext differentiates from other interfaces.
-	IsSimpleStmtContext()
-}
-
-type SimpleStmtContext struct {
-	*antlr.BaseParserRuleContext
-	parser      antlr.Parser
-	s           Statement
-	_expression IExpressionContext
-}
-
-func NewEmptySimpleStmtContext() *SimpleStmtContext {
-	var p = new(SimpleStmtContext)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_simpleStmt
-	return p
-}
-
-func (*SimpleStmtContext) IsSimpleStmtContext() {}
-
-func NewSimpleStmtContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *SimpleStmtContext {
-	var p = new(SimpleStmtContext)
-
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RuneParserRULE_simpleStmt
-
-	return p
-}
-
-func (s *SimpleStmtContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *SimpleStmtContext) Get_expression() IExpressionContext { return s._expression }
-
-func (s *SimpleStmtContext) Set_expression(v IExpressionContext) { s._expression = v }
-
-func (s *SimpleStmtContext) GetS() Statement { return s.s }
-
-func (s *SimpleStmtContext) SetS(v Statement) { s.s = v }
-
-func (s *SimpleStmtContext) Expression() IExpressionContext {
+func (s *StatementContext) Expression() IExpressionContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpressionContext)(nil)).Elem(), 0)
 
 	if t == nil {
@@ -453,29 +330,374 @@ func (s *SimpleStmtContext) Expression() IExpressionContext {
 	return t.(IExpressionContext)
 }
 
-func (s *SimpleStmtContext) GetRuleContext() antlr.RuleContext {
+func (s *StatementContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *SimpleStmtContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *StatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *SimpleStmtContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *StatementContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterSimpleStmt(s)
+		listenerT.EnterStatement(s)
 	}
 }
 
-func (s *SimpleStmtContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *StatementContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitSimpleStmt(s)
+		listenerT.ExitStatement(s)
 	}
 }
 
-func (p *RuneParser) SimpleStmt() (localctx ISimpleStmtContext) {
-	localctx = NewSimpleStmtContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 4, RuneParserRULE_simpleStmt)
+func (s *StatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitStatement(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) Statement() (localctx IStatementContext) {
+	localctx = NewStatementContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 2, RuneParserRULE_statement)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.SetState(28)
+	p.GetErrorHandler().Sync(p)
+
+	switch p.GetTokenStream().LA(1) {
+	case RuneParserIDENTIFIER:
+		p.EnterOuterAlt(localctx, 1)
+		{
+			p.SetState(22)
+			p.Declaration()
+		}
+		{
+			p.SetState(23)
+			p.Match(RuneParserT__0)
+		}
+
+	case RuneParserT__7, RuneParserT__9, RuneParserINTEGER_LITERAL, RuneParserREAL_LITERAL:
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(25)
+			p.Expression()
+		}
+		{
+			p.SetState(26)
+			p.Match(RuneParserT__0)
+		}
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+	}
+
+	return localctx
+}
+
+// IDeclarationContext is an interface to support dynamic dispatch.
+type IDeclarationContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// GetIdentifier returns the identifier token.
+	GetIdentifier() antlr.Token
+
+	// SetIdentifier sets the identifier token.
+	SetIdentifier(antlr.Token)
+
+	// GetValue returns the value rule contexts.
+	GetValue() IExpressionContext
+
+	// GetType_ returns the type_ rule contexts.
+	GetType_() ITypeNameContext
+
+	// SetValue sets the value rule contexts.
+	SetValue(IExpressionContext)
+
+	// SetType_ sets the type_ rule contexts.
+	SetType_(ITypeNameContext)
+
+	// IsDeclarationContext differentiates from other interfaces.
+	IsDeclarationContext()
+}
+
+type DeclarationContext struct {
+	*antlr.BaseParserRuleContext
+	parser     antlr.Parser
+	identifier antlr.Token
+	value      IExpressionContext
+	type_      ITypeNameContext
+}
+
+func NewEmptyDeclarationContext() *DeclarationContext {
+	var p = new(DeclarationContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = RuneParserRULE_declaration
+	return p
+}
+
+func (*DeclarationContext) IsDeclarationContext() {}
+
+func NewDeclarationContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *DeclarationContext {
+	var p = new(DeclarationContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = RuneParserRULE_declaration
+
+	return p
+}
+
+func (s *DeclarationContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *DeclarationContext) GetIdentifier() antlr.Token { return s.identifier }
+
+func (s *DeclarationContext) SetIdentifier(v antlr.Token) { s.identifier = v }
+
+func (s *DeclarationContext) GetValue() IExpressionContext { return s.value }
+
+func (s *DeclarationContext) GetType_() ITypeNameContext { return s.type_ }
+
+func (s *DeclarationContext) SetValue(v IExpressionContext) { s.value = v }
+
+func (s *DeclarationContext) SetType_(v ITypeNameContext) { s.type_ = v }
+
+func (s *DeclarationContext) IDENTIFIER() antlr.TerminalNode {
+	return s.GetToken(RuneParserIDENTIFIER, 0)
+}
+
+func (s *DeclarationContext) Expression() IExpressionContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpressionContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpressionContext)
+}
+
+func (s *DeclarationContext) TypeName() ITypeNameContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITypeNameContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ITypeNameContext)
+}
+
+func (s *DeclarationContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *DeclarationContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *DeclarationContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterDeclaration(s)
+	}
+}
+
+func (s *DeclarationContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitDeclaration(s)
+	}
+}
+
+func (s *DeclarationContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitDeclaration(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) Declaration() (localctx IDeclarationContext) {
+	localctx = NewDeclarationContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 4, RuneParserRULE_declaration)
+	var _la int
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.SetState(40)
+	p.GetErrorHandler().Sync(p)
+	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
+	case 1:
+		p.EnterOuterAlt(localctx, 1)
+		{
+			p.SetState(30)
+
+			var _m = p.Match(RuneParserIDENTIFIER)
+
+			localctx.(*DeclarationContext).identifier = _m
+		}
+		{
+			p.SetState(31)
+			p.Match(RuneParserT__1)
+		}
+		{
+			p.SetState(32)
+
+			var _x = p.Expression()
+
+			localctx.(*DeclarationContext).value = _x
+		}
+
+	case 2:
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(33)
+
+			var _m = p.Match(RuneParserIDENTIFIER)
+
+			localctx.(*DeclarationContext).identifier = _m
+		}
+		{
+			p.SetState(34)
+			p.Match(RuneParserT__2)
+		}
+		{
+			p.SetState(35)
+
+			var _x = p.TypeName()
+
+			localctx.(*DeclarationContext).type_ = _x
+		}
+		p.SetState(38)
+		p.GetErrorHandler().Sync(p)
+		_la = p.GetTokenStream().LA(1)
+
+		if _la == RuneParserT__3 {
+			{
+				p.SetState(36)
+				p.Match(RuneParserT__3)
+			}
+			{
+				p.SetState(37)
+
+				var _x = p.Expression()
+
+				localctx.(*DeclarationContext).value = _x
+			}
+
+		}
+
+	}
+
+	return localctx
+}
+
+// ITypeNameContext is an interface to support dynamic dispatch.
+type ITypeNameContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsTypeNameContext differentiates from other interfaces.
+	IsTypeNameContext()
+}
+
+type TypeNameContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyTypeNameContext() *TypeNameContext {
+	var p = new(TypeNameContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = RuneParserRULE_typeName
+	return p
+}
+
+func (*TypeNameContext) IsTypeNameContext() {}
+
+func NewTypeNameContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeNameContext {
+	var p = new(TypeNameContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = RuneParserRULE_typeName
+
+	return p
+}
+
+func (s *TypeNameContext) GetParser() antlr.Parser { return s.parser }
+func (s *TypeNameContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *TypeNameContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *TypeNameContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterTypeName(s)
+	}
+}
+
+func (s *TypeNameContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitTypeName(s)
+	}
+}
+
+func (s *TypeNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitTypeName(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) TypeName() (localctx ITypeNameContext) {
+	localctx = NewTypeNameContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 6, RuneParserRULE_typeName)
+	var _la int
 
 	defer func() {
 		p.ExitRule()
@@ -494,18 +716,14 @@ func (p *RuneParser) SimpleStmt() (localctx ISimpleStmtContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(25)
+	p.SetState(42)
+	_la = p.GetTokenStream().LA(1)
 
-		var _x = p.Expression()
-
-		localctx.(*SimpleStmtContext)._expression = _x
-	}
-	localctx.(*SimpleStmtContext).s = &expressionStatement{localctx.(*SimpleStmtContext).Get_expression().GetExpr()}
-
-	{
-		p.SetState(28)
-		p.Match(RuneParserT__0)
+	if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__5)|(1<<RuneParserT__6))) != 0) {
+		p.GetErrorHandler().RecoverInline(p)
+	} else {
+		p.GetErrorHandler().ReportMatch(p)
+		p.Consume()
 	}
 
 	return localctx
@@ -518,18 +736,6 @@ type IExpressionContext interface {
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetE returns the e rule contexts.
-	GetE() IArithExprContext
-
-	// SetE sets the e rule contexts.
-	SetE(IArithExprContext)
-
-	// GetExpr returns the expr attribute.
-	GetExpr() Expression
-
-	// SetExpr sets the expr attribute.
-	SetExpr(Expression)
-
 	// IsExpressionContext differentiates from other interfaces.
 	IsExpressionContext()
 }
@@ -537,8 +743,6 @@ type IExpressionContext interface {
 type ExpressionContext struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	expr   Expression
-	e      IArithExprContext
 }
 
 func NewEmptyExpressionContext() *ExpressionContext {
@@ -563,22 +767,14 @@ func NewExpressionContext(parser antlr.Parser, parent antlr.ParserRuleContext, i
 
 func (s *ExpressionContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ExpressionContext) GetE() IArithExprContext { return s.e }
-
-func (s *ExpressionContext) SetE(v IArithExprContext) { s.e = v }
-
-func (s *ExpressionContext) GetExpr() Expression { return s.expr }
-
-func (s *ExpressionContext) SetExpr(v Expression) { s.expr = v }
-
-func (s *ExpressionContext) ArithExpr() IArithExprContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IArithExprContext)(nil)).Elem(), 0)
+func (s *ExpressionContext) Expression2() IExpression2Context {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpression2Context)(nil)).Elem(), 0)
 
 	if t == nil {
 		return nil
 	}
 
-	return t.(IArithExprContext)
+	return t.(IExpression2Context)
 }
 
 func (s *ExpressionContext) GetRuleContext() antlr.RuleContext {
@@ -601,9 +797,19 @@ func (s *ExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
 	}
 }
 
+func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
 func (p *RuneParser) Expression() (localctx IExpressionContext) {
 	localctx = NewExpressionContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, RuneParserRULE_expression)
+	p.EnterRule(localctx, 8, RuneParserRULE_expression)
 
 	defer func() {
 		p.ExitRule()
@@ -623,396 +829,323 @@ func (p *RuneParser) Expression() (localctx IExpressionContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(30)
-
-		var _x = p.arithExpr(0)
-
-		localctx.(*ExpressionContext).e = _x
-	}
-	localctx.(*ExpressionContext).expr = localctx.(*ExpressionContext).GetE().GetExpr()
-
-	return localctx
-}
-
-// IArithExprContext is an interface to support dynamic dispatch.
-type IArithExprContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// GetOp returns the op token.
-	GetOp() antlr.Token
-
-	// SetOp sets the op token.
-	SetOp(antlr.Token)
-
-	// GetLeft returns the left rule contexts.
-	GetLeft() IArithExprContext
-
-	// GetE returns the e rule contexts.
-	GetE() ITermContext
-
-	// GetRight returns the right rule contexts.
-	GetRight() ITermContext
-
-	// SetLeft sets the left rule contexts.
-	SetLeft(IArithExprContext)
-
-	// SetE sets the e rule contexts.
-	SetE(ITermContext)
-
-	// SetRight sets the right rule contexts.
-	SetRight(ITermContext)
-
-	// GetExpr returns the expr attribute.
-	GetExpr() Expression
-
-	// SetExpr sets the expr attribute.
-	SetExpr(Expression)
-
-	// IsArithExprContext differentiates from other interfaces.
-	IsArithExprContext()
-}
-
-type ArithExprContext struct {
-	*antlr.BaseParserRuleContext
-	parser antlr.Parser
-	expr   Expression
-	left   IArithExprContext
-	e      ITermContext
-	op     antlr.Token
-	right  ITermContext
-}
-
-func NewEmptyArithExprContext() *ArithExprContext {
-	var p = new(ArithExprContext)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_arithExpr
-	return p
-}
-
-func (*ArithExprContext) IsArithExprContext() {}
-
-func NewArithExprContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ArithExprContext {
-	var p = new(ArithExprContext)
-
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RuneParserRULE_arithExpr
-
-	return p
-}
-
-func (s *ArithExprContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *ArithExprContext) GetOp() antlr.Token { return s.op }
-
-func (s *ArithExprContext) SetOp(v antlr.Token) { s.op = v }
-
-func (s *ArithExprContext) GetLeft() IArithExprContext { return s.left }
-
-func (s *ArithExprContext) GetE() ITermContext { return s.e }
-
-func (s *ArithExprContext) GetRight() ITermContext { return s.right }
-
-func (s *ArithExprContext) SetLeft(v IArithExprContext) { s.left = v }
-
-func (s *ArithExprContext) SetE(v ITermContext) { s.e = v }
-
-func (s *ArithExprContext) SetRight(v ITermContext) { s.right = v }
-
-func (s *ArithExprContext) GetExpr() Expression { return s.expr }
-
-func (s *ArithExprContext) SetExpr(v Expression) { s.expr = v }
-
-func (s *ArithExprContext) Term() ITermContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITermContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ITermContext)
-}
-
-func (s *ArithExprContext) ArithExpr() IArithExprContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IArithExprContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IArithExprContext)
-}
-
-func (s *ArithExprContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *ArithExprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *ArithExprContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterArithExpr(s)
-	}
-}
-
-func (s *ArithExprContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitArithExpr(s)
-	}
-}
-
-func (p *RuneParser) ArithExpr() (localctx IArithExprContext) {
-	return p.arithExpr(0)
-}
-
-func (p *RuneParser) arithExpr(_p int) (localctx IArithExprContext) {
-	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
-	_parentState := p.GetState()
-	localctx = NewArithExprContext(p, p.GetParserRuleContext(), _parentState)
-	var _prevctx IArithExprContext = localctx
-	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
-	_startState := 8
-	p.EnterRecursionRule(localctx, 8, RuneParserRULE_arithExpr, _p)
-	var _la int
-
-	defer func() {
-		p.UnrollRecursionContexts(_parentctx)
-	}()
-
-	defer func() {
-		if err := recover(); err != nil {
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-		}
-	}()
-
-	var _alt int
-
-	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(34)
-
-		var _x = p.term(0)
-
-		localctx.(*ArithExprContext).e = _x
-	}
-	localctx.(*ArithExprContext).expr = localctx.(*ArithExprContext).GetE().GetExpr()
-
-	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(44)
-	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
-
-	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-		if _alt == 1 {
-			if p.GetParseListeners() != nil {
-				p.TriggerExitRuleEvent()
-			}
-			_prevctx = localctx
-			localctx = NewArithExprContext(p, _parentctx, _parentState)
-			localctx.(*ArithExprContext).left = _prevctx
-			p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_arithExpr)
-			p.SetState(37)
-
-			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
-				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
-			}
-			p.SetState(38)
-
-			var _lt = p.GetTokenStream().LT(1)
-
-			localctx.(*ArithExprContext).op = _lt
-
-			_la = p.GetTokenStream().LA(1)
-
-			if !(_la == RuneParserT__1 || _la == RuneParserT__2) {
-				var _ri = p.GetErrorHandler().RecoverInline(p)
-
-				localctx.(*ArithExprContext).op = _ri
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
-			}
-			{
-				p.SetState(39)
-
-				var _x = p.term(0)
-
-				localctx.(*ArithExprContext).right = _x
-			}
-			localctx.(*ArithExprContext).expr = NewBinaryExpression(localctx.(*ArithExprContext).GetLeft().GetExpr(), (func() string {
-				if localctx.(*ArithExprContext).GetOp() == nil {
-					return ""
-				} else {
-					return localctx.(*ArithExprContext).GetOp().GetText()
-				}
-			}()), localctx.(*ArithExprContext).GetRight().GetExpr())
-
-		}
-		p.SetState(46)
-		p.GetErrorHandler().Sync(p)
-		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext())
+		p.SetState(44)
+		p.expression2(0)
 	}
 
 	return localctx
 }
 
-// ITermContext is an interface to support dynamic dispatch.
-type ITermContext interface {
+// IExpression2Context is an interface to support dynamic dispatch.
+type IExpression2Context interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
 
-	// GetOp returns the op token.
-	GetOp() antlr.Token
-
-	// SetOp sets the op token.
-	SetOp(antlr.Token)
-
-	// GetLeft returns the left rule contexts.
-	GetLeft() ITermContext
-
-	// GetE returns the e rule contexts.
-	GetE() IAtomContext
-
-	// GetRight returns the right rule contexts.
-	GetRight() IAtomContext
-
-	// SetLeft sets the left rule contexts.
-	SetLeft(ITermContext)
-
-	// SetE sets the e rule contexts.
-	SetE(IAtomContext)
-
-	// SetRight sets the right rule contexts.
-	SetRight(IAtomContext)
-
-	// GetExpr returns the expr attribute.
-	GetExpr() Expression
-
-	// SetExpr sets the expr attribute.
-	SetExpr(Expression)
-
-	// IsTermContext differentiates from other interfaces.
-	IsTermContext()
+	// IsExpression2Context differentiates from other interfaces.
+	IsExpression2Context()
 }
 
-type TermContext struct {
+type Expression2Context struct {
 	*antlr.BaseParserRuleContext
 	parser antlr.Parser
-	expr   Expression
-	left   ITermContext
-	e      IAtomContext
-	op     antlr.Token
-	right  IAtomContext
 }
 
-func NewEmptyTermContext() *TermContext {
-	var p = new(TermContext)
+func NewEmptyExpression2Context() *Expression2Context {
+	var p = new(Expression2Context)
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_term
+	p.RuleIndex = RuneParserRULE_expression2
 	return p
 }
 
-func (*TermContext) IsTermContext() {}
+func (*Expression2Context) IsExpression2Context() {}
 
-func NewTermContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TermContext {
-	var p = new(TermContext)
+func NewExpression2Context(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Expression2Context {
+	var p = new(Expression2Context)
 
 	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = RuneParserRULE_term
+	p.RuleIndex = RuneParserRULE_expression2
 
 	return p
 }
 
-func (s *TermContext) GetParser() antlr.Parser { return s.parser }
+func (s *Expression2Context) GetParser() antlr.Parser { return s.parser }
 
-func (s *TermContext) GetOp() antlr.Token { return s.op }
-
-func (s *TermContext) SetOp(v antlr.Token) { s.op = v }
-
-func (s *TermContext) GetLeft() ITermContext { return s.left }
-
-func (s *TermContext) GetE() IAtomContext { return s.e }
-
-func (s *TermContext) GetRight() IAtomContext { return s.right }
-
-func (s *TermContext) SetLeft(v ITermContext) { s.left = v }
-
-func (s *TermContext) SetE(v IAtomContext) { s.e = v }
-
-func (s *TermContext) SetRight(v IAtomContext) { s.right = v }
-
-func (s *TermContext) GetExpr() Expression { return s.expr }
-
-func (s *TermContext) SetExpr(v Expression) { s.expr = v }
-
-func (s *TermContext) Atom() IAtomContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IAtomContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IAtomContext)
+func (s *Expression2Context) CopyFrom(ctx *Expression2Context) {
+	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
 }
 
-func (s *TermContext) Term() ITermContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITermContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(ITermContext)
-}
-
-func (s *TermContext) GetRuleContext() antlr.RuleContext {
+func (s *Expression2Context) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *TermContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *Expression2Context) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *TermContext) EnterRule(listener antlr.ParseTreeListener) {
+type LiteralPassthroughContext struct {
+	*Expression2Context
+	value ILiteralContext
+}
+
+func NewLiteralPassthroughContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *LiteralPassthroughContext {
+	var p = new(LiteralPassthroughContext)
+
+	p.Expression2Context = NewEmptyExpression2Context()
+	p.parser = parser
+	p.CopyFrom(ctx.(*Expression2Context))
+
+	return p
+}
+
+func (s *LiteralPassthroughContext) GetValue() ILiteralContext { return s.value }
+
+func (s *LiteralPassthroughContext) SetValue(v ILiteralContext) { s.value = v }
+
+func (s *LiteralPassthroughContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *LiteralPassthroughContext) Literal() ILiteralContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ILiteralContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ILiteralContext)
+}
+
+func (s *LiteralPassthroughContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterTerm(s)
+		listenerT.EnterLiteralPassthrough(s)
 	}
 }
 
-func (s *TermContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *LiteralPassthroughContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitTerm(s)
+		listenerT.ExitLiteralPassthrough(s)
 	}
 }
 
-func (p *RuneParser) Term() (localctx ITermContext) {
-	return p.term(0)
+func (s *LiteralPassthroughContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitLiteralPassthrough(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
 }
 
-func (p *RuneParser) term(_p int) (localctx ITermContext) {
+type BinaryExpressionContext struct {
+	*Expression2Context
+	left  IExpression2Context
+	op    antlr.Token
+	right IExpression2Context
+}
+
+func NewBinaryExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *BinaryExpressionContext {
+	var p = new(BinaryExpressionContext)
+
+	p.Expression2Context = NewEmptyExpression2Context()
+	p.parser = parser
+	p.CopyFrom(ctx.(*Expression2Context))
+
+	return p
+}
+
+func (s *BinaryExpressionContext) GetOp() antlr.Token { return s.op }
+
+func (s *BinaryExpressionContext) SetOp(v antlr.Token) { s.op = v }
+
+func (s *BinaryExpressionContext) GetLeft() IExpression2Context { return s.left }
+
+func (s *BinaryExpressionContext) GetRight() IExpression2Context { return s.right }
+
+func (s *BinaryExpressionContext) SetLeft(v IExpression2Context) { s.left = v }
+
+func (s *BinaryExpressionContext) SetRight(v IExpression2Context) { s.right = v }
+
+func (s *BinaryExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *BinaryExpressionContext) AllExpression2() []IExpression2Context {
+	var ts = s.GetTypedRuleContexts(reflect.TypeOf((*IExpression2Context)(nil)).Elem())
+	var tst = make([]IExpression2Context, len(ts))
+
+	for i, t := range ts {
+		if t != nil {
+			tst[i] = t.(IExpression2Context)
+		}
+	}
+
+	return tst
+}
+
+func (s *BinaryExpressionContext) Expression2(i int) IExpression2Context {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpression2Context)(nil)).Elem(), i)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpression2Context)
+}
+
+func (s *BinaryExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterBinaryExpression(s)
+	}
+}
+
+func (s *BinaryExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitBinaryExpression(s)
+	}
+}
+
+func (s *BinaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitBinaryExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type ExpressionPassthroughContext struct {
+	*Expression2Context
+	value IExpression2Context
+}
+
+func NewExpressionPassthroughContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *ExpressionPassthroughContext {
+	var p = new(ExpressionPassthroughContext)
+
+	p.Expression2Context = NewEmptyExpression2Context()
+	p.parser = parser
+	p.CopyFrom(ctx.(*Expression2Context))
+
+	return p
+}
+
+func (s *ExpressionPassthroughContext) GetValue() IExpression2Context { return s.value }
+
+func (s *ExpressionPassthroughContext) SetValue(v IExpression2Context) { s.value = v }
+
+func (s *ExpressionPassthroughContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *ExpressionPassthroughContext) Expression2() IExpression2Context {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpression2Context)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpression2Context)
+}
+
+func (s *ExpressionPassthroughContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterExpressionPassthrough(s)
+	}
+}
+
+func (s *ExpressionPassthroughContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitExpressionPassthrough(s)
+	}
+}
+
+func (s *ExpressionPassthroughContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitExpressionPassthrough(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type UnaryExpressionContext struct {
+	*Expression2Context
+	op    antlr.Token
+	value IExpression2Context
+}
+
+func NewUnaryExpressionContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *UnaryExpressionContext {
+	var p = new(UnaryExpressionContext)
+
+	p.Expression2Context = NewEmptyExpression2Context()
+	p.parser = parser
+	p.CopyFrom(ctx.(*Expression2Context))
+
+	return p
+}
+
+func (s *UnaryExpressionContext) GetOp() antlr.Token { return s.op }
+
+func (s *UnaryExpressionContext) SetOp(v antlr.Token) { s.op = v }
+
+func (s *UnaryExpressionContext) GetValue() IExpression2Context { return s.value }
+
+func (s *UnaryExpressionContext) SetValue(v IExpression2Context) { s.value = v }
+
+func (s *UnaryExpressionContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *UnaryExpressionContext) Expression2() IExpression2Context {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IExpression2Context)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IExpression2Context)
+}
+
+func (s *UnaryExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterUnaryExpression(s)
+	}
+}
+
+func (s *UnaryExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitUnaryExpression(s)
+	}
+}
+
+func (s *UnaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitUnaryExpression(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) Expression2() (localctx IExpression2Context) {
+	return p.expression2(0)
+}
+
+func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 	var _parentctx antlr.ParserRuleContext = p.GetParserRuleContext()
 	_parentState := p.GetState()
-	localctx = NewTermContext(p, p.GetParserRuleContext(), _parentState)
-	var _prevctx ITermContext = localctx
+	localctx = NewExpression2Context(p, p.GetParserRuleContext(), _parentState)
+	var _prevctx IExpression2Context = localctx
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
 	_startState := 10
-	p.EnterRecursionRule(localctx, 10, RuneParserRULE_term, _p)
+	p.EnterRecursionRule(localctx, 10, RuneParserRULE_expression2, _p)
 	var _la int
 
 	defer func() {
@@ -1034,219 +1167,351 @@ func (p *RuneParser) term(_p int) (localctx ITermContext) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	{
-		p.SetState(48)
-
-		var _x = p.Atom()
-
-		localctx.(*TermContext).e = _x
-	}
-	localctx.(*TermContext).expr = localctx.(*TermContext).GetE().GetExpr()
-
-	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(58)
-	p.GetErrorHandler().Sync(p)
-	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
-
-	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
-		if _alt == 1 {
-			if p.GetParseListeners() != nil {
-				p.TriggerExitRuleEvent()
-			}
-			_prevctx = localctx
-			localctx = NewTermContext(p, _parentctx, _parentState)
-			localctx.(*TermContext).left = _prevctx
-			p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_term)
-			p.SetState(51)
-
-			if !(p.Precpred(p.GetParserRuleContext(), 1)) {
-				panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 1)", ""))
-			}
-			p.SetState(52)
-
-			var _lt = p.GetTokenStream().LT(1)
-
-			localctx.(*TermContext).op = _lt
-
-			_la = p.GetTokenStream().LA(1)
-
-			if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__3)|(1<<RuneParserT__4)|(1<<RuneParserT__5))) != 0) {
-				var _ri = p.GetErrorHandler().RecoverInline(p)
-
-				localctx.(*TermContext).op = _ri
-			} else {
-				p.GetErrorHandler().ReportMatch(p)
-				p.Consume()
-			}
-			{
-				p.SetState(53)
-
-				var _x = p.Atom()
-
-				localctx.(*TermContext).right = _x
-			}
-			localctx.(*TermContext).expr = NewBinaryExpression(localctx.(*TermContext).GetLeft().GetExpr(), (func() string {
-				if localctx.(*TermContext).GetOp() == nil {
-					return ""
-				} else {
-					return localctx.(*TermContext).GetOp().GetText()
-				}
-			}()), localctx.(*TermContext).GetRight().GetExpr())
-
-		}
-		p.SetState(60)
-		p.GetErrorHandler().Sync(p)
-		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 2, p.GetParserRuleContext())
-	}
-
-	return localctx
-}
-
-// IAtomContext is an interface to support dynamic dispatch.
-type IAtomContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// GetVal returns the val token.
-	GetVal() antlr.Token
-
-	// SetVal sets the val token.
-	SetVal(antlr.Token)
-
-	// GetExpr returns the expr attribute.
-	GetExpr() Expression
-
-	// SetExpr sets the expr attribute.
-	SetExpr(Expression)
-
-	// IsAtomContext differentiates from other interfaces.
-	IsAtomContext()
-}
-
-type AtomContext struct {
-	*antlr.BaseParserRuleContext
-	parser antlr.Parser
-	expr   Expression
-	val    antlr.Token
-}
-
-func NewEmptyAtomContext() *AtomContext {
-	var p = new(AtomContext)
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
-	p.RuleIndex = RuneParserRULE_atom
-	return p
-}
-
-func (*AtomContext) IsAtomContext() {}
-
-func NewAtomContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *AtomContext {
-	var p = new(AtomContext)
-
-	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = RuneParserRULE_atom
-
-	return p
-}
-
-func (s *AtomContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *AtomContext) GetVal() antlr.Token { return s.val }
-
-func (s *AtomContext) SetVal(v antlr.Token) { s.val = v }
-
-func (s *AtomContext) GetExpr() Expression { return s.expr }
-
-func (s *AtomContext) SetExpr(v Expression) { s.expr = v }
-
-func (s *AtomContext) INTEGER_LITERAL() antlr.TerminalNode {
-	return s.GetToken(RuneParserINTEGER_LITERAL, 0)
-}
-
-func (s *AtomContext) REAL_LITERAL() antlr.TerminalNode {
-	return s.GetToken(RuneParserREAL_LITERAL, 0)
-}
-
-func (s *AtomContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *AtomContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *AtomContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterAtom(s)
-	}
-}
-
-func (s *AtomContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitAtom(s)
-	}
-}
-
-func (p *RuneParser) Atom() (localctx IAtomContext) {
-	localctx = NewAtomContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, RuneParserRULE_atom)
-
-	defer func() {
-		p.ExitRule()
-	}()
-
-	defer func() {
-		if err := recover(); err != nil {
-			if v, ok := err.(antlr.RecognitionException); ok {
-				localctx.SetException(v)
-				p.GetErrorHandler().ReportError(p, v)
-				p.GetErrorHandler().Recover(p, v)
-			} else {
-				panic(err)
-			}
-		}
-	}()
-
-	p.SetState(65)
+	p.SetState(54)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case RuneParserINTEGER_LITERAL:
+	case RuneParserT__7:
+		localctx = NewExpressionPassthroughContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+
+		{
+			p.SetState(47)
+			p.Match(RuneParserT__7)
+		}
+		{
+			p.SetState(48)
+
+			var _x = p.expression2(0)
+
+			localctx.(*ExpressionPassthroughContext).value = _x
+		}
+		{
+			p.SetState(49)
+			p.Match(RuneParserT__8)
+		}
+
+	case RuneParserT__9:
+		localctx = NewUnaryExpressionContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+			p.SetState(51)
+
+			var _m = p.Match(RuneParserT__9)
+
+			localctx.(*UnaryExpressionContext).op = _m
+		}
+		{
+			p.SetState(52)
+
+			var _x = p.expression2(4)
+
+			localctx.(*UnaryExpressionContext).value = _x
+		}
+
+	case RuneParserINTEGER_LITERAL, RuneParserREAL_LITERAL:
+		localctx = NewLiteralPassthroughContext(p, localctx)
+		p.SetParserRuleContext(localctx)
+		_prevctx = localctx
+		{
+			p.SetState(53)
+
+			var _x = p.Literal()
+
+			localctx.(*LiteralPassthroughContext).value = _x
+		}
+
+	default:
+		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+	}
+	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
+	p.SetState(64)
+	p.GetErrorHandler().Sync(p)
+	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
+
+	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
+		if _alt == 1 {
+			if p.GetParseListeners() != nil {
+				p.TriggerExitRuleEvent()
+			}
+			_prevctx = localctx
+			p.SetState(62)
+			p.GetErrorHandler().Sync(p)
+			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 5, p.GetParserRuleContext()) {
+			case 1:
+				localctx = NewBinaryExpressionContext(p, NewExpression2Context(p, _parentctx, _parentState))
+				localctx.(*BinaryExpressionContext).left = _prevctx
+
+				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
+				p.SetState(56)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 3)) {
+					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 3)", ""))
+				}
+				p.SetState(57)
+
+				var _lt = p.GetTokenStream().LT(1)
+
+				localctx.(*BinaryExpressionContext).op = _lt
+
+				_la = p.GetTokenStream().LA(1)
+
+				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__10)|(1<<RuneParserT__11)|(1<<RuneParserT__12))) != 0) {
+					var _ri = p.GetErrorHandler().RecoverInline(p)
+
+					localctx.(*BinaryExpressionContext).op = _ri
+				} else {
+					p.GetErrorHandler().ReportMatch(p)
+					p.Consume()
+				}
+				{
+					p.SetState(58)
+
+					var _x = p.expression2(4)
+
+					localctx.(*BinaryExpressionContext).right = _x
+				}
+
+			case 2:
+				localctx = NewBinaryExpressionContext(p, NewExpression2Context(p, _parentctx, _parentState))
+				localctx.(*BinaryExpressionContext).left = _prevctx
+
+				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
+				p.SetState(59)
+
+				if !(p.Precpred(p.GetParserRuleContext(), 2)) {
+					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 2)", ""))
+				}
+				p.SetState(60)
+
+				var _lt = p.GetTokenStream().LT(1)
+
+				localctx.(*BinaryExpressionContext).op = _lt
+
+				_la = p.GetTokenStream().LA(1)
+
+				if !(_la == RuneParserT__9 || _la == RuneParserT__13) {
+					var _ri = p.GetErrorHandler().RecoverInline(p)
+
+					localctx.(*BinaryExpressionContext).op = _ri
+				} else {
+					p.GetErrorHandler().ReportMatch(p)
+					p.Consume()
+				}
+				{
+					p.SetState(61)
+
+					var _x = p.expression2(3)
+
+					localctx.(*BinaryExpressionContext).right = _x
+				}
+
+			}
+
+		}
+		p.SetState(66)
+		p.GetErrorHandler().Sync(p)
+		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 6, p.GetParserRuleContext())
+	}
+
+	return localctx
+}
+
+// ILiteralContext is an interface to support dynamic dispatch.
+type ILiteralContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// IsLiteralContext differentiates from other interfaces.
+	IsLiteralContext()
+}
+
+type LiteralContext struct {
+	*antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyLiteralContext() *LiteralContext {
+	var p = new(LiteralContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = RuneParserRULE_literal
+	return p
+}
+
+func (*LiteralContext) IsLiteralContext() {}
+
+func NewLiteralContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *LiteralContext {
+	var p = new(LiteralContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = RuneParserRULE_literal
+
+	return p
+}
+
+func (s *LiteralContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *LiteralContext) CopyFrom(ctx *LiteralContext) {
+	s.BaseParserRuleContext.CopyFrom(ctx.BaseParserRuleContext)
+}
+
+func (s *LiteralContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *LiteralContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type RealLiteralContext struct {
+	*LiteralContext
+	value antlr.Token
+}
+
+func NewRealLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *RealLiteralContext {
+	var p = new(RealLiteralContext)
+
+	p.LiteralContext = NewEmptyLiteralContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*LiteralContext))
+
+	return p
+}
+
+func (s *RealLiteralContext) GetValue() antlr.Token { return s.value }
+
+func (s *RealLiteralContext) SetValue(v antlr.Token) { s.value = v }
+
+func (s *RealLiteralContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *RealLiteralContext) REAL_LITERAL() antlr.TerminalNode {
+	return s.GetToken(RuneParserREAL_LITERAL, 0)
+}
+
+func (s *RealLiteralContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterRealLiteral(s)
+	}
+}
+
+func (s *RealLiteralContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitRealLiteral(s)
+	}
+}
+
+func (s *RealLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitRealLiteral(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+type IntegerLiteralContext struct {
+	*LiteralContext
+	value antlr.Token
+}
+
+func NewIntegerLiteralContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *IntegerLiteralContext {
+	var p = new(IntegerLiteralContext)
+
+	p.LiteralContext = NewEmptyLiteralContext()
+	p.parser = parser
+	p.CopyFrom(ctx.(*LiteralContext))
+
+	return p
+}
+
+func (s *IntegerLiteralContext) GetValue() antlr.Token { return s.value }
+
+func (s *IntegerLiteralContext) SetValue(v antlr.Token) { s.value = v }
+
+func (s *IntegerLiteralContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *IntegerLiteralContext) INTEGER_LITERAL() antlr.TerminalNode {
+	return s.GetToken(RuneParserINTEGER_LITERAL, 0)
+}
+
+func (s *IntegerLiteralContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.EnterIntegerLiteral(s)
+	}
+}
+
+func (s *IntegerLiteralContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(RuneListener); ok {
+		listenerT.ExitIntegerLiteral(s)
+	}
+}
+
+func (s *IntegerLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitIntegerLiteral(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) Literal() (localctx ILiteralContext) {
+	localctx = NewLiteralContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 12, RuneParserRULE_literal)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.SetState(69)
+	p.GetErrorHandler().Sync(p)
+
+	switch p.GetTokenStream().LA(1) {
+	case RuneParserREAL_LITERAL:
+		localctx = NewRealLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(61)
-
-			var _m = p.Match(RuneParserINTEGER_LITERAL)
-
-			localctx.(*AtomContext).val = _m
-		}
-		localctx.(*AtomContext).expr = NewIntegerLiteral((func() string {
-			if localctx.(*AtomContext).GetVal() == nil {
-				return ""
-			} else {
-				return localctx.(*AtomContext).GetVal().GetText()
-			}
-		}()))
-
-	case RuneParserREAL_LITERAL:
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(63)
+			p.SetState(67)
 
 			var _m = p.Match(RuneParserREAL_LITERAL)
 
-			localctx.(*AtomContext).val = _m
+			localctx.(*RealLiteralContext).value = _m
 		}
-		localctx.(*AtomContext).expr = NewRealLiteral((func() string {
-			if localctx.(*AtomContext).GetVal() == nil {
-				return ""
-			} else {
-				return localctx.(*AtomContext).GetVal().GetText()
-			}
-		}()))
+
+	case RuneParserINTEGER_LITERAL:
+		localctx = NewIntegerLiteralContext(p, localctx)
+		p.EnterOuterAlt(localctx, 2)
+		{
+			p.SetState(68)
+
+			var _m = p.Match(RuneParserINTEGER_LITERAL)
+
+			localctx.(*IntegerLiteralContext).value = _m
+		}
 
 	default:
 		panic(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
@@ -1257,39 +1522,25 @@ func (p *RuneParser) Atom() (localctx IAtomContext) {
 
 func (p *RuneParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
-	case 4:
-		var t *ArithExprContext = nil
-		if localctx != nil {
-			t = localctx.(*ArithExprContext)
-		}
-		return p.ArithExpr_Sempred(t, predIndex)
-
 	case 5:
-		var t *TermContext = nil
+		var t *Expression2Context = nil
 		if localctx != nil {
-			t = localctx.(*TermContext)
+			t = localctx.(*Expression2Context)
 		}
-		return p.Term_Sempred(t, predIndex)
+		return p.Expression2_Sempred(t, predIndex)
 
 	default:
 		panic("No predicate with index: " + fmt.Sprint(ruleIndex))
 	}
 }
 
-func (p *RuneParser) ArithExpr_Sempred(localctx antlr.RuleContext, predIndex int) bool {
+func (p *RuneParser) Expression2_Sempred(localctx antlr.RuleContext, predIndex int) bool {
 	switch predIndex {
 	case 0:
-		return p.Precpred(p.GetParserRuleContext(), 1)
+		return p.Precpred(p.GetParserRuleContext(), 3)
 
-	default:
-		panic("No predicate with index: " + fmt.Sprint(predIndex))
-	}
-}
-
-func (p *RuneParser) Term_Sempred(localctx antlr.RuleContext, predIndex int) bool {
-	switch predIndex {
 	case 1:
-		return p.Precpred(p.GetParserRuleContext(), 1)
+		return p.Precpred(p.GetParserRuleContext(), 2)
 
 	default:
 		panic("No predicate with index: " + fmt.Sprint(predIndex))

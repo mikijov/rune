@@ -8,45 +8,69 @@ import "github.com/antlr/antlr4/runtime/Go/antlr"
 type RuneListener interface {
 	antlr.ParseTreeListener
 
-	// EnterModule is called when entering the module production.
-	EnterModule(c *ModuleContext)
+	// EnterProgram is called when entering the program production.
+	EnterProgram(c *ProgramContext)
 
-	// EnterStmt is called when entering the stmt production.
-	EnterStmt(c *StmtContext)
+	// EnterStatement is called when entering the statement production.
+	EnterStatement(c *StatementContext)
 
-	// EnterSimpleStmt is called when entering the simpleStmt production.
-	EnterSimpleStmt(c *SimpleStmtContext)
+	// EnterDeclaration is called when entering the declaration production.
+	EnterDeclaration(c *DeclarationContext)
+
+	// EnterTypeName is called when entering the typeName production.
+	EnterTypeName(c *TypeNameContext)
 
 	// EnterExpression is called when entering the expression production.
 	EnterExpression(c *ExpressionContext)
 
-	// EnterArithExpr is called when entering the arithExpr production.
-	EnterArithExpr(c *ArithExprContext)
+	// EnterLiteralPassthrough is called when entering the LiteralPassthrough production.
+	EnterLiteralPassthrough(c *LiteralPassthroughContext)
 
-	// EnterTerm is called when entering the term production.
-	EnterTerm(c *TermContext)
+	// EnterBinaryExpression is called when entering the BinaryExpression production.
+	EnterBinaryExpression(c *BinaryExpressionContext)
 
-	// EnterAtom is called when entering the atom production.
-	EnterAtom(c *AtomContext)
+	// EnterExpressionPassthrough is called when entering the ExpressionPassthrough production.
+	EnterExpressionPassthrough(c *ExpressionPassthroughContext)
 
-	// ExitModule is called when exiting the module production.
-	ExitModule(c *ModuleContext)
+	// EnterUnaryExpression is called when entering the UnaryExpression production.
+	EnterUnaryExpression(c *UnaryExpressionContext)
 
-	// ExitStmt is called when exiting the stmt production.
-	ExitStmt(c *StmtContext)
+	// EnterRealLiteral is called when entering the RealLiteral production.
+	EnterRealLiteral(c *RealLiteralContext)
 
-	// ExitSimpleStmt is called when exiting the simpleStmt production.
-	ExitSimpleStmt(c *SimpleStmtContext)
+	// EnterIntegerLiteral is called when entering the IntegerLiteral production.
+	EnterIntegerLiteral(c *IntegerLiteralContext)
+
+	// ExitProgram is called when exiting the program production.
+	ExitProgram(c *ProgramContext)
+
+	// ExitStatement is called when exiting the statement production.
+	ExitStatement(c *StatementContext)
+
+	// ExitDeclaration is called when exiting the declaration production.
+	ExitDeclaration(c *DeclarationContext)
+
+	// ExitTypeName is called when exiting the typeName production.
+	ExitTypeName(c *TypeNameContext)
 
 	// ExitExpression is called when exiting the expression production.
 	ExitExpression(c *ExpressionContext)
 
-	// ExitArithExpr is called when exiting the arithExpr production.
-	ExitArithExpr(c *ArithExprContext)
+	// ExitLiteralPassthrough is called when exiting the LiteralPassthrough production.
+	ExitLiteralPassthrough(c *LiteralPassthroughContext)
 
-	// ExitTerm is called when exiting the term production.
-	ExitTerm(c *TermContext)
+	// ExitBinaryExpression is called when exiting the BinaryExpression production.
+	ExitBinaryExpression(c *BinaryExpressionContext)
 
-	// ExitAtom is called when exiting the atom production.
-	ExitAtom(c *AtomContext)
+	// ExitExpressionPassthrough is called when exiting the ExpressionPassthrough production.
+	ExitExpressionPassthrough(c *ExpressionPassthroughContext)
+
+	// ExitUnaryExpression is called when exiting the UnaryExpression production.
+	ExitUnaryExpression(c *UnaryExpressionContext)
+
+	// ExitRealLiteral is called when exiting the RealLiteral production.
+	ExitRealLiteral(c *RealLiteralContext)
+
+	// ExitIntegerLiteral is called when exiting the IntegerLiteral production.
+	ExitIntegerLiteral(c *IntegerLiteralContext)
 }

@@ -21,23 +21,29 @@ func (s *BaseRuneListener) EnterEveryRule(ctx antlr.ParserRuleContext) {}
 // ExitEveryRule is called when any rule is exited.
 func (s *BaseRuneListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-// EnterModule is called when production module is entered.
-func (s *BaseRuneListener) EnterModule(ctx *ModuleContext) {}
+// EnterProgram is called when production program is entered.
+func (s *BaseRuneListener) EnterProgram(ctx *ProgramContext) {}
 
-// ExitModule is called when production module is exited.
-func (s *BaseRuneListener) ExitModule(ctx *ModuleContext) {}
+// ExitProgram is called when production program is exited.
+func (s *BaseRuneListener) ExitProgram(ctx *ProgramContext) {}
 
-// EnterStmt is called when production stmt is entered.
-func (s *BaseRuneListener) EnterStmt(ctx *StmtContext) {}
+// EnterStatement is called when production statement is entered.
+func (s *BaseRuneListener) EnterStatement(ctx *StatementContext) {}
 
-// ExitStmt is called when production stmt is exited.
-func (s *BaseRuneListener) ExitStmt(ctx *StmtContext) {}
+// ExitStatement is called when production statement is exited.
+func (s *BaseRuneListener) ExitStatement(ctx *StatementContext) {}
 
-// EnterSimpleStmt is called when production simpleStmt is entered.
-func (s *BaseRuneListener) EnterSimpleStmt(ctx *SimpleStmtContext) {}
+// EnterDeclaration is called when production declaration is entered.
+func (s *BaseRuneListener) EnterDeclaration(ctx *DeclarationContext) {}
 
-// ExitSimpleStmt is called when production simpleStmt is exited.
-func (s *BaseRuneListener) ExitSimpleStmt(ctx *SimpleStmtContext) {}
+// ExitDeclaration is called when production declaration is exited.
+func (s *BaseRuneListener) ExitDeclaration(ctx *DeclarationContext) {}
+
+// EnterTypeName is called when production typeName is entered.
+func (s *BaseRuneListener) EnterTypeName(ctx *TypeNameContext) {}
+
+// ExitTypeName is called when production typeName is exited.
+func (s *BaseRuneListener) ExitTypeName(ctx *TypeNameContext) {}
 
 // EnterExpression is called when production expression is entered.
 func (s *BaseRuneListener) EnterExpression(ctx *ExpressionContext) {}
@@ -45,20 +51,38 @@ func (s *BaseRuneListener) EnterExpression(ctx *ExpressionContext) {}
 // ExitExpression is called when production expression is exited.
 func (s *BaseRuneListener) ExitExpression(ctx *ExpressionContext) {}
 
-// EnterArithExpr is called when production arithExpr is entered.
-func (s *BaseRuneListener) EnterArithExpr(ctx *ArithExprContext) {}
+// EnterLiteralPassthrough is called when production LiteralPassthrough is entered.
+func (s *BaseRuneListener) EnterLiteralPassthrough(ctx *LiteralPassthroughContext) {}
 
-// ExitArithExpr is called when production arithExpr is exited.
-func (s *BaseRuneListener) ExitArithExpr(ctx *ArithExprContext) {}
+// ExitLiteralPassthrough is called when production LiteralPassthrough is exited.
+func (s *BaseRuneListener) ExitLiteralPassthrough(ctx *LiteralPassthroughContext) {}
 
-// EnterTerm is called when production term is entered.
-func (s *BaseRuneListener) EnterTerm(ctx *TermContext) {}
+// EnterBinaryExpression is called when production BinaryExpression is entered.
+func (s *BaseRuneListener) EnterBinaryExpression(ctx *BinaryExpressionContext) {}
 
-// ExitTerm is called when production term is exited.
-func (s *BaseRuneListener) ExitTerm(ctx *TermContext) {}
+// ExitBinaryExpression is called when production BinaryExpression is exited.
+func (s *BaseRuneListener) ExitBinaryExpression(ctx *BinaryExpressionContext) {}
 
-// EnterAtom is called when production atom is entered.
-func (s *BaseRuneListener) EnterAtom(ctx *AtomContext) {}
+// EnterExpressionPassthrough is called when production ExpressionPassthrough is entered.
+func (s *BaseRuneListener) EnterExpressionPassthrough(ctx *ExpressionPassthroughContext) {}
 
-// ExitAtom is called when production atom is exited.
-func (s *BaseRuneListener) ExitAtom(ctx *AtomContext) {}
+// ExitExpressionPassthrough is called when production ExpressionPassthrough is exited.
+func (s *BaseRuneListener) ExitExpressionPassthrough(ctx *ExpressionPassthroughContext) {}
+
+// EnterUnaryExpression is called when production UnaryExpression is entered.
+func (s *BaseRuneListener) EnterUnaryExpression(ctx *UnaryExpressionContext) {}
+
+// ExitUnaryExpression is called when production UnaryExpression is exited.
+func (s *BaseRuneListener) ExitUnaryExpression(ctx *UnaryExpressionContext) {}
+
+// EnterRealLiteral is called when production RealLiteral is entered.
+func (s *BaseRuneListener) EnterRealLiteral(ctx *RealLiteralContext) {}
+
+// ExitRealLiteral is called when production RealLiteral is exited.
+func (s *BaseRuneListener) ExitRealLiteral(ctx *RealLiteralContext) {}
+
+// EnterIntegerLiteral is called when production IntegerLiteral is entered.
+func (s *BaseRuneListener) EnterIntegerLiteral(ctx *IntegerLiteralContext) {}
+
+// ExitIntegerLiteral is called when production IntegerLiteral is exited.
+func (s *BaseRuneListener) ExitIntegerLiteral(ctx *IntegerLiteralContext) {}
