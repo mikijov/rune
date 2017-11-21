@@ -10,15 +10,13 @@ type Variable struct {
 }
 
 type Scope interface {
-	AddStatement(stmt Statement)
 	Declare(name string, type_ Type) (*Variable, bool)
 	Get(name string) (*Variable, bool)
 }
 
 type scope struct {
-	store      map[string]*Variable
-	statements []Statement
-	outer      Scope
+	store map[string]*Variable
+	outer Scope
 }
 
 func NewScope(outer Scope) Scope {
@@ -26,10 +24,6 @@ func NewScope(outer Scope) Scope {
 		store: make(map[string]*Variable),
 		outer: outer,
 	}
-}
-
-func (s *scope) AddStatement(stmt Statement) {
-	s.statements = append(s.statements, stmt)
 }
 
 func (s *scope) Declare(name string, type_ Type) (*Variable, bool) {
