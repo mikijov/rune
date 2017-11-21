@@ -29,7 +29,7 @@ declaration
     | identifier=IDENTIFIER ':' type_=typeName ('=' value=expression)?
     ;
 typeName
-    : 'int' | 'string' | 'bool'
+    : 'int' | 'real' | 'string' | 'bool'
     // | 'list' | 'map'
     ;
 

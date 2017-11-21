@@ -11,13 +11,14 @@ import (
 	"mikijov/rune-antlr/vm"
 )
 
-func trace(msg string, ctx antlr.ParserRuleContext) {
+func trace(ctx antlr.ParserRuleContext) {
+	return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	// file, line := f.FileLine(pc[0])
 	// fmt.Printf("%s:%d %s\n", file, line, f.Name())
-	fmt.Printf("%s(%s)\n", f.Name(), msg)
+	fmt.Printf("%s(%s)\n", f.Name(), ctx.GetText())
 
 	if ctx != nil {
 		fmt.Printf("%T\n", ctx)
@@ -37,14 +38,18 @@ func trace(msg string, ctx antlr.ParserRuleContext) {
 type MyVisitor struct {
 	*antlr.BaseParseTreeVisitor
 	program vm.Program
+	scope   vm.Scope
 }
 
 func NewMyVisitor() *MyVisitor {
-	return &MyVisitor{program: vm.NewProgram()}
+	return &MyVisitor{
+		program: vm.NewProgram(),
+		scope:   vm.NewScope(nil),
+	}
 }
 
 func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	for _, child := range ctx.GetChildren() {
 		switch child := child.(type) {
@@ -60,11 +65,13 @@ func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 }
 
 func (this *MyVisitor) VisitStatement(ctx *StatementContext) vm.Statement {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
 	case *ExpressionContext:
 		return vm.NewExpressionStatement(this.VisitExpression(child))
+	case *DeclarationContext:
+		return this.VisitDeclaration(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
@@ -87,18 +94,63 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 	}
 }
 
-// func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) interface{} {
-// 	trace()
-// 	return this.VisitChildren(ctx)
-// }
+func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
+	trace(ctx)
 
-// func (this *MyVisitor) VisitTypeName(ctx *TypeNameContext) interface{} {
-// 	trace()
-// 	return this.VisitChildren(ctx)
-// }
+	var type_ vm.Type
+	if ctx.GetType_() != nil {
+		type_ = this.VisitTypeName(ctx.GetType_())
+	}
+
+	var value vm.Expression
+	if ctx.GetValue() != nil {
+		value = this.VisitExpression(ctx.GetValue())
+	}
+
+	if type_ != "" && value != nil {
+		if type_ != value.Type() {
+			panic("type mismatch")
+		}
+	} else if type_ != "" {
+		// already have type, nothing to do
+	} else if value != nil {
+		type_ = value.Type()
+	} else {
+		panic("variable type not provided") // grammar should not allow this
+	}
+
+	_, ok := this.scope.Declare(ctx.GetIdentifier().GetText(), type_)
+	if !ok {
+		panic("variable redeclared")
+	}
+
+	// TODO: this should be an assignment!
+	if value != nil {
+		return vm.NewExpressionStatement(value)
+	} else {
+		return vm.NewExpressionStatement(vm.NewZeroLiteral(type_))
+	}
+}
+
+func (this *MyVisitor) VisitTypeName(ctx ITypeNameContext) vm.Type {
+	trace(ctx)
+
+	switch ctx.GetText() {
+	case "int":
+		return vm.INTEGER
+	case "real":
+		return vm.REAL
+	case "string":
+		return vm.STRING
+	case "bool":
+		return vm.BOOLEAN
+	default:
+		panic("unknown type") // grammar should not allow this
+	}
+}
 
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
 	case *RealLiteralContext:
@@ -111,7 +163,7 @@ func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) v
 }
 
 func (this *MyVisitor) VisitBinaryExpression(ctx *BinaryExpressionContext) vm.Expression {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	left := this.VisitExpression(ctx.left)
 	right := this.VisitExpression(ctx.right)
@@ -130,13 +182,13 @@ func (this *MyVisitor) VisitBinaryExpression(ctx *BinaryExpressionContext) vm.Ex
 // }
 
 func (this *MyVisitor) VisitRealLiteral(ctx *RealLiteralContext) vm.Expression {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	return vm.NewRealLiteral(ctx.GetText())
 }
 
 func (this *MyVisitor) VisitIntegerLiteral(ctx *IntegerLiteralContext) vm.Expression {
-	trace(ctx.GetText(), ctx)
+	trace(ctx)
 
 	return vm.NewIntegerLiteral(ctx.GetText())
 }

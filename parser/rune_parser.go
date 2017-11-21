@@ -22,7 +22,7 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 23, 74, 4,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 24, 74, 4,
 	2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7, 4,
 	8, 9, 8, 3, 2, 7, 2, 18, 10, 2, 12, 2, 14, 2, 21, 11, 2, 3, 2, 3, 2, 3,
 	3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 3, 31, 10, 3, 3, 4, 3, 4, 3, 4, 3,
@@ -30,38 +30,38 @@ var parserATN = []uint16{
 	3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 5, 7, 57, 10,
 	7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 7, 7, 65, 10, 7, 12, 7, 14, 7, 68,
 	11, 7, 3, 8, 3, 8, 5, 8, 72, 10, 8, 3, 8, 2, 3, 12, 9, 2, 4, 6, 8, 10,
-	12, 14, 2, 5, 3, 2, 7, 9, 3, 2, 13, 15, 4, 2, 12, 12, 16, 16, 2, 75, 2,
+	12, 14, 2, 5, 3, 2, 7, 10, 3, 2, 14, 16, 4, 2, 13, 13, 17, 17, 2, 75, 2,
 	19, 3, 2, 2, 2, 4, 30, 3, 2, 2, 2, 6, 42, 3, 2, 2, 2, 8, 44, 3, 2, 2, 2,
 	10, 46, 3, 2, 2, 2, 12, 56, 3, 2, 2, 2, 14, 71, 3, 2, 2, 2, 16, 18, 5,
 	4, 3, 2, 17, 16, 3, 2, 2, 2, 18, 21, 3, 2, 2, 2, 19, 17, 3, 2, 2, 2, 19,
 	20, 3, 2, 2, 2, 20, 22, 3, 2, 2, 2, 21, 19, 3, 2, 2, 2, 22, 23, 7, 2, 2,
 	3, 23, 3, 3, 2, 2, 2, 24, 25, 5, 6, 4, 2, 25, 26, 7, 3, 2, 2, 26, 31, 3,
 	2, 2, 2, 27, 28, 5, 10, 6, 2, 28, 29, 7, 3, 2, 2, 29, 31, 3, 2, 2, 2, 30,
-	24, 3, 2, 2, 2, 30, 27, 3, 2, 2, 2, 31, 5, 3, 2, 2, 2, 32, 33, 7, 20, 2,
-	2, 33, 34, 7, 4, 2, 2, 34, 43, 5, 10, 6, 2, 35, 36, 7, 20, 2, 2, 36, 37,
+	24, 3, 2, 2, 2, 30, 27, 3, 2, 2, 2, 31, 5, 3, 2, 2, 2, 32, 33, 7, 21, 2,
+	2, 33, 34, 7, 4, 2, 2, 34, 43, 5, 10, 6, 2, 35, 36, 7, 21, 2, 2, 36, 37,
 	7, 5, 2, 2, 37, 40, 5, 8, 5, 2, 38, 39, 7, 6, 2, 2, 39, 41, 5, 10, 6, 2,
 	40, 38, 3, 2, 2, 2, 40, 41, 3, 2, 2, 2, 41, 43, 3, 2, 2, 2, 42, 32, 3,
 	2, 2, 2, 42, 35, 3, 2, 2, 2, 43, 7, 3, 2, 2, 2, 44, 45, 9, 2, 2, 2, 45,
 	9, 3, 2, 2, 2, 46, 47, 5, 12, 7, 2, 47, 11, 3, 2, 2, 2, 48, 49, 8, 7, 1,
-	2, 49, 50, 7, 10, 2, 2, 50, 51, 5, 12, 7, 2, 51, 52, 7, 11, 2, 2, 52, 57,
-	3, 2, 2, 2, 53, 54, 7, 12, 2, 2, 54, 57, 5, 12, 7, 6, 55, 57, 5, 14, 8,
+	2, 49, 50, 7, 11, 2, 2, 50, 51, 5, 12, 7, 2, 51, 52, 7, 12, 2, 2, 52, 57,
+	3, 2, 2, 2, 53, 54, 7, 13, 2, 2, 54, 57, 5, 12, 7, 6, 55, 57, 5, 14, 8,
 	2, 56, 48, 3, 2, 2, 2, 56, 53, 3, 2, 2, 2, 56, 55, 3, 2, 2, 2, 57, 66,
 	3, 2, 2, 2, 58, 59, 12, 5, 2, 2, 59, 60, 9, 3, 2, 2, 60, 65, 5, 12, 7,
 	6, 61, 62, 12, 4, 2, 2, 62, 63, 9, 4, 2, 2, 63, 65, 5, 12, 7, 5, 64, 58,
 	3, 2, 2, 2, 64, 61, 3, 2, 2, 2, 65, 68, 3, 2, 2, 2, 66, 64, 3, 2, 2, 2,
 	66, 67, 3, 2, 2, 2, 67, 13, 3, 2, 2, 2, 68, 66, 3, 2, 2, 2, 69, 72, 7,
-	18, 2, 2, 70, 72, 7, 17, 2, 2, 71, 69, 3, 2, 2, 2, 71, 70, 3, 2, 2, 2,
+	19, 2, 2, 70, 72, 7, 18, 2, 2, 71, 69, 3, 2, 2, 2, 71, 70, 3, 2, 2, 2,
 	72, 15, 3, 2, 2, 2, 10, 19, 30, 40, 42, 56, 64, 66, 71,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "';'", "':='", "':'", "'='", "'int'", "'string'", "'bool'", "'('",
-	"')'", "'-'", "'*'", "'/'", "'%'", "'+'",
+	"", "';'", "':='", "':'", "'='", "'int'", "'real'", "'string'", "'bool'",
+	"'('", "')'", "'-'", "'*'", "'/'", "'%'", "'+'",
 }
 var symbolicNames = []string{
-	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "INTEGER_LITERAL",
+	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "INTEGER_LITERAL",
 	"REAL_LITERAL", "BOOLEAN_LITERAL", "IDENTIFIER", "LINENDING", "WHITESPACE",
 	"COMMENT",
 }
@@ -113,13 +113,14 @@ const (
 	RuneParserT__11           = 12
 	RuneParserT__12           = 13
 	RuneParserT__13           = 14
-	RuneParserINTEGER_LITERAL = 15
-	RuneParserREAL_LITERAL    = 16
-	RuneParserBOOLEAN_LITERAL = 17
-	RuneParserIDENTIFIER      = 18
-	RuneParserLINENDING       = 19
-	RuneParserWHITESPACE      = 20
-	RuneParserCOMMENT         = 21
+	RuneParserT__14           = 15
+	RuneParserINTEGER_LITERAL = 16
+	RuneParserREAL_LITERAL    = 17
+	RuneParserBOOLEAN_LITERAL = 18
+	RuneParserIDENTIFIER      = 19
+	RuneParserLINENDING       = 20
+	RuneParserWHITESPACE      = 21
+	RuneParserCOMMENT         = 22
 )
 
 // RuneParser rules.
@@ -254,7 +255,7 @@ func (p *RuneParser) Program() (localctx IProgramContext) {
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__7)|(1<<RuneParserT__9)|(1<<RuneParserINTEGER_LITERAL)|(1<<RuneParserREAL_LITERAL)|(1<<RuneParserIDENTIFIER))) != 0 {
+	for ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__8)|(1<<RuneParserT__10)|(1<<RuneParserINTEGER_LITERAL)|(1<<RuneParserREAL_LITERAL)|(1<<RuneParserIDENTIFIER))) != 0 {
 		{
 			p.SetState(14)
 			p.Statement()
@@ -395,7 +396,7 @@ func (p *RuneParser) Statement() (localctx IStatementContext) {
 			p.Match(RuneParserT__0)
 		}
 
-	case RuneParserT__7, RuneParserT__9, RuneParserINTEGER_LITERAL, RuneParserREAL_LITERAL:
+	case RuneParserT__8, RuneParserT__10, RuneParserINTEGER_LITERAL, RuneParserREAL_LITERAL:
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(25)
@@ -719,7 +720,7 @@ func (p *RuneParser) TypeName() (localctx ITypeNameContext) {
 	p.SetState(42)
 	_la = p.GetTokenStream().LA(1)
 
-	if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__5)|(1<<RuneParserT__6))) != 0) {
+	if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__5)|(1<<RuneParserT__6)|(1<<RuneParserT__7))) != 0) {
 		p.GetErrorHandler().RecoverInline(p)
 	} else {
 		p.GetErrorHandler().ReportMatch(p)
@@ -1171,14 +1172,14 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case RuneParserT__7:
+	case RuneParserT__8:
 		localctx = NewExpressionPassthroughContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 
 		{
 			p.SetState(47)
-			p.Match(RuneParserT__7)
+			p.Match(RuneParserT__8)
 		}
 		{
 			p.SetState(48)
@@ -1189,17 +1190,17 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		}
 		{
 			p.SetState(49)
-			p.Match(RuneParserT__8)
+			p.Match(RuneParserT__9)
 		}
 
-	case RuneParserT__9:
+	case RuneParserT__10:
 		localctx = NewUnaryExpressionContext(p, localctx)
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
 			p.SetState(51)
 
-			var _m = p.Match(RuneParserT__9)
+			var _m = p.Match(RuneParserT__10)
 
 			localctx.(*UnaryExpressionContext).op = _m
 		}
@@ -1258,7 +1259,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__10)|(1<<RuneParserT__11)|(1<<RuneParserT__12))) != 0) {
+				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__11)|(1<<RuneParserT__12)|(1<<RuneParserT__13))) != 0) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*BinaryExpressionContext).op = _ri
@@ -1292,7 +1293,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(_la == RuneParserT__9 || _la == RuneParserT__13) {
+				if !(_la == RuneParserT__10 || _la == RuneParserT__14) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*BinaryExpressionContext).op = _ri

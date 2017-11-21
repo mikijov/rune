@@ -139,6 +139,17 @@ func NewRealLiteral(s string) Expression {
 	return retVal
 }
 
+func NewZeroLiteral(t Type) Expression {
+	switch t {
+	case INTEGER:
+		return &integerLiteral{value: Integer{Value: VmInteger(0)}}
+	case REAL:
+		return &realLiteral{value: Real{Value: VmReal(0.0)}}
+	default:
+		panic("invalid type")
+	}
+}
+
 // expressions
 //////////////
 
