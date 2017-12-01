@@ -96,11 +96,11 @@ func (this *integerLiteral) Type() Type {
 }
 
 func (this *integerLiteral) Value() Object {
-	return &this.value
+	return this.value
 }
 
 func (this *integerLiteral) ToString() string {
-	return fmt.Sprintf("%d", this.value.Value)
+	return fmt.Sprintf("%d", this.value.GetValue())
 }
 
 func NewIntegerLiteral(s string) Expression {
@@ -108,7 +108,7 @@ func NewIntegerLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	var retVal Expression = &integerLiteral{value: Integer{Value: VmInteger(val)}}
+	var retVal Expression = &integerLiteral{value: &integer{value: VmInteger(val)}}
 	fmt.Println(retVal.ToString())
 	return retVal
 }
@@ -122,11 +122,11 @@ func (this *realLiteral) Type() Type {
 }
 
 func (this *realLiteral) Value() Object {
-	return &this.value
+	return this.value
 }
 
 func (this *realLiteral) ToString() string {
-	return fmt.Sprintf("%f", this.value.Value)
+	return fmt.Sprintf("%f", this.value.GetValue())
 }
 
 func NewRealLiteral(s string) Expression {
@@ -134,7 +134,7 @@ func NewRealLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	var retVal Expression = &realLiteral{value: Real{Value: VmReal(val)}}
+	var retVal Expression = &realLiteral{value: &real{value: VmReal(val)}}
 	fmt.Println(retVal.ToString())
 	return retVal
 }
@@ -142,9 +142,9 @@ func NewRealLiteral(s string) Expression {
 func NewZeroLiteral(t Type) Expression {
 	switch t {
 	case INTEGER:
-		return &integerLiteral{value: Integer{Value: VmInteger(0)}}
+		return &integerLiteral{value: &integer{value: VmInteger(0)}}
 	case REAL:
-		return &realLiteral{value: Real{Value: VmReal(0.0)}}
+		return &realLiteral{value: &real{value: VmReal(0.0)}}
 	default:
 		panic("invalid type")
 	}
@@ -165,9 +165,9 @@ func (this *integerAddition) Type() Type {
 }
 
 func (this *integerAddition) Value() Object {
-	left := this.left.Value().(*Integer)
-	right := this.right.Value().(*Integer)
-	return &Integer{left.Value + right.Value}
+	left := this.left.Value().(Integer)
+	right := this.right.Value().(Integer)
+	return &integer{left.GetValue() + right.GetValue()}
 }
 
 func (this *integerAddition) Left() Expression {
@@ -194,9 +194,9 @@ func (this *realAddition) Type() Type {
 }
 
 func (this *realAddition) Value() Object {
-	left := this.left.Value().(*Real)
-	right := this.right.Value().(*Real)
-	return &Real{left.Value + right.Value}
+	left := this.left.Value().(Real)
+	right := this.right.Value().(Real)
+	return &real{left.GetValue() + right.GetValue()}
 }
 
 func (this *realAddition) Left() Expression {
@@ -223,9 +223,9 @@ func (this *integerSubstraction) Type() Type {
 }
 
 func (this *integerSubstraction) Value() Object {
-	left := this.left.Value().(*Integer)
-	right := this.right.Value().(*Integer)
-	return &Integer{left.Value - right.Value}
+	left := this.left.Value().(Integer)
+	right := this.right.Value().(Integer)
+	return &integer{left.GetValue() - right.GetValue()}
 }
 
 func (this *integerSubstraction) Left() Expression {
@@ -252,9 +252,9 @@ func (this *realSubstraction) Type() Type {
 }
 
 func (this *realSubstraction) Value() Object {
-	left := this.left.Value().(*Real)
-	right := this.right.Value().(*Real)
-	return &Real{left.Value - right.Value}
+	left := this.left.Value().(Real)
+	right := this.right.Value().(Real)
+	return &real{left.GetValue() - right.GetValue()}
 }
 
 func (this *realSubstraction) Left() Expression {
@@ -281,9 +281,9 @@ func (this *integerMultiplication) Type() Type {
 }
 
 func (this *integerMultiplication) Value() Object {
-	left := this.left.Value().(*Integer)
-	right := this.right.Value().(*Integer)
-	return &Integer{left.Value * right.Value}
+	left := this.left.Value().(Integer)
+	right := this.right.Value().(Integer)
+	return &integer{left.GetValue() * right.GetValue()}
 }
 
 func (this *integerMultiplication) ToString() string {
@@ -302,9 +302,9 @@ func (this *realMultiplication) Type() Type {
 }
 
 func (this *realMultiplication) Value() Object {
-	left := this.left.Value().(*Real)
-	right := this.right.Value().(*Real)
-	return &Real{left.Value * right.Value}
+	left := this.left.Value().(Real)
+	right := this.right.Value().(Real)
+	return &real{left.GetValue() * right.GetValue()}
 }
 
 func (this *realMultiplication) ToString() string {
@@ -323,9 +323,9 @@ func (this *integerDivision) Type() Type {
 }
 
 func (this *integerDivision) Value() Object {
-	left := this.left.Value().(*Integer)
-	right := this.right.Value().(*Integer)
-	return &Integer{left.Value / right.Value}
+	left := this.left.Value().(Integer)
+	right := this.right.Value().(Integer)
+	return &integer{left.GetValue() / right.GetValue()}
 }
 
 func (this *integerDivision) ToString() string {
@@ -344,9 +344,9 @@ func (this *realDivision) Type() Type {
 }
 
 func (this *realDivision) Value() Object {
-	left := this.left.Value().(*Real)
-	right := this.right.Value().(*Real)
-	return &Real{left.Value / right.Value}
+	left := this.left.Value().(Real)
+	right := this.right.Value().(Real)
+	return &real{left.GetValue() / right.GetValue()}
 }
 
 func (this *realDivision) ToString() string {
@@ -365,9 +365,9 @@ func (this *integerModulo) Type() Type {
 }
 
 func (this *integerModulo) Value() Object {
-	left := this.left.Value().(*Integer)
-	right := this.right.Value().(*Integer)
-	return &Integer{left.Value % right.Value}
+	left := this.left.Value().(Integer)
+	right := this.right.Value().(Integer)
+	return &integer{left.GetValue() % right.GetValue()}
 }
 
 func (this *integerModulo) ToString() string {

@@ -18,33 +18,65 @@ type Object interface {
 	Inspect() string
 }
 
-type Integer struct {
-	Value VmInteger
+type Integer interface {
+	Object
+	GetValue() VmInteger
+	SetValue(value VmInteger)
 }
 
-func (i *Integer) Type() Type      { return INTEGER }
-func (i *Integer) Inspect() string { return fmt.Sprintf("%d", i.Value) }
-
-type Real struct {
-	Value VmReal
+type integer struct {
+	value VmInteger
 }
 
-func (r *Real) Type() Type      { return REAL }
-func (r *Real) Inspect() string { return fmt.Sprintf("%f", r.Value) }
+func (this *integer) Type() Type               { return INTEGER }
+func (this *integer) Inspect() string          { return fmt.Sprintf("%d", this.value) }
+func (this *integer) GetValue() VmInteger      { return this.value }
+func (this *integer) SetValue(value VmInteger) { this.value = value }
 
-type Boolean struct {
-	Value bool
+type Real interface {
+	Object
+	GetValue() VmReal
+	SetValue(value VmReal)
 }
 
-func (b *Boolean) Type() Type      { return BOOLEAN }
-func (b *Boolean) Inspect() string { return fmt.Sprintf("%t", b.Value) }
-
-type String struct {
-	Value string
+type real struct {
+	value VmReal
 }
 
-func (s *String) Type() Type      { return STRING }
-func (s *String) Inspect() string { return s.Value }
+func (this *real) Type() Type            { return REAL }
+func (this *real) Inspect() string       { return fmt.Sprintf("%f", this.value) }
+func (this *real) GetValue() VmReal      { return this.value }
+func (this *real) SetValue(value VmReal) { this.value = value }
+
+type Boolean interface {
+	Object
+	GetValue() bool
+	SetValue(value bool)
+}
+
+type boolean struct {
+	value bool
+}
+
+func (this *boolean) Type() Type          { return BOOLEAN }
+func (this *boolean) Inspect() string     { return fmt.Sprintf("%t", this.value) }
+func (this *boolean) GetValue() bool      { return this.value }
+func (this *boolean) SetValue(value bool) { this.value = value }
+
+type String interface {
+	Object
+	GetValue() string
+	SetValue(value string)
+}
+
+type string_ struct {
+	value string
+}
+
+func (this *string_) Type() Type            { return STRING }
+func (this *string_) Inspect() string       { return this.value }
+func (this *string_) GetValue() string      { return this.value }
+func (this *string_) SetValue(value string) { this.value = value }
 
 // type Function struct {
 // 	Defn FunctionCode
