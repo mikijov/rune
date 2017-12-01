@@ -1,8 +1,14 @@
 package vm
 
-import ()
+import (
+	"fmt"
+)
 
 type Environment interface {
+	Declare(name string, value Object)
+	Set(name string, value Object)
+	Get(name string) Object
+
 	GetInteger(name string) Integer
 	GetReal(name string) Real
 
@@ -20,6 +26,37 @@ func NewEnvironment(outer Environment) Environment {
 		store: make(map[string]Object),
 		outer: outer,
 	}
+}
+
+func (this *environment) Declare(name string, value Object) {
+	_, ok := this.store[name]
+	if ok {
+		panic(fmt.Sprintf("variable redeclared: %s", name))
+	}
+	this.store[name] = value
+}
+
+func (this *environment) Set(name string, value Object) {
+	obj := this.Get(name)
+	if obj == nil {
+		panic(fmt.Sprintf("undeclared variable: %s", name))
+	}
+	switch obj := obj.(type) {
+	case Integer:
+		obj.SetValue(value.(Integer).GetValue())
+	case Real:
+		obj.SetValue(value.(Real).GetValue())
+	default:
+		panic("unknown type")
+	}
+}
+
+func (this *environment) Get(name string) Object {
+	obj, ok := this.store[name]
+	if !ok && this.outer != nil {
+		return this.outer.Get(name)
+	}
+	return obj
 }
 
 func (this *environment) SetInteger(name string, value Integer) {

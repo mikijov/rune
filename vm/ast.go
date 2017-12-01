@@ -7,17 +7,17 @@ import (
 
 type Program interface {
 	AddStatement(s Statement)
-	Execute()
+	Execute(env Environment)
 	ToString() string
 }
 
 type Statement interface {
-	Execute()
+	Execute(env Environment)
 	ToString() string
 }
 
 type Expression interface {
-	Value() Object
+	Execute(env Environment) Object
 	Type() Type
 	ToString() string
 }
@@ -50,9 +50,9 @@ func (this *program) AddStatement(s Statement) {
 	this.statements = append(this.statements, s)
 }
 
-func (this *program) Execute() {
+func (this *program) Execute(env Environment) {
 	for _, stmt := range this.statements {
-		stmt.Execute()
+		stmt.Execute(env)
 	}
 }
 
@@ -75,13 +75,39 @@ func NewExpressionStatement(e Expression) Statement {
 	return &expressionStatement{expression: e}
 }
 
-func (this *expressionStatement) Execute() {
-	value := this.expression.Value()
+func (this *expressionStatement) Execute(env Environment) {
+	value := this.expression.Execute(env)
 	fmt.Printf("Expression (%s): %s\n", value.Type(), value.Inspect())
 }
 
 func (this *expressionStatement) ToString() string {
 	return this.expression.ToString() + ";"
+}
+
+type declarationStatement struct {
+	name       string
+	expression Expression
+}
+
+func NewDeclarationStatement(name string, value Expression) Statement {
+	return &declarationStatement{
+		name:       name,
+		expression: value,
+	}
+}
+
+func (this *declarationStatement) Execute(env Environment) {
+	value := this.expression.Execute(env)
+	env.Declare(this.name, value)
+	fmt.Printf("%s :%s = %s;\n", this.name, value.Type(), value.Inspect())
+}
+
+func (this *declarationStatement) ToString() string {
+	return fmt.Sprintf("%s :%s = %s;",
+		this.name,
+		this.expression.Type(),
+		this.expression.ToString(),
+	)
 }
 
 // literals
@@ -95,7 +121,7 @@ func (this *integerLiteral) Type() Type {
 	return INTEGER
 }
 
-func (this *integerLiteral) Value() Object {
+func (this *integerLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
@@ -121,7 +147,7 @@ func (this *realLiteral) Type() Type {
 	return REAL
 }
 
-func (this *realLiteral) Value() Object {
+func (this *realLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
@@ -164,9 +190,9 @@ func (this *integerAddition) Type() Type {
 	return INTEGER
 }
 
-func (this *integerAddition) Value() Object {
-	left := this.left.Value().(Integer)
-	right := this.right.Value().(Integer)
+func (this *integerAddition) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() + right.GetValue()}
 }
 
@@ -193,9 +219,9 @@ func (this *realAddition) Type() Type {
 	return REAL
 }
 
-func (this *realAddition) Value() Object {
-	left := this.left.Value().(Real)
-	right := this.right.Value().(Real)
+func (this *realAddition) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real)
+	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() + right.GetValue()}
 }
 
@@ -222,9 +248,9 @@ func (this *integerSubstraction) Type() Type {
 	return INTEGER
 }
 
-func (this *integerSubstraction) Value() Object {
-	left := this.left.Value().(Integer)
-	right := this.right.Value().(Integer)
+func (this *integerSubstraction) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() - right.GetValue()}
 }
 
@@ -251,9 +277,9 @@ func (this *realSubstraction) Type() Type {
 	return REAL
 }
 
-func (this *realSubstraction) Value() Object {
-	left := this.left.Value().(Real)
-	right := this.right.Value().(Real)
+func (this *realSubstraction) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real)
+	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() - right.GetValue()}
 }
 
@@ -280,9 +306,9 @@ func (this *integerMultiplication) Type() Type {
 	return INTEGER
 }
 
-func (this *integerMultiplication) Value() Object {
-	left := this.left.Value().(Integer)
-	right := this.right.Value().(Integer)
+func (this *integerMultiplication) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() * right.GetValue()}
 }
 
@@ -301,9 +327,9 @@ func (this *realMultiplication) Type() Type {
 	return REAL
 }
 
-func (this *realMultiplication) Value() Object {
-	left := this.left.Value().(Real)
-	right := this.right.Value().(Real)
+func (this *realMultiplication) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real)
+	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() * right.GetValue()}
 }
 
@@ -322,9 +348,9 @@ func (this *integerDivision) Type() Type {
 	return INTEGER
 }
 
-func (this *integerDivision) Value() Object {
-	left := this.left.Value().(Integer)
-	right := this.right.Value().(Integer)
+func (this *integerDivision) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() / right.GetValue()}
 }
 
@@ -343,9 +369,9 @@ func (this *realDivision) Type() Type {
 	return REAL
 }
 
-func (this *realDivision) Value() Object {
-	left := this.left.Value().(Real)
-	right := this.right.Value().(Real)
+func (this *realDivision) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real)
+	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() / right.GetValue()}
 }
 
@@ -364,9 +390,9 @@ func (this *integerModulo) Type() Type {
 	return INTEGER
 }
 
-func (this *integerModulo) Value() Object {
-	left := this.left.Value().(Integer)
-	right := this.right.Value().(Integer)
+func (this *integerModulo) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() % right.GetValue()}
 }
 

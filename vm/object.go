@@ -5,10 +5,10 @@ import (
 )
 
 const (
-	INTEGER = "Integer"
-	REAL    = "Real"
-	BOOLEAN = "Boolean"
-	STRING  = "String"
+	INTEGER = "int"
+	REAL    = "real"
+	BOOLEAN = "bool"
+	STRING  = "string"
 )
 
 type Type string

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"mikijov/rune-antlr/parser"
+	"mikijov/rune-antlr/vm"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
@@ -41,5 +42,7 @@ func main() {
 	visitor := parser.NewMyVisitor()
 	context := tree.(*parser.ProgramContext)
 	program := visitor.VisitProgram(context)
-	program.Execute()
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
 }

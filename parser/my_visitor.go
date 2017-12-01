@@ -119,16 +119,16 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 		panic("variable type not provided") // grammar should not allow this
 	}
 
-	_, ok := this.scope.Declare(ctx.GetIdentifier().GetText(), type_)
+	name := ctx.GetIdentifier().GetText()
+	_, ok := this.scope.Declare(name, type_)
 	if !ok {
 		panic("variable redeclared")
 	}
 
-	// TODO: this should be an assignment!
 	if value != nil {
-		return vm.NewExpressionStatement(value)
+		return vm.NewDeclarationStatement(name, value)
 	} else {
-		return vm.NewExpressionStatement(vm.NewZeroLiteral(type_))
+		return vm.NewDeclarationStatement(name, vm.NewZeroLiteral(type_))
 	}
 }
 
