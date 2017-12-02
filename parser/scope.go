@@ -3,7 +3,7 @@ package parser
 import (
 	"fmt"
 
-	"mikijov/rune-antlr/vm"
+	"mikijov/rune/vm"
 )
 
 type variable struct {

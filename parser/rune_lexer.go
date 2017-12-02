@@ -10,7 +10,7 @@ import (
 )
 
 import (
-	"mikijov/rune-antlr/vm"
+	"mikijov/rune/vm"
 )
 
 var _ vm.Type // inhibit unused import error

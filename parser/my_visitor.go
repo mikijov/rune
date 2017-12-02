@@ -8,7 +8,7 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
-	"mikijov/rune-antlr/vm"
+	"mikijov/rune/vm"
 )
 
 func trace(ctx antlr.ParserRuleContext) {
