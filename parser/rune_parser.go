@@ -207,18 +207,6 @@ func (s *ProgramContext) ToStringTree(ruleNames []string, recog antlr.Recognizer
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *ProgramContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterProgram(s)
-	}
-}
-
-func (s *ProgramContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitProgram(s)
-	}
-}
-
 func (s *ProgramContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -337,18 +325,6 @@ func (s *StatementContext) GetRuleContext() antlr.RuleContext {
 
 func (s *StatementContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *StatementContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterStatement(s)
-	}
-}
-
-func (s *StatementContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitStatement(s)
-	}
 }
 
 func (s *StatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
@@ -517,18 +493,6 @@ func (s *DeclarationContext) ToStringTree(ruleNames []string, recog antlr.Recogn
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *DeclarationContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterDeclaration(s)
-	}
-}
-
-func (s *DeclarationContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitDeclaration(s)
-	}
-}
-
 func (s *DeclarationContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -673,18 +637,6 @@ func (s *TypeNameContext) ToStringTree(ruleNames []string, recog antlr.Recognize
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *TypeNameContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterTypeName(s)
-	}
-}
-
-func (s *TypeNameContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitTypeName(s)
-	}
-}
-
 func (s *TypeNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -784,18 +736,6 @@ func (s *ExpressionContext) GetRuleContext() antlr.RuleContext {
 
 func (s *ExpressionContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *ExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterExpression(s)
-	}
-}
-
-func (s *ExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitExpression(s)
-	}
 }
 
 func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
@@ -920,18 +860,6 @@ func (s *LiteralPassthroughContext) Literal() ILiteralContext {
 	return t.(ILiteralContext)
 }
 
-func (s *LiteralPassthroughContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterLiteralPassthrough(s)
-	}
-}
-
-func (s *LiteralPassthroughContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitLiteralPassthrough(s)
-	}
-}
-
 func (s *LiteralPassthroughContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -998,18 +926,6 @@ func (s *BinaryExpressionContext) Expression2(i int) IExpression2Context {
 	return t.(IExpression2Context)
 }
 
-func (s *BinaryExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterBinaryExpression(s)
-	}
-}
-
-func (s *BinaryExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitBinaryExpression(s)
-	}
-}
-
 func (s *BinaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -1051,18 +967,6 @@ func (s *ExpressionPassthroughContext) Expression2() IExpression2Context {
 	}
 
 	return t.(IExpression2Context)
-}
-
-func (s *ExpressionPassthroughContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterExpressionPassthrough(s)
-	}
-}
-
-func (s *ExpressionPassthroughContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitExpressionPassthrough(s)
-	}
 }
 
 func (s *ExpressionPassthroughContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
@@ -1111,18 +1015,6 @@ func (s *UnaryExpressionContext) Expression2() IExpression2Context {
 	}
 
 	return t.(IExpression2Context)
-}
-
-func (s *UnaryExpressionContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterUnaryExpression(s)
-	}
-}
-
-func (s *UnaryExpressionContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitUnaryExpression(s)
-	}
 }
 
 func (s *UnaryExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
@@ -1397,18 +1289,6 @@ func (s *RealLiteralContext) REAL_LITERAL() antlr.TerminalNode {
 	return s.GetToken(RuneParserREAL_LITERAL, 0)
 }
 
-func (s *RealLiteralContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterRealLiteral(s)
-	}
-}
-
-func (s *RealLiteralContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitRealLiteral(s)
-	}
-}
-
 func (s *RealLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case RuneVisitor:
@@ -1444,18 +1324,6 @@ func (s *IntegerLiteralContext) GetRuleContext() antlr.RuleContext {
 
 func (s *IntegerLiteralContext) INTEGER_LITERAL() antlr.TerminalNode {
 	return s.GetToken(RuneParserINTEGER_LITERAL, 0)
-}
-
-func (s *IntegerLiteralContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.EnterIntegerLiteral(s)
-	}
-}
-
-func (s *IntegerLiteralContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(RuneListener); ok {
-		listenerT.ExitIntegerLiteral(s)
-	}
 }
 
 func (s *IntegerLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {

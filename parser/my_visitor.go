@@ -38,13 +38,13 @@ func trace(ctx antlr.ParserRuleContext) {
 type MyVisitor struct {
 	*antlr.BaseParseTreeVisitor
 	program vm.Program
-	scope   vm.Scope
+	scope   *scope
 }
 
 func NewMyVisitor() *MyVisitor {
 	return &MyVisitor{
 		program: vm.NewProgram(),
-		scope:   vm.NewScope(nil),
+		scope:   newScope(nil),
 	}
 }
 
@@ -120,7 +120,7 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 	}
 
 	name := ctx.GetIdentifier().GetText()
-	_, ok := this.scope.Declare(name, type_)
+	_, ok := this.scope.declare(name, type_)
 	if !ok {
 		panic("variable redeclared")
 	}

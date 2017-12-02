@@ -40,7 +40,7 @@ type program struct {
 	statements []Statement
 }
 
-func NewProgram() *program {
+func NewProgram() Program {
 	return &program{
 		statements: make([]Statement, 0, 10),
 	}

@@ -11,6 +11,9 @@ const (
 	STRING  = "string"
 )
 
+type VmInteger int64
+type VmReal float64
+
 type Type string
 
 type Object interface {
