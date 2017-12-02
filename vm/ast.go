@@ -67,23 +67,6 @@ func (this *program) ToString() string {
 // statements
 /////////////
 
-type expressionStatement struct {
-	expression Expression
-}
-
-func NewExpressionStatement(e Expression) Statement {
-	return &expressionStatement{expression: e}
-}
-
-func (this *expressionStatement) Execute(env Environment) {
-	value := this.expression.Execute(env)
-	fmt.Printf("Expression (%s): %s\n", value.Type(), value.Inspect())
-}
-
-func (this *expressionStatement) ToString() string {
-	return this.expression.ToString() + ";"
-}
-
 type declarationStatement struct {
 	name       string
 	expression Expression
@@ -110,6 +93,49 @@ func (this *declarationStatement) ToString() string {
 	)
 }
 
+type assignmentStatement struct {
+	name       string
+	expression Expression
+}
+
+func NewAssignmentStatement(name string, value Expression) Statement {
+	return &assignmentStatement{
+		name:       name,
+		expression: value,
+	}
+}
+
+func (this *assignmentStatement) Execute(env Environment) {
+	value := this.expression.Execute(env)
+	env.Set(this.name, value)
+	fmt.Printf("%s = %s;\n", this.name, value.Type(), value.Inspect())
+}
+
+func (this *assignmentStatement) ToString() string {
+	return fmt.Sprintf("%s = %s;",
+		this.name,
+		this.expression.Type(),
+		this.expression.ToString(),
+	)
+}
+
+type expressionStatement struct {
+	expression Expression
+}
+
+func NewExpressionStatement(e Expression) Statement {
+	return &expressionStatement{expression: e}
+}
+
+func (this *expressionStatement) Execute(env Environment) {
+	value := this.expression.Execute(env)
+	fmt.Printf("Expression (%s): %s\n", value.Type(), value.Inspect())
+}
+
+func (this *expressionStatement) ToString() string {
+	return this.expression.ToString() + ";"
+}
+
 // literals
 ///////////
 
@@ -134,9 +160,7 @@ func NewIntegerLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	var retVal Expression = &integerLiteral{value: &integer{value: VmInteger(val)}}
-	fmt.Println(retVal.ToString())
-	return retVal
+	return &integerLiteral{value: &integer{value: VmInteger(val)}}
 }
 
 type realLiteral struct {
@@ -160,9 +184,7 @@ func NewRealLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	var retVal Expression = &realLiteral{value: &real{value: VmReal(val)}}
-	fmt.Println(retVal.ToString())
-	return retVal
+	return &realLiteral{value: &real{value: VmReal(val)}}
 }
 
 func NewZeroLiteral(t Type) Expression {
@@ -452,6 +474,6 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 		panic("unsupported operand")
 	}
 
-	fmt.Println(retVal.ToString())
+	// fmt.Println(retVal.ToString())
 	return retVal
 }

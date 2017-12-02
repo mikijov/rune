@@ -36,9 +36,8 @@ func main() {
 	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
 	tree := p.Program()
-	antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
+	// antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 
-	fmt.Println("Running...")
 	visitor := parser.NewMyVisitor()
 	context := tree.(*parser.ProgramContext)
 	program := visitor.VisitProgram(context)

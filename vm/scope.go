@@ -35,7 +35,7 @@ func (s *scope) Declare(name string, type_ Type) (*Variable, bool) {
 		type_: type_,
 	}
 	s.store[name] = retVal
-	fmt.Printf("%s :%s\n", name, type_)
+	// fmt.Printf("%s :%s\n", name, type_)
 	return retVal, true
 }
 

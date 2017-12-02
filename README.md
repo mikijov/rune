@@ -1,5 +1,10 @@
 # rune
 
+Simple declarations working. Implement assignments and tests.
+
+
+
+
 ```
 console := import("console")
 
