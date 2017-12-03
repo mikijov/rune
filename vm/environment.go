@@ -9,22 +9,59 @@ type Environment interface {
 	Set(name string, value Object)
 	Get(name string) Object
 
+	SetReturnValue(value Object)
+	GetReturnValue() Object
+	SetReturning()
+	IsReturning() bool
+	SetError(msg string)
+	GetError() (failed bool, msg string)
+
 	GetInteger(name string) Integer
 	GetReal(name string) Real
 
 	SetInteger(name string, value Integer)
 	SetReal(name string, value Real)
+
+	getFunctionContext() *functionContext
+}
+
+type functionContext struct {
+	retVal    Object
+	returning bool
+	errorFlag bool
+	errorMsg  string
 }
 
 type environment struct {
-	store map[string]Object
-	outer Environment
+	outer           Environment
+	store           map[string]Object
+	functionContext *functionContext
 }
 
 func NewEnvironment(outer Environment) Environment {
+	var fc *functionContext
+	if outer != nil {
+		fc = outer.getFunctionContext()
+	} else {
+		fc = &functionContext{
+			retVal: Zero(VOID),
+		}
+	}
+
 	return &environment{
-		store: make(map[string]Object),
+		outer:           outer,
+		store:           make(map[string]Object),
+		functionContext: fc,
+	}
+}
+
+func NewFunctionEnvironment(outer Environment, returnType Type) Environment {
+	return &environment{
 		outer: outer,
+		store: make(map[string]Object),
+		functionContext: &functionContext{
+			retVal: Zero(returnType),
+		},
 	}
 }
 
@@ -41,14 +78,7 @@ func (this *environment) Set(name string, value Object) {
 	if obj == nil {
 		panic(fmt.Sprintf("undeclared variable: %s", name))
 	}
-	switch obj := obj.(type) {
-	case Integer:
-		obj.SetValue(value.(Integer).GetValue())
-	case Real:
-		obj.SetValue(value.(Real).GetValue())
-	default:
-		panic("unknown type")
-	}
+	Assign(obj, value)
 }
 
 func (this *environment) Get(name string) Object {
@@ -57,6 +87,39 @@ func (this *environment) Get(name string) Object {
 		return this.outer.Get(name)
 	}
 	return obj
+}
+
+func (this *environment) getFunctionContext() *functionContext {
+	if this != nil {
+		return this.functionContext
+	} else {
+		return nil
+	}
+}
+
+func (this *environment) SetReturnValue(value Object) {
+	Assign(this.functionContext.retVal, value)
+}
+
+func (this *environment) GetReturnValue() Object {
+	return this.functionContext.retVal
+}
+
+func (this *environment) SetReturning() {
+	this.functionContext.returning = true
+}
+
+func (this *environment) IsReturning() bool {
+	return this.functionContext.returning || this.functionContext.errorFlag
+}
+
+func (this *environment) SetError(msg string) {
+	this.functionContext.errorFlag = true
+	this.functionContext.errorMsg = msg
+}
+
+func (this *environment) GetError() (failed bool, msg string) {
+	return this.functionContext.errorFlag, this.functionContext.errorMsg
 }
 
 func (this *environment) SetInteger(name string, value Integer) {

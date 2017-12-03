@@ -24,6 +24,22 @@ func (v *BaseRuneVisitor) VisitTypeName(ctx *TypeNameContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitFunction(ctx *FunctionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitParamDecl(ctx *ParamDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitCombinedParam(ctx *CombinedParamContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitScope(ctx *ScopeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -41,6 +57,10 @@ func (v *BaseRuneVisitor) VisitExpressionPassthrough(ctx *ExpressionPassthroughC
 }
 
 func (v *BaseRuneVisitor) VisitUnaryExpression(ctx *UnaryExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitVariableExpression(ctx *VariableExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

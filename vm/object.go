@@ -5,6 +5,7 @@ import (
 )
 
 const (
+	VOID    = "void"
 	INTEGER = "int"
 	REAL    = "real"
 	BOOLEAN = "bool"
@@ -20,6 +21,40 @@ type Object interface {
 	Type() Type
 	Inspect() string
 }
+
+func Zero(type_ Type) Object {
+	switch type_ {
+	case INTEGER:
+		return &integer{value: VmInteger(0)}
+	case REAL:
+		return &real{value: VmReal(0.0)}
+	case STRING:
+		return &string_{value: ""}
+	case BOOLEAN:
+		return &boolean{value: false}
+	case VOID:
+		return &void{}
+	default:
+		panic("invalid type")
+	}
+}
+
+func Assign(dest, src Object) {
+	switch dest := dest.(type) {
+	case Integer:
+		dest.SetValue(src.(Integer).GetValue())
+	case Real:
+		dest.SetValue(src.(Real).GetValue())
+	default:
+		panic("unknown type")
+	}
+}
+
+type void struct {
+}
+
+func (this *void) Type() Type      { return VOID }
+func (this *void) Inspect() string { return VOID }
 
 type Integer interface {
 	Object

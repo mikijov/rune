@@ -3,7 +3,7 @@ grammar Rune;
 // put imports here
 @header {
 import (
-    "mikijov/rune-antlr/vm"
+    "mikijov/rune/vm"
 )
 
 var _ vm.Type // inhibit unused import error
@@ -21,6 +21,7 @@ program
 
 statement
     : declaration ';'
+    | function
     | expression ';'
     ;
 
@@ -33,7 +34,21 @@ typeName
     // | 'list' | 'map'
     ;
 
-expression: expression2 ;
+function
+    : 'func' identifier=IDENTIFIER params=paramDecl (':' returnType=typeName)? body=scope
+    ;
+paramDecl
+    : '(' (paramGroup+=combinedParam (',' paramGroup+=combinedParam)*)? ')'
+    ;
+combinedParam
+    : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName
+    ;
+scope
+    : '{' statement* '}'
+    ;
+
+expression: expression2
+    ;
 
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
@@ -41,6 +56,7 @@ expression2
     | left=expression2 op=('*'|'/'|'%') right=expression2 # BinaryExpression
     | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
     | value=literal # LiteralPassthrough
+    | name=IDENTIFIER # VariableExpression
     ;
 
 literal

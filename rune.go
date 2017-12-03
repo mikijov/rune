@@ -14,6 +14,10 @@ func NewRuneErrorListener() *runeErrorListener {
 	return new(runeErrorListener)
 }
 
+func (this *runeErrorListener) Error(line, column int, msg string) {
+	this.messages = append(this.messages, fmt.Sprintf("%d:%d: %s", line, column, msg))
+}
+
 func (this *runeErrorListener) SyntaxError(recognizer antlr.Recognizer, offendingSymbol interface{}, line, column int, msg string, e antlr.RecognitionException) {
 	this.messages = append(this.messages, fmt.Sprintf("%d:%d: %s", line, column, msg))
 }
@@ -28,7 +32,4 @@ func (this *runeErrorListener) ReportAttemptingFullContext(recognizer antlr.Pars
 
 func (this *runeErrorListener) ReportContextSensitivity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex, prediction int, configs antlr.ATNConfigSet) {
 	this.messages = append(this.messages, "CONTEXT SENSITIVITY")
-}
-
-type Rune interface {
 }

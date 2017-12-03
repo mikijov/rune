@@ -26,6 +26,18 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#typeName.
 	VisitTypeName(ctx *TypeNameContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#function.
+	VisitFunction(ctx *FunctionContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#paramDecl.
+	VisitParamDecl(ctx *ParamDeclContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#combinedParam.
+	VisitCombinedParam(ctx *CombinedParamContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#scope.
+	VisitScope(ctx *ScopeContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
 
@@ -40,6 +52,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#UnaryExpression.
 	VisitUnaryExpression(ctx *UnaryExpressionContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#VariableExpression.
+	VisitVariableExpression(ctx *VariableExpressionContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#RealLiteral.
 	VisitRealLiteral(ctx *RealLiteralContext) interface{}

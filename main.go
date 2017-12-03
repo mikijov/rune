@@ -35,7 +35,7 @@ func main() {
 	}
 
 	// convert from parser AST to VM AST
-	visitor := parser.NewMyVisitor()
+	visitor := parser.NewMyVisitor(errors)
 	context := tree.(*parser.ProgramContext)
 	program := visitor.VisitProgram(context)
 	// program is the compiled code

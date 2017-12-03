@@ -42,7 +42,7 @@ type program struct {
 
 func NewProgram() Program {
 	return &program{
-		statements: make([]Statement, 0, 10),
+		statements: make([]Statement, 0, 5),
 	}
 }
 
@@ -53,6 +53,9 @@ func (this *program) AddStatement(s Statement) {
 func (this *program) Execute(env Environment) {
 	for _, stmt := range this.statements {
 		stmt.Execute(env)
+		if env.IsReturning() {
+			return
+		}
 	}
 }
 
@@ -91,6 +94,125 @@ func (this *declarationStatement) ToString() string {
 		this.expression.Type(),
 		this.expression.ToString(),
 	)
+}
+
+// type Parameter interface {
+// 	GetName() string
+// 	GetType() Type
+// }
+
+type parameter struct {
+	// Parameter
+	name  string
+	type_ Type
+}
+
+// func NewParameter(name string, type_ Type) Parameter {
+// 	return &parameter{
+// 		name:  name,
+// 		type_: type_,
+// 	}
+// }
+
+func (this *parameter) GetName() string {
+	return this.name
+}
+
+func (this *parameter) GetType() Type {
+	return this.type_
+}
+
+type FunctionStatement interface {
+	Statement
+	AddParameter(name string, type_ Type)
+	SetBody(s ScopeStatement)
+}
+
+type functionStatement struct {
+	name       string
+	params     []*parameter
+	returnType Type
+	body       ScopeStatement
+}
+
+func NewFunctionStatement(name string, returnType Type) FunctionStatement {
+	return &functionStatement{
+		name:       name,
+		params:     make([]*parameter, 0, 5),
+		returnType: returnType,
+	}
+}
+
+func (this *functionStatement) AddParameter(name string, type_ Type) {
+	this.params = append(this.params, &parameter{name, type_})
+}
+
+func (this *functionStatement) SetBody(body ScopeStatement) {
+	this.body = body
+}
+
+func (this *functionStatement) Execute(env Environment) {
+	env = NewFunctionEnvironment(env, this.returnType)
+	this.body.Execute(env)
+}
+
+func (this *functionStatement) ToString() string {
+	params := ""
+	for _, param := range this.params {
+		if len(params) > 0 {
+			params += ", "
+		}
+		params += param.name + " :" + string(param.type_)
+	}
+
+	if this.returnType != VOID {
+		return fmt.Sprintf("func %s(%s) :%s;", this.name, params, this.returnType)
+	} else {
+		return fmt.Sprintf("func %s(%s);", this.name, params)
+	}
+}
+
+type ScopeStatement interface {
+	Statement
+	AddStatement(s Statement)
+}
+
+type scopeStatement struct {
+	statements []Statement
+}
+
+func NewScopeStatement() ScopeStatement {
+	return &scopeStatement{
+		statements: make([]Statement, 0, 5),
+	}
+}
+
+func (this *scopeStatement) AddStatement(s Statement) {
+	this.statements = append(this.statements, s)
+}
+
+func (this *scopeStatement) Execute(env Environment) {
+	env = NewEnvironment(env)
+	for _, stmt := range this.statements {
+		stmt.Execute(env)
+		if env.IsReturning() {
+			return
+		}
+	}
+}
+
+func (this *scopeStatement) ToString() string {
+	if len(this.statements) == 0 {
+		return "{}"
+	}
+
+	retVal := "{ "
+	for _, stmt := range this.statements {
+		retVal += stmt.ToString()
+	}
+	retVal += " }"
+
+	return retVal
 }
 
 type assignmentStatement struct {
@@ -134,6 +256,33 @@ func (this *expressionStatement) Execute(env Environment) {
 
 func (this *expressionStatement) ToString() string {
 	return this.expression.ToString() + ";"
+}
+
+// atoms
+////////
+
+type variableReference struct {
+	name  string
+	type_ Type
+}
+
+func (this *variableReference) Type() Type {
+	return this.type_
+}
+
+func (this *variableReference) Execute(env Environment) Object {
+	return env.Get(this.name)
+}
+
+func (this *variableReference) ToString() string {
+	return this.name
+}
+
+func NewVariableReference(name string, type_ Type) Expression {
+	return &variableReference{
+		name:  name,
+		type_: type_,
+	}
 }
 
 // literals

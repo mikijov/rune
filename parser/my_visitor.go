@@ -11,8 +11,12 @@ import (
 	"mikijov/rune/vm"
 )
 
+type ErrorListener interface {
+	Error(line, col int, msg string)
+}
+
 func trace(ctx antlr.ParserRuleContext) {
-	return
+	// return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -37,12 +41,15 @@ func trace(ctx antlr.ParserRuleContext) {
 
 type MyVisitor struct {
 	*antlr.BaseParseTreeVisitor
-	program vm.Program
-	scope   *scope
+	errors          ErrorListener
+	program         vm.Program
+	scope           *scope
+	currentFunction vm.FunctionStatement
 }
 
-func NewMyVisitor() *MyVisitor {
+func NewMyVisitor(errors ErrorListener) *MyVisitor {
 	return &MyVisitor{
+		errors:  errors,
 		program: vm.NewProgram(),
 		scope:   newScope(nil),
 	}
@@ -72,6 +79,8 @@ func (this *MyVisitor) VisitStatement(ctx *StatementContext) vm.Statement {
 		return vm.NewExpressionStatement(this.VisitExpression(child))
 	case *DeclarationContext:
 		return this.VisitDeclaration(child)
+	case *FunctionContext:
+		return this.VisitFunction(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
@@ -89,6 +98,8 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 		return this.VisitRealLiteral(ctx)
 	case *IntegerLiteralContext:
 		return this.VisitIntegerLiteral(ctx)
+	case *VariableExpressionContext:
+		return this.VisitVariableExpression(ctx)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx))
 	}
@@ -132,6 +143,49 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 	}
 }
 
+func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
+	trace(ctx)
+
+	name := ctx.GetIdentifier().GetText()
+
+	var returnType vm.Type = vm.VOID
+	if ctx.GetReturnType() != nil {
+		returnType = this.VisitTypeName(ctx.GetReturnType())
+	}
+
+	oldFunction := this.currentFunction
+	defer func() { this.currentFunction = oldFunction }()
+	this.currentFunction = vm.NewFunctionStatement(name, returnType)
+
+	oldScope := this.scope
+	defer func() { this.scope = oldScope }()
+	this.scope = newScope(this.scope)
+
+	this.VisitParams(ctx.GetParams())
+
+	this.currentFunction.SetBody(this.VisitScope(ctx.GetBody()))
+
+	return this.currentFunction
+}
+
+func (this *MyVisitor) VisitParams(ctx IParamDeclContext) {
+	trace(ctx)
+
+	for _, child := range ctx.GetParamGroup() {
+		this.VisitCombinedParam(child)
+	}
+}
+
+func (this *MyVisitor) VisitCombinedParam(ctx ICombinedParamContext) {
+	trace(ctx)
+
+	returnType := this.VisitTypeName(ctx.GetParamType())
+
+	for _, name := range ctx.GetNames() {
+		this.currentFunction.AddParameter(name.GetText(), returnType)
+	}
+}
+
 func (this *MyVisitor) VisitTypeName(ctx ITypeNameContext) vm.Type {
 	trace(ctx)
 
@@ -147,6 +201,21 @@ func (this *MyVisitor) VisitTypeName(ctx ITypeNameContext) vm.Type {
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
+}
+
+func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
+	trace(ctx)
+
+	scope := vm.NewScopeStatement()
+	for _, child := range ctx.GetChildren() {
+		switch child := child.(type) {
+		case *StatementContext:
+			scope.AddStatement(this.VisitStatement(child))
+		default:
+			panic(fmt.Sprintf("unknown type: %T\n", child))
+		}
+	}
+	return scope
 }
 
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
@@ -191,4 +260,17 @@ func (this *MyVisitor) VisitIntegerLiteral(ctx *IntegerLiteralContext) vm.Expres
 	trace(ctx)
 
 	return vm.NewIntegerLiteral(ctx.GetText())
+}
+
+func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) vm.Expression {
+	trace(ctx)
+
+	token := ctx.GetName()
+	name := token.GetText()
+	variable, declared := this.scope.get(name)
+	if !declared {
+		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared variable")
+	}
+
+	return vm.NewVariableReference(name, variable.type_)
 }
