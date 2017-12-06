@@ -27,19 +27,17 @@ func main() {
 	tree := p.Program()
 	// antlr.ParseTreeWalkerDefault.Walk(NewTreeShapeListener(), tree)
 
+	visitor := parser.NewMyVisitor(errors)
+	context := tree.(*parser.ProgramContext)
+	program := visitor.VisitProgram(context)
+
 	// check for errors
 	if len(errors.messages) > 0 {
 		for _, msg := range errors.messages {
 			fmt.Println(msg)
 		}
+	} else {
+		env := vm.NewEnvironment(nil)
+		program.Execute(env)
 	}
-
-	// convert from parser AST to VM AST
-	visitor := parser.NewMyVisitor(errors)
-	context := tree.(*parser.ProgramContext)
-	program := visitor.VisitProgram(context)
-	// program is the compiled code
-
-	env := vm.NewEnvironment(nil)
-	program.Execute(env)
 }

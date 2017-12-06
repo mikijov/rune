@@ -96,23 +96,10 @@ func (this *declarationStatement) ToString() string {
 	)
 }
 
-// type Parameter interface {
-// 	GetName() string
-// 	GetType() Type
-// }
-
 type parameter struct {
-	// Parameter
 	name  string
 	type_ Type
 }
-
-// func NewParameter(name string, type_ Type) Parameter {
-// 	return &parameter{
-// 		name:  name,
-// 		type_: type_,
-// 	}
-// }
 
 func (this *parameter) GetName() string {
 	return this.name
@@ -122,41 +109,60 @@ func (this *parameter) GetType() Type {
 	return this.type_
 }
 
-type FunctionStatement interface {
+type FunctionDeclaration interface {
 	Statement
 	AddParameter(name string, type_ Type)
+	getParameters() []*parameter
 	SetBody(s ScopeStatement)
+	GetBody() ScopeStatement
+	GetType() Type
 }
 
-type functionStatement struct {
+type functionDeclaration struct {
 	name       string
 	params     []*parameter
 	returnType Type
 	body       ScopeStatement
 }
 
-func NewFunctionStatement(name string, returnType Type) FunctionStatement {
-	return &functionStatement{
+func NewFunctionStatement(name string, returnType Type) FunctionDeclaration {
+	return &functionDeclaration{
 		name:       name,
 		params:     make([]*parameter, 0, 5),
 		returnType: returnType,
 	}
 }
 
-func (this *functionStatement) AddParameter(name string, type_ Type) {
+func (this *functionDeclaration) AddParameter(name string, type_ Type) {
 	this.params = append(this.params, &parameter{name, type_})
 }
 
-func (this *functionStatement) SetBody(body ScopeStatement) {
+func (this *functionDeclaration) getParameters() []*parameter {
+	return this.params
+}
+
+func (this *functionDeclaration) SetBody(body ScopeStatement) {
 	this.body = body
 }
 
-func (this *functionStatement) Execute(env Environment) {
-	env = NewFunctionEnvironment(env, this.returnType)
-	this.body.Execute(env)
+func (this *functionDeclaration) GetBody() ScopeStatement {
+	return this.body
 }
 
-func (this *functionStatement) ToString() string {
+func (this *functionDeclaration) GetType() Type {
+	paramTypes := make([]Type, 0, len(this.params))
+	for _, param := range this.params {
+		paramTypes = append(paramTypes, param.GetType())
+	}
+
+	return GetFunctionType(paramTypes, this.returnType)
+}
+
+func (this *functionDeclaration) Execute(env Environment) {
+	env.Declare(this.name, &function{this})
+}
+
+func (this *functionDeclaration) ToString() string {
 	params := ""
 	for _, param := range this.params {
 		if len(params) > 0 {
@@ -192,7 +198,10 @@ func (this *scopeStatement) AddStatement(s Statement) {
 }
 
 func (this *scopeStatement) Execute(env Environment) {
+	// TODO: Need new env for nested scopes, but this creates needless scope
+	// for function calls. Can I avoid this?
 	env = NewEnvironment(env)
+
 	for _, stmt := range this.statements {
 		stmt.Execute(env)
 		if env.IsReturning() {
@@ -282,6 +291,49 @@ func NewVariableReference(name string, type_ Type) Expression {
 	return &variableReference{
 		name:  name,
 		type_: type_,
+	}
+}
+
+type functionCall struct {
+	Expression
+	name       string
+	params     []Expression
+	returnType Type
+}
+
+func (this *functionCall) Type() Type {
+	return this.returnType
+}
+
+func (this *functionCall) Execute(env Environment) Object {
+	fn := env.Get(this.name).(Function).GetValue()
+	paramDefs := fn.getParameters()
+
+	funcEnv := NewFunctionEnvironment(env, this.returnType)
+	for i, param := range this.params {
+		val := param.Execute(env)
+		funcEnv.Declare(paramDefs[i].GetName(), val)
+	}
+
+	fn.GetBody().Execute(funcEnv)
+
+	failed, msg := funcEnv.GetError()
+	if failed {
+		env.SetError(msg)
+	}
+
+	return funcEnv.GetReturnValue()
+}
+
+func (this *functionCall) ToString() string {
+	return this.name
+}
+
+func NewFunctionCall(name string, params []Expression, returnType Type) Expression {
+	return &functionCall{
+		name:       name,
+		params:     params,
+		returnType: returnType,
 	}
 }
 

@@ -56,6 +56,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#VariableExpression.
 	VisitVariableExpression(ctx *VariableExpressionContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#FunctionCall.
+	VisitFunctionCall(ctx *FunctionCallContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#RealLiteral.
 	VisitRealLiteral(ctx *RealLiteralContext) interface{}
 

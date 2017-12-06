@@ -16,7 +16,7 @@ type ErrorListener interface {
 }
 
 func trace(ctx antlr.ParserRuleContext) {
-	// return
+	return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -44,7 +44,7 @@ type MyVisitor struct {
 	errors          ErrorListener
 	program         vm.Program
 	scope           *scope
-	currentFunction vm.FunctionStatement
+	currentFunction vm.FunctionDeclaration
 }
 
 func NewMyVisitor(errors ErrorListener) *MyVisitor {
@@ -58,20 +58,14 @@ func NewMyVisitor(errors ErrorListener) *MyVisitor {
 func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 	trace(ctx)
 
-	for _, child := range ctx.GetChildren() {
-		switch child := child.(type) {
-		case *StatementContext:
-			this.program.AddStatement(this.VisitStatement(child))
-		case *antlr.TerminalNodeImpl:
-			// do nothing
-		default:
-			fmt.Println(fmt.Sprintf("unknown type: %T\n", child))
-		}
+	for _, stmt := range ctx.GetStatements() {
+		this.program.AddStatement(this.VisitStatement(stmt))
 	}
+
 	return this.program
 }
 
-func (this *MyVisitor) VisitStatement(ctx *StatementContext) vm.Statement {
+func (this *MyVisitor) VisitStatement(ctx IStatementContext) vm.Statement {
 	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
@@ -100,6 +94,8 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 		return this.VisitIntegerLiteral(ctx)
 	case *VariableExpressionContext:
 		return this.VisitVariableExpression(ctx)
+	case *FunctionCallContext:
+		return this.VisitFunctionCall(ctx)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx))
 	}
@@ -165,6 +161,9 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	this.currentFunction.SetBody(this.VisitScope(ctx.GetBody()))
 
+	this.scope = oldScope // need to manually set it so that the declaration is made in proper scope
+	this.scope.declare(name, this.currentFunction.GetType())
+
 	return this.currentFunction
 }
 
@@ -207,14 +206,10 @@ func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
 	trace(ctx)
 
 	scope := vm.NewScopeStatement()
-	for _, child := range ctx.GetChildren() {
-		switch child := child.(type) {
-		case *StatementContext:
-			scope.AddStatement(this.VisitStatement(child))
-		default:
-			panic(fmt.Sprintf("unknown type: %T\n", child))
-		}
+	for _, stmt := range ctx.GetStatements() {
+		scope.AddStatement(this.VisitStatement(stmt))
 	}
+
 	return scope
 }
 
@@ -273,4 +268,37 @@ func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) v
 	}
 
 	return vm.NewVariableReference(name, variable.type_)
+}
+
+func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression {
+	trace(ctx)
+
+	token := ctx.GetName()
+	name := token.GetText()
+	variable, declared := this.scope.get(name)
+	var returnType vm.Type
+	if !declared {
+		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared function")
+		returnType = vm.VOID
+	} else {
+		returnType = vm.GetFunctionReturnType(variable.type_)
+	}
+
+	params := make([]vm.Expression, 0, len(ctx.GetParams()))
+	paramTypes := make([]vm.Type, 0, len(ctx.GetParams()))
+	for _, ectx := range ctx.GetParams() {
+		expression := this.VisitExpression(ectx)
+		params = append(params, expression)
+		paramTypes = append(paramTypes, expression.Type())
+	}
+
+	callType := vm.GetFunctionType(paramTypes, returnType)
+
+	if declared && callType != variable.type_ {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("function parameter mismatch\nExpected: %s\n     Got: %s", variable.type_, callType))
+	}
+
+	return vm.NewFunctionCall(name, params, returnType)
 }

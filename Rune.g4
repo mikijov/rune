@@ -16,7 +16,7 @@ var _ vm.Type // inhibit unused import error
 /* tokens { EOF } */
 
 program
-    : statement* EOF
+    : statements+=statement* EOF
     ;
 
 statement
@@ -44,7 +44,7 @@ combinedParam
     : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName
     ;
 scope
-    : '{' statement* '}'
+    : '{' statements+=statement* '}'
     ;
 
 expression: expression2
@@ -57,6 +57,7 @@ expression2
     | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
     | value=literal # LiteralPassthrough
     | name=IDENTIFIER # VariableExpression
+    | name=IDENTIFIER '(' (params+=expression (',' params+=expression)*)? ')' # FunctionCall
     ;
 
 literal

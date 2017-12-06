@@ -64,6 +64,10 @@ func (v *BaseRuneVisitor) VisitVariableExpression(ctx *VariableExpressionContext
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitFunctionCall(ctx *FunctionCallContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitRealLiteral(ctx *RealLiteralContext) interface{} {
 	return v.VisitChildren(ctx)
 }

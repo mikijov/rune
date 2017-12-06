@@ -4,19 +4,6 @@ import (
 	"fmt"
 )
 
-const (
-	VOID    = "void"
-	INTEGER = "int"
-	REAL    = "real"
-	BOOLEAN = "bool"
-	STRING  = "string"
-)
-
-type VmInteger int64
-type VmReal float64
-
-type Type string
-
 type Object interface {
 	Type() Type
 	Inspect() string
@@ -116,36 +103,17 @@ func (this *string_) Inspect() string       { return this.value }
 func (this *string_) GetValue() string      { return this.value }
 func (this *string_) SetValue(value string) { this.value = value }
 
-// type Function struct {
-// 	Defn FunctionCode
-// }
-//
-// func (f *Function) Type() string    { return FUNCTION }
-// func (f *Function) Inspect() string { return f.String() }
+type Function interface {
+	Object
+	GetValue() FunctionDeclaration
+	SetValue(value FunctionDeclaration)
+}
 
-// type Builtin struct {
-// 	Fn BuiltinFunction
-// }
-//
-// func (b *Builtin) Type() string    { return BUILTIN }
-// func (b *Builtin) Inspect() string { return "builtin function" }
+type function struct {
+	value FunctionDeclaration
+}
 
-// type Array struct {
-// 	Elements []Object
-// }
-//
-// func (ao *Array) Type() string { return ARRAY }
-// func (ao *Array) Inspect() string {
-// 	var out bytes.Buffer
-//
-// 	elements := []string{}
-// 	for _, e := range ao.Elements {
-// 		elements = append(elements, e.Inspect())
-// 	}
-//
-// 	out.WriteString("[")
-// 	out.WriteString(strings.Join(elements, ", "))
-// 	out.WriteString("]")
-//
-// 	return out.String()
-// }
+func (this *function) Type() Type                         { return this.value.GetType() }
+func (this *function) Inspect() string                    { return "func" }
+func (this *function) GetValue() FunctionDeclaration      { return this.value }
+func (this *function) SetValue(value FunctionDeclaration) { this.value = value }
