@@ -40,6 +40,10 @@ func (v *BaseRuneVisitor) VisitScope(ctx *ScopeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitReturnStatement(ctx *ReturnStatementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }

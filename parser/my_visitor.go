@@ -75,6 +75,8 @@ func (this *MyVisitor) VisitStatement(ctx IStatementContext) vm.Statement {
 		return this.VisitDeclaration(child)
 	case *FunctionContext:
 		return this.VisitFunction(child)
+	case *ReturnStatementContext:
+		return this.VisitReturnStatement(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
@@ -211,6 +213,31 @@ func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
 	}
 
 	return scope
+}
+
+func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Statement {
+	trace(ctx)
+
+	var retVal vm.Expression
+	if ctx.GetRetVal() != nil {
+		retVal = this.VisitExpression(ctx.GetRetVal())
+	}
+
+	if this.currentFunction == nil {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			"return statement outside function declaration")
+	} else {
+		declType := vm.GetFunctionReturnType(this.currentFunction.GetType())
+		if declType != retVal.Type() {
+			token := ctx.GetRetVal().GetStart()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("return value mismatch\nExpected: %s\n     Got: %s",
+					declType, retVal.Type()))
+		}
+	}
+
+	return vm.NewReturnStatement(retVal)
 }
 
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {

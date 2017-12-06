@@ -224,6 +224,32 @@ func (this *scopeStatement) ToString() string {
 	return retVal
 }
 
+type returnStatement struct {
+	value Expression
+}
+
+func NewReturnStatement(retVal Expression) Statement {
+	return &returnStatement{
+		value: retVal,
+	}
+}
+
+func (this *returnStatement) Execute(env Environment) {
+	if this.value != nil {
+		env.SetReturnValue(this.value.Execute(env))
+	}
+
+	env.SetReturning()
+}
+
+func (this *returnStatement) ToString() string {
+	if this.value != nil {
+		return "return " + this.value.ToString() + ";"
+	} else {
+		return "return;"
+	}
+}
+
 type assignmentStatement struct {
 	name       string
 	expression Expression
@@ -260,7 +286,7 @@ func NewExpressionStatement(e Expression) Statement {
 
 func (this *expressionStatement) Execute(env Environment) {
 	value := this.expression.Execute(env)
-	fmt.Printf("Expression (%s): %s\n", value.Type(), value.Inspect())
+	fmt.Printf("%s :%s = %s\n", this.ToString(), value.Type(), value.Inspect())
 }
 
 func (this *expressionStatement) ToString() string {
@@ -326,7 +352,20 @@ func (this *functionCall) Execute(env Environment) Object {
 }
 
 func (this *functionCall) ToString() string {
-	return this.name
+	retVal := this.name + "("
+
+	first := true
+	for _, param := range this.params {
+		if first {
+			first = false
+		} else {
+			retVal += ", "
+		}
+		retVal += param.ToString()
+	}
+	retVal += ")"
+
+	return retVal
 }
 
 func NewFunctionCall(name string, params []Expression, returnType Type) Expression {

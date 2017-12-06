@@ -38,6 +38,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#scope.
 	VisitScope(ctx *ScopeContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#returnStatement.
+	VisitReturnStatement(ctx *ReturnStatementContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
 

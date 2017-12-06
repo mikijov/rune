@@ -22,6 +22,7 @@ program
 statement
     : declaration ';'
     | function
+    | returnStatement ';'
     | expression ';'
     ;
 
@@ -45,6 +46,10 @@ combinedParam
     ;
 scope
     : '{' statements+=statement* '}'
+    ;
+
+returnStatement
+    : 'return' (retVal=expression)?
     ;
 
 expression: expression2
