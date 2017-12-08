@@ -114,6 +114,6 @@ type function struct {
 }
 
 func (this *function) Type() Type                         { return this.value.GetType() }
-func (this *function) Inspect() string                    { return "func" }
+func (this *function) Inspect() string                    { return this.value.ToString() }
 func (this *function) GetValue() FunctionDeclaration      { return this.value }
 func (this *function) SetValue(value FunctionDeclaration) { this.value = value }

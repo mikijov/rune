@@ -1,10 +1,8 @@
 # rune
 
-- Complete functions. Implement return types and calls. Executing funcitons
-does the wrong thing now, i.e. does not declare and there is no way to pass
-parameters.
+## backlog
 
-# syntax
+## syntax
 
 ```
 console := import("console")

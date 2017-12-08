@@ -44,6 +44,10 @@ func (v *BaseRuneVisitor) VisitReturnStatement(ctx *ReturnStatementContext) inte
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitIfStatement(ctx *IfStatementContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -77,5 +81,9 @@ func (v *BaseRuneVisitor) VisitRealLiteral(ctx *RealLiteralContext) interface{} 
 }
 
 func (v *BaseRuneVisitor) VisitIntegerLiteral(ctx *IntegerLiteralContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitBooleanLiteral(ctx *BooleanLiteralContext) interface{} {
 	return v.VisitChildren(ctx)
 }

@@ -23,6 +23,7 @@ statement
     : declaration ';'
     | function
     | returnStatement ';'
+    | ifStatement
     | expression ';'
     ;
 
@@ -52,12 +53,23 @@ returnStatement
     : 'return' (retVal=expression)?
     ;
 
+ifStatement
+    : 'if' conditions+=expression effects+=scope
+            ('else' 'if' conditions+=expression effects+=scope)*
+            ('else' alternative=scope)?
+    ;
+
 expression: expression2
     ;
 
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | op='-' value=expression2 # UnaryExpression
+    | left=expression2 op='or' right=expression2 # BinaryExpression
+    | left=expression2 op='and' right=expression2 # BinaryExpression
+    | left=expression2 op='|' right=expression2 # BinaryExpression
+    | left=expression2 op='^' right=expression2 # BinaryExpression
+    | left=expression2 op='&' right=expression2 # BinaryExpression
     | left=expression2 op=('*'|'/'|'%') right=expression2 # BinaryExpression
     | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
     | value=literal # LiteralPassthrough
@@ -68,6 +80,7 @@ expression2
 literal
     : value=REAL_LITERAL # RealLiteral
     | value=INTEGER_LITERAL # IntegerLiteral
+    | value=BOOLEAN_LITERAL # BooleanLiteral
     ;
 
 INTEGER_LITERAL: [0-9]+ ;

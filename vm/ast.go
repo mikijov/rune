@@ -250,6 +250,47 @@ func (this *returnStatement) ToString() string {
 	}
 }
 
+type IfStatement interface {
+	Statement
+	SetAlternative(alternative Statement)
+}
+
+type ifStatement struct {
+	condition   Expression
+	effect      Statement
+	alternative Statement
+}
+
+func NewIfStatement(condition Expression, effect, alternative Statement) IfStatement {
+	return &ifStatement{
+		condition:   condition,
+		effect:      effect,
+		alternative: alternative,
+	}
+}
+
+func (this *ifStatement) SetAlternative(alternative Statement) {
+	this.alternative = alternative
+}
+
+func (this *ifStatement) Execute(env Environment) {
+	flag := this.condition.Execute(env).(Boolean).GetValue()
+
+	if flag {
+		this.effect.Execute(env)
+	} else if this.alternative != nil {
+		this.alternative.Execute(env)
+	}
+}
+
+func (this *ifStatement) ToString() string {
+	retVal := "if " + this.condition.ToString() + " " + this.effect.ToString()
+	if this.alternative != nil {
+		retVal += " else " + this.alternative.ToString()
+	}
+	return retVal
+}
+
 type assignmentStatement struct {
 	name       string
 	expression Expression
@@ -384,7 +425,7 @@ type integerLiteral struct {
 }
 
 func (this *integerLiteral) Type() Type {
-	return INTEGER
+	return this.value.Type()
 }
 
 func (this *integerLiteral) Execute(env Environment) Object {
@@ -408,7 +449,7 @@ type realLiteral struct {
 }
 
 func (this *realLiteral) Type() Type {
-	return REAL
+	return this.value.Type()
 }
 
 func (this *realLiteral) Execute(env Environment) Object {
@@ -427,12 +468,40 @@ func NewRealLiteral(s string) Expression {
 	return &realLiteral{value: &real{value: VmReal(val)}}
 }
 
+type booleanLiteral struct {
+	value Boolean
+}
+
+func (this *booleanLiteral) Type() Type {
+	return this.value.Type()
+}
+
+func (this *booleanLiteral) Execute(env Environment) Object {
+	return this.value
+}
+
+func (this *booleanLiteral) ToString() string {
+	return fmt.Sprintf("%f", this.value.GetValue())
+}
+
+func NewBooleanLiteral(s string) Expression {
+	if s == "true" {
+		return &booleanLiteral{value: &boolean{value: true}}
+	} else if s == "false" {
+		return &booleanLiteral{value: &boolean{value: false}}
+	} else {
+		panic("unexpected boolean value")
+	}
+}
+
 func NewZeroLiteral(t Type) Expression {
 	switch t {
 	case INTEGER:
 		return &integerLiteral{value: &integer{value: VmInteger(0)}}
 	case REAL:
 		return &realLiteral{value: &real{value: VmReal(0.0)}}
+	case BOOLEAN:
+		return &booleanLiteral{value: &boolean{value: false}}
 	default:
 		panic("invalid type")
 	}
@@ -662,6 +731,117 @@ func (this *integerModulo) ToString() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "%", this.right.ToString())
 }
 
+// |
+
+type integerOr struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerOr) Type() Type {
+	return INTEGER
+}
+
+func (this *integerOr) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
+	return &integer{left.GetValue() | right.GetValue()}
+}
+
+func (this *integerOr) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "|", this.right.ToString())
+}
+
+// ^
+
+type integerXor struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerXor) Type() Type {
+	return INTEGER
+}
+
+func (this *integerXor) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
+	return &integer{left.GetValue() ^ right.GetValue()}
+}
+
+func (this *integerXor) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "^", this.right.ToString())
+}
+
+// &
+
+type integerAnd struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerAnd) Type() Type {
+	return INTEGER
+}
+
+func (this *integerAnd) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer)
+	right := this.right.Execute(env).(Integer)
+	return &integer{left.GetValue() & right.GetValue()}
+}
+
+func (this *integerAnd) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "&", this.right.ToString())
+}
+
+// or
+
+type booleanOr struct {
+	left  Expression
+	right Expression
+}
+
+func (this *booleanOr) Type() Type {
+	return BOOLEAN
+}
+
+func (this *booleanOr) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Boolean).GetValue()
+	if left {
+		return &boolean{true}
+	}
+	right := this.right.Execute(env).(Boolean).GetValue()
+	return &boolean{right}
+}
+
+func (this *booleanOr) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " or ", this.right.ToString())
+}
+
+// and
+
+type booleanAnd struct {
+	left  Expression
+	right Expression
+}
+
+func (this *booleanAnd) Type() Type {
+	return BOOLEAN
+}
+
+func (this *booleanAnd) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Boolean).GetValue()
+	if !left {
+		return &boolean{false}
+	}
+	right := this.right.Execute(env).(Boolean).GetValue()
+	return &boolean{right}
+}
+
+func (this *booleanAnd) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " and ", this.right.ToString())
+}
+
 func NewBinaryExpression(left Expression, op string, right Expression) Expression {
 	lType := left.Type()
 	rType := right.Type()
@@ -707,6 +887,36 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 	case "%":
 		if lType == INTEGER {
 			retVal = &integerModulo{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "|":
+		if lType == INTEGER {
+			retVal = &integerOr{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "^":
+		if lType == INTEGER {
+			retVal = &integerXor{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "&":
+		if lType == INTEGER {
+			retVal = &integerAnd{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "or":
+		if lType == BOOLEAN {
+			retVal = &booleanOr{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "and":
+		if lType == BOOLEAN {
+			retVal = &booleanAnd{left, right}
 		} else {
 			panic("unsupported type")
 		}

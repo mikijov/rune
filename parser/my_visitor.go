@@ -16,7 +16,7 @@ type ErrorListener interface {
 }
 
 func trace(ctx antlr.ParserRuleContext) {
-	return
+	// return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -77,6 +77,8 @@ func (this *MyVisitor) VisitStatement(ctx IStatementContext) vm.Statement {
 		return this.VisitFunction(child)
 	case *ReturnStatementContext:
 		return this.VisitReturnStatement(child)
+	case *IfStatementContext:
+		return this.VisitIfStatement(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
@@ -94,6 +96,8 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 		return this.VisitRealLiteral(ctx)
 	case *IntegerLiteralContext:
 		return this.VisitIntegerLiteral(ctx)
+	case *BooleanLiteralContext:
+		return this.VisitBooleanLiteral(ctx)
 	case *VariableExpressionContext:
 		return this.VisitVariableExpression(ctx)
 	case *FunctionCallContext:
@@ -240,6 +244,42 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 	return vm.NewReturnStatement(retVal)
 }
 
+func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
+	trace(ctx)
+
+	conditions := ctx.GetConditions()
+	effects := ctx.GetEffects()
+
+	var retVal vm.IfStatement
+	var current vm.IfStatement
+
+	for i, condCtx := range conditions {
+		condition := this.VisitExpression(condCtx)
+		if condition.Type() != vm.BOOLEAN {
+			token := condCtx.GetStart()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				"if condition must be a boolean expression, but it is "+string(condition.Type()))
+		}
+
+		effect := this.VisitScope(effects[i])
+
+		if retVal == nil {
+			retVal = vm.NewIfStatement(condition, effect, nil)
+			current = retVal
+		} else {
+			nestedIf := vm.NewIfStatement(condition, effect, nil)
+			current.SetAlternative(nestedIf)
+			current = nestedIf
+		}
+	}
+
+	if ctx.GetAlternative() != nil {
+		current.SetAlternative(this.VisitScope(ctx.GetAlternative()))
+	}
+
+	return retVal
+}
+
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
 	trace(ctx)
 
@@ -248,6 +288,8 @@ func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) v
 		return this.VisitRealLiteral(child)
 	case *IntegerLiteralContext:
 		return this.VisitIntegerLiteral(child)
+	case *BooleanLiteralContext:
+		return this.VisitBooleanLiteral(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
@@ -262,16 +304,6 @@ func (this *MyVisitor) VisitBinaryExpression(ctx *BinaryExpressionContext) vm.Ex
 	return vm.NewBinaryExpression(left, ctx.op.GetText(), right)
 }
 
-// func (this *MyVisitor) VisitExpressionPassthrough(ctx *ExpressionPassthroughContext) interface{} {
-// 	trace()
-// 	return this.VisitChildren(ctx)
-// }
-
-// func (this *MyVisitor) VisitUnaryExpression(ctx *UnaryExpressionContext) interface{} {
-// 	trace()
-// 	return this.VisitChildren(ctx)
-// }
-
 func (this *MyVisitor) VisitRealLiteral(ctx *RealLiteralContext) vm.Expression {
 	trace(ctx)
 
@@ -282,6 +314,12 @@ func (this *MyVisitor) VisitIntegerLiteral(ctx *IntegerLiteralContext) vm.Expres
 	trace(ctx)
 
 	return vm.NewIntegerLiteral(ctx.GetText())
+}
+
+func (this *MyVisitor) VisitBooleanLiteral(ctx *BooleanLiteralContext) vm.Expression {
+	trace(ctx)
+
+	return vm.NewBooleanLiteral(ctx.GetText())
 }
 
 func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) vm.Expression {
