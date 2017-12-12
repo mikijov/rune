@@ -22,7 +22,7 @@ type Environment interface {
 	SetInteger(name string, value Integer)
 	SetReal(name string, value Real)
 
-	getFunctionContext() *functionContext
+	// getFunctionContext() *functionContext
 }
 
 type functionContext struct {
@@ -41,7 +41,7 @@ type environment struct {
 func NewEnvironment(outer Environment) Environment {
 	var fc *functionContext
 	if outer != nil {
-		fc = outer.getFunctionContext()
+		fc = outer.(*environment).functionContext
 	} else {
 		fc = &functionContext{
 			retVal: Zero(VOID),
@@ -89,13 +89,13 @@ func (this *environment) Get(name string) Object {
 	return obj
 }
 
-func (this *environment) getFunctionContext() *functionContext {
-	if this != nil {
-		return this.functionContext
-	} else {
-		return nil
-	}
-}
+// func (this *environment) getFunctionContext() *functionContext {
+// 	if this != nil {
+// 		return this.functionContext
+// 	} else {
+// 		return nil
+// 	}
+// }
 
 func (this *environment) SetReturnValue(value Object) {
 	Assign(this.functionContext.retVal, value)

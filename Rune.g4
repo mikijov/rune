@@ -21,10 +21,11 @@ program
 
 statement
     : declaration ';'
-    | function
     | returnStatement ';'
-    | ifStatement
     | expression ';'
+    | function
+    | ifStatement
+    | loop
     ;
 
 declaration
@@ -59,14 +60,19 @@ ifStatement
             ('else' alternative=scope)?
     ;
 
+loop: 'loop' (kind=('while'|'until') condition=expression)? body=scope
+    ;
+
 expression: expression2
     ;
 
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | op='-' value=expression2 # UnaryExpression
+    | left=IDENTIFIER op=assignmentOp right=expression2 # Assignment
     | left=expression2 op='or' right=expression2 # BinaryExpression
     | left=expression2 op='and' right=expression2 # BinaryExpression
+    | left=expression2 op=('<'|'>'|'=='|'>='|'<='|'!=') right=expression2 # BinaryExpression
     | left=expression2 op='|' right=expression2 # BinaryExpression
     | left=expression2 op='^' right=expression2 # BinaryExpression
     | left=expression2 op='&' right=expression2 # BinaryExpression
@@ -77,6 +83,10 @@ expression2
     | name=IDENTIFIER '(' (params+=expression (',' params+=expression)*)? ')' # FunctionCall
     ;
 
+assignmentOp
+    /* : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=' */
+    : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^='
+    ;
 literal
     : value=REAL_LITERAL # RealLiteral
     | value=INTEGER_LITERAL # IntegerLiteral

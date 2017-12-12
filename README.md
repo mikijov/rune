@@ -2,6 +2,12 @@
 
 ## backlog
 
+- loops
+- external functions
+- arrays
+- maps
+- lambda's
+
 ## syntax
 
 ```

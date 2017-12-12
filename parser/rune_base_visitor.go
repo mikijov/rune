@@ -48,7 +48,15 @@ func (v *BaseRuneVisitor) VisitIfStatement(ctx *IfStatementContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitLoop(ctx *LoopContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitExpression(ctx *ExpressionContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitAssignment(ctx *AssignmentContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -73,6 +81,10 @@ func (v *BaseRuneVisitor) VisitVariableExpression(ctx *VariableExpressionContext
 }
 
 func (v *BaseRuneVisitor) VisitFunctionCall(ctx *FunctionCallContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

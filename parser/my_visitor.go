@@ -73,6 +73,8 @@ func (this *MyVisitor) VisitStatement(ctx IStatementContext) vm.Statement {
 		return vm.NewExpressionStatement(this.VisitExpression(child))
 	case *DeclarationContext:
 		return this.VisitDeclaration(child)
+	case *LoopContext:
+		return this.VisitLoop(child)
 	case *FunctionContext:
 		return this.VisitFunction(child)
 	case *ReturnStatementContext:
@@ -90,6 +92,8 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 		return this.VisitExpression(ctx.GetChild(0))
 	case *BinaryExpressionContext:
 		return this.VisitBinaryExpression(ctx)
+	case *AssignmentContext:
+		return this.VisitAssignment(ctx)
 	case *LiteralPassthroughContext:
 		return this.VisitLiteralPassthrough(ctx)
 	case *RealLiteralContext:
@@ -223,8 +227,12 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 	trace(ctx)
 
 	var retVal vm.Expression
+	var retType vm.Type
 	if ctx.GetRetVal() != nil {
 		retVal = this.VisitExpression(ctx.GetRetVal())
+		retType = retVal.Type()
+	} else {
+		retType = vm.VOID
 	}
 
 	if this.currentFunction == nil {
@@ -233,7 +241,18 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 			"return statement outside function declaration")
 	} else {
 		declType := vm.GetFunctionReturnType(this.currentFunction.GetType())
-		if declType != retVal.Type() {
+
+		if declType == vm.VOID {
+			if retType != vm.VOID {
+				token := ctx.GetRetVal().GetStart()
+				this.errors.Error(token.GetLine(), token.GetColumn(),
+					fmt.Sprintf("return value provided when none expected"))
+			}
+		} else if retType == vm.VOID {
+			token := ctx.GetRetVal().GetStart()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("return value required"))
+		} else if declType != retVal.Type() {
 			token := ctx.GetRetVal().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
 				fmt.Sprintf("return value mismatch\nExpected: %s\n     Got: %s",
@@ -280,6 +299,38 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 	return retVal
 }
 
+func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
+	trace(ctx)
+
+	var label string
+	// if ctx.GetLabel() != nil {
+	// 	label = ctx.GetLabel().GetText()
+	// }
+
+	var condition vm.Expression
+	var isWhile bool
+	if ctx.GetCondition() != nil {
+		isWhile = ctx.GetKind().GetText() == "while"
+
+		condition = this.VisitExpression(ctx.GetCondition())
+		if condition.Type() != vm.BOOLEAN {
+			token := ctx.GetCondition().GetStart()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				"if condition must be a boolean expression, but it is "+string(condition.Type()))
+		}
+	}
+
+	body := this.VisitScope(ctx.GetBody())
+
+	if condition == nil {
+		return vm.NewLoopStatement(label, body)
+	} else if isWhile {
+		return vm.NewWhileStatement(label, condition, body)
+	} else {
+		return vm.NewUntilStatement(label, condition, body)
+	}
+}
+
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
 	trace(ctx)
 
@@ -292,6 +343,56 @@ func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) v
 		return this.VisitBooleanLiteral(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
+	}
+}
+
+func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
+	trace(ctx)
+
+	name := ctx.GetLeft().GetText()
+	variable, declared := this.scope.get(name)
+	if !declared {
+		token := ctx.GetLeft()
+		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared variable")
+	}
+
+	right := this.VisitExpression(ctx.right)
+
+	if variable.type_ != right.Type() {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", variable.type_, right.Type()))
+	}
+
+	switch ctx.GetOp().GetText() {
+	case "=":
+		return vm.NewAssignment(name, right)
+	case "+=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "+", right))
+	case "-=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "-", right))
+	case "*=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "*", right))
+	case "/=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "/", right))
+	case "%=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "%", right))
+	case "&=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "&", right))
+	case "|=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "|", right))
+	case "^=":
+		return vm.NewAssignment(name,
+			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "^", right))
+	default:
+		panic("unknown operation")
 	}
 }
 

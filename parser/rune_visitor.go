@@ -44,8 +44,14 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#ifStatement.
 	VisitIfStatement(ctx *IfStatementContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#loop.
+	VisitLoop(ctx *LoopContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#Assignment.
+	VisitAssignment(ctx *AssignmentContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#LiteralPassthrough.
 	VisitLiteralPassthrough(ctx *LiteralPassthroughContext) interface{}
@@ -64,6 +70,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#FunctionCall.
 	VisitFunctionCall(ctx *FunctionCallContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#assignmentOp.
+	VisitAssignmentOp(ctx *AssignmentOpContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#RealLiteral.
 	VisitRealLiteral(ctx *RealLiteralContext) interface{}

@@ -291,30 +291,98 @@ func (this *ifStatement) ToString() string {
 	return retVal
 }
 
-type assignmentStatement struct {
-	name       string
-	expression Expression
+type loopStatement struct {
+	label string
+	body  Statement
 }
 
-func NewAssignmentStatement(name string, value Expression) Statement {
-	return &assignmentStatement{
-		name:       name,
-		expression: value,
+func NewLoopStatement(label string, body Statement) Statement {
+	return &loopStatement{
+		label: label,
+		body:  body,
 	}
 }
 
-func (this *assignmentStatement) Execute(env Environment) {
-	value := this.expression.Execute(env)
-	env.Set(this.name, value)
-	fmt.Printf("%s = %s;\n", this.name, value.Type(), value.Inspect())
+func (this *loopStatement) Execute(env Environment) {
+	for {
+		this.body.Execute(env)
+		if env.IsReturning() {
+			return
+		}
+	}
 }
 
-func (this *assignmentStatement) ToString() string {
-	return fmt.Sprintf("%s = %s;",
-		this.name,
-		this.expression.Type(),
-		this.expression.ToString(),
-	)
+func (this *loopStatement) ToString() string {
+	retVal := "loop "
+	if this.label != "" {
+		retVal += this.label + " "
+	}
+	retVal += this.body.ToString()
+	return retVal
+}
+
+type whileStatement struct {
+	label     string
+	condition Expression
+	body      Statement
+}
+
+func NewWhileStatement(label string, condition Expression, body Statement) Statement {
+	return &whileStatement{
+		label:     label,
+		condition: condition,
+		body:      body,
+	}
+}
+
+func (this *whileStatement) Execute(env Environment) {
+	for this.condition.Execute(env).(Boolean).GetValue() {
+		this.body.Execute(env)
+		if env.IsReturning() {
+			return
+		}
+	}
+}
+
+func (this *whileStatement) ToString() string {
+	retVal := "loop "
+	if this.label != "" {
+		retVal += this.label + " "
+	}
+	retVal += "while " + this.body.ToString()
+	return retVal
+}
+
+type untilStatement struct {
+	label     string
+	condition Expression
+	body      Statement
+}
+
+func NewUntilStatement(label string, condition Expression, body Statement) Statement {
+	return &untilStatement{
+		label:     label,
+		condition: condition,
+		body:      body,
+	}
+}
+
+func (this *untilStatement) Execute(env Environment) {
+	for this.condition.Execute(env).(Boolean).GetValue() {
+		this.body.Execute(env)
+		if env.IsReturning() {
+			return
+		}
+	}
+}
+
+func (this *untilStatement) ToString() string {
+	retVal := "loop "
+	if this.label != "" {
+		retVal += this.label + " "
+	}
+	retVal += "until " + this.body.ToString()
+	return retVal
 }
 
 type expressionStatement struct {
@@ -842,6 +910,324 @@ func (this *booleanAnd) ToString() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " and ", this.right.ToString())
 }
 
+// equal
+
+type integerEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left == right}
+}
+
+func (this *integerEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+}
+
+type realEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left == right}
+}
+
+func (this *realEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+}
+
+type booleanEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *booleanEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *booleanEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Boolean).GetValue()
+	right := this.right.Execute(env).(Boolean).GetValue()
+	return &boolean{left == right}
+}
+
+func (this *booleanEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+}
+
+type funcEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *funcEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *funcEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Function).GetValue()
+	right := this.right.Execute(env).(Function).GetValue()
+	return &boolean{left == right}
+}
+
+func (this *funcEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+}
+
+// notEqual
+
+type integerNotEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerNotEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerNotEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left != right}
+}
+
+func (this *integerNotEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+}
+
+type realNotEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realNotEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realNotEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left != right}
+}
+
+func (this *realNotEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+}
+
+type booleanNotEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *booleanNotEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *booleanNotEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Boolean).GetValue()
+	right := this.right.Execute(env).(Boolean).GetValue()
+	return &boolean{left != right}
+}
+
+func (this *booleanNotEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+}
+
+type funcNotEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *funcNotEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *funcNotEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Function).GetValue()
+	right := this.right.Execute(env).(Function).GetValue()
+	return &boolean{left != right}
+}
+
+func (this *funcNotEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+}
+
+// lessThan
+
+type integerLessThan struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerLessThan) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerLessThan) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left < right}
+}
+
+func (this *integerLessThan) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " < ", this.right.ToString())
+}
+
+type realLessThan struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realLessThan) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realLessThan) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left < right}
+}
+
+func (this *realLessThan) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " < ", this.right.ToString())
+}
+
+// greaterThan
+
+type integerGreaterThan struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerGreaterThan) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerGreaterThan) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left > right}
+}
+
+func (this *integerGreaterThan) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " > ", this.right.ToString())
+}
+
+type realGreaterThan struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realGreaterThan) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realGreaterThan) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left > right}
+}
+
+func (this *realGreaterThan) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " > ", this.right.ToString())
+}
+
+// lessOrEqual
+
+type integerLessOrEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerLessOrEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerLessOrEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left <= right}
+}
+
+func (this *integerLessOrEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " <= ", this.right.ToString())
+}
+
+type realLessOrEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realLessOrEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realLessOrEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left <= right}
+}
+
+func (this *realLessOrEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " <= ", this.right.ToString())
+}
+
+// greaterOrEqual
+
+type integerGreaterOrEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *integerGreaterOrEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *integerGreaterOrEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Integer).GetValue()
+	right := this.right.Execute(env).(Integer).GetValue()
+	return &boolean{left >= right}
+}
+
+func (this *integerGreaterOrEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " >= ", this.right.ToString())
+}
+
+type realGreaterOrEqual struct {
+	left  Expression
+	right Expression
+}
+
+func (this *realGreaterOrEqual) Type() Type {
+	return BOOLEAN
+}
+
+func (this *realGreaterOrEqual) Execute(env Environment) Object {
+	left := this.left.Execute(env).(Real).GetValue()
+	right := this.right.Execute(env).(Real).GetValue()
+	return &boolean{left >= right}
+}
+
+func (this *realGreaterOrEqual) ToString() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " >= ", this.right.ToString())
+}
+
+// NewBinaryExpression
+
 func NewBinaryExpression(left Expression, op string, right Expression) Expression {
 	lType := left.Type()
 	rType := right.Type()
@@ -920,10 +1306,95 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 		} else {
 			panic("unsupported type")
 		}
+	case "==":
+		if lType == BOOLEAN {
+			retVal = &booleanEqual{left, right}
+		} else if lType == INTEGER {
+			retVal = &integerEqual{left, right}
+		} else if lType == REAL {
+			retVal = &realEqual{left, right}
+		} else if IsFunction(lType) {
+			retVal = &funcEqual{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "!=":
+		if lType == BOOLEAN {
+			retVal = &booleanNotEqual{left, right}
+		} else if lType == INTEGER {
+			retVal = &integerNotEqual{left, right}
+		} else if lType == REAL {
+			retVal = &realNotEqual{left, right}
+		} else if IsFunction(lType) {
+			retVal = &funcNotEqual{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "<":
+		if lType == INTEGER {
+			retVal = &integerLessThan{left, right}
+		} else if lType == REAL {
+			retVal = &realLessThan{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case ">":
+		if lType == INTEGER {
+			retVal = &integerGreaterThan{left, right}
+		} else if lType == REAL {
+			retVal = &realGreaterThan{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case "<=":
+		if lType == INTEGER {
+			retVal = &integerLessOrEqual{left, right}
+		} else if lType == REAL {
+			retVal = &realLessOrEqual{left, right}
+		} else {
+			panic("unsupported type")
+		}
+	case ">=":
+		if lType == INTEGER {
+			retVal = &integerGreaterOrEqual{left, right}
+		} else if lType == REAL {
+			retVal = &realGreaterOrEqual{left, right}
+		} else {
+			panic("unsupported type")
+		}
 	default:
 		panic("unsupported operand")
 	}
 
 	// fmt.Println(retVal.ToString())
 	return retVal
+}
+
+type assignment struct {
+	name       string
+	expression Expression
+}
+
+func NewAssignment(name string, value Expression) Expression {
+	return &assignment{
+		name:       name,
+		expression: value,
+	}
+}
+
+func (this *assignment) Type() Type {
+	return this.expression.Type()
+}
+
+func (this *assignment) Execute(env Environment) Object {
+	value := this.expression.Execute(env)
+	env.Set(this.name, value)
+	return value
+}
+
+func (this *assignment) ToString() string {
+	return fmt.Sprintf("%s = %s",
+		this.name,
+		this.expression.ToString(),
+	)
 }

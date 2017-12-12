@@ -12,6 +12,10 @@ type Type string
 type VmInteger int64
 type VmReal float64
 
+func IsFunction(type_ Type) bool {
+	return type_[:6] == "func ("
+}
+
 func GetFunctionType(paramTypes []Type, returnType Type) Type {
 	retVal := "func ("
 
