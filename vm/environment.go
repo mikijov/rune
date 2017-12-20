@@ -1,10 +1,15 @@
 package vm
 
 import (
+	"errors"
 	"fmt"
+	"reflect"
+	"regexp"
 )
 
 type Environment interface {
+	DeclareUserFunction(name string, fn interface{}) error
+
 	Declare(name string, value Object)
 	Set(name string, value Object)
 	Get(name string) Object
@@ -21,8 +26,6 @@ type Environment interface {
 
 	SetInteger(name string, value Integer)
 	SetReal(name string, value Real)
-
-	// getFunctionContext() *functionContext
 }
 
 type functionContext struct {
@@ -65,6 +68,66 @@ func NewFunctionEnvironment(outer Environment, returnType Type) Environment {
 	}
 }
 
+func go2runeType(typ reflect.Type) (Type, error) {
+	switch typ.Kind() {
+	case reflect.Int64:
+		return INTEGER, nil
+	case reflect.Float64:
+		return REAL, nil
+	case reflect.Bool:
+		return BOOLEAN, nil
+	case reflect.String:
+		return STRING, nil
+	// TODO: implement support for passing Environment to user function
+	// case reflect.Interface:
+	// 	return ?
+	default:
+		return VOID, errors.New("unsupported type")
+	}
+}
+
+func (this *environment) DeclareUserFunction(name string, fn interface{}) error {
+	matched, err := regexp.MatchString("^[a-zA-Z_][a-zA-Z0-9_]*$", name)
+	if err != nil {
+		return err
+	} else if !matched {
+		return errors.New("invalid name; must match ^[a-zA-Z_][a-zA-Z0-9_]*$")
+	}
+
+	val := reflect.ValueOf(fn)
+	if val.Kind() != reflect.Func {
+		return errors.New("not a function")
+	}
+
+	typ := val.Type()
+
+	var returnType Type
+	if typ.NumOut() == 0 {
+		returnType = VOID
+	} else if typ.NumOut() > 1 {
+		return errors.New("function can have no or one return value")
+	} else {
+		returnType, err = go2runeType(typ.Out(0))
+		if err != nil {
+			return err
+		}
+	}
+
+	fdecl := NewFunctionDeclaration(name, returnType)
+
+	for i := 0; i < typ.NumIn(); i += 1 {
+		paramType, err := go2runeType(typ.In(i))
+		if err != nil {
+			return err
+		}
+		fdecl.AddParameter(fmt.Sprintf("param%d", i), paramType)
+	}
+
+	fdecl.SetBody(nil) // TODO: make actual function call
+
+	return nil
+}
+
 func (this *environment) Declare(name string, value Object) {
 	_, ok := this.store[name]
 	if ok {
@@ -88,14 +151,6 @@ func (this *environment) Get(name string) Object {
 	}
 	return obj
 }
-
-// func (this *environment) getFunctionContext() *functionContext {
-// 	if this != nil {
-// 		return this.functionContext
-// 	} else {
-// 		return nil
-// 	}
-// }
 
 func (this *environment) SetReturnValue(value Object) {
 	Assign(this.functionContext.retVal, value)

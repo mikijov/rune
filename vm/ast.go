@@ -113,19 +113,20 @@ type FunctionDeclaration interface {
 	Statement
 	AddParameter(name string, type_ Type)
 	getParameters() []*parameter
-	SetBody(s ScopeStatement)
-	GetBody() ScopeStatement
+	SetBody(s Statement)
+	GetBody() Statement
 	GetType() Type
+	GetReturnType() Type
 }
 
 type functionDeclaration struct {
 	name       string
 	params     []*parameter
 	returnType Type
-	body       ScopeStatement
+	body       Statement
 }
 
-func NewFunctionStatement(name string, returnType Type) FunctionDeclaration {
+func NewFunctionDeclaration(name string, returnType Type) FunctionDeclaration {
 	return &functionDeclaration{
 		name:       name,
 		params:     make([]*parameter, 0, 5),
@@ -141,11 +142,11 @@ func (this *functionDeclaration) getParameters() []*parameter {
 	return this.params
 }
 
-func (this *functionDeclaration) SetBody(body ScopeStatement) {
+func (this *functionDeclaration) SetBody(body Statement) {
 	this.body = body
 }
 
-func (this *functionDeclaration) GetBody() ScopeStatement {
+func (this *functionDeclaration) GetBody() Statement {
 	return this.body
 }
 
@@ -156,6 +157,10 @@ func (this *functionDeclaration) GetType() Type {
 	}
 
 	return GetFunctionType(paramTypes, this.returnType)
+}
+
+func (this *functionDeclaration) GetReturnType() Type {
+	return this.returnType
 }
 
 func (this *functionDeclaration) Execute(env Environment) {
@@ -441,23 +446,7 @@ func (this *functionCall) Type() Type {
 }
 
 func (this *functionCall) Execute(env Environment) Object {
-	fn := env.Get(this.name).(Function).GetValue()
-	paramDefs := fn.getParameters()
-
-	funcEnv := NewFunctionEnvironment(env, this.returnType)
-	for i, param := range this.params {
-		val := param.Execute(env)
-		funcEnv.Declare(paramDefs[i].GetName(), val)
-	}
-
-	fn.GetBody().Execute(funcEnv)
-
-	failed, msg := funcEnv.GetError()
-	if failed {
-		env.SetError(msg)
-	}
-
-	return funcEnv.GetReturnValue()
+	return env.Get(this.name).(Function).Call(env, this.params)
 }
 
 func (this *functionCall) ToString() string {
@@ -979,9 +968,9 @@ func (this *funcEqual) Type() Type {
 }
 
 func (this *funcEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Function).GetValue()
-	right := this.right.Execute(env).(Function).GetValue()
-	return &boolean{left == right}
+	left := this.left.Execute(env).(Function)
+	right := this.right.Execute(env).(Function)
+	return &boolean{left.Equal(right)}
 }
 
 func (this *funcEqual) ToString() string {
@@ -1057,9 +1046,9 @@ func (this *funcNotEqual) Type() Type {
 }
 
 func (this *funcNotEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Function).GetValue()
-	right := this.right.Execute(env).(Function).GetValue()
-	return &boolean{left != right}
+	left := this.left.Execute(env).(Function)
+	right := this.right.Execute(env).(Function)
+	return &boolean{!left.Equal(right)}
 }
 
 func (this *funcNotEqual) ToString() string {

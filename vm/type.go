@@ -1,11 +1,12 @@
 package vm
 
 const (
-	VOID    = "void"
-	INTEGER = "int"
-	REAL    = "real"
-	BOOLEAN = "bool"
-	STRING  = "string"
+	VOID     = "void"
+	INTEGER  = "int"
+	REAL     = "real"
+	BOOLEAN  = "bool"
+	STRING   = "string"
+	FUNCTION = "func"
 )
 
 type Type string

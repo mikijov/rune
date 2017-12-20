@@ -16,7 +16,7 @@ type ErrorListener interface {
 }
 
 func trace(ctx antlr.ParserRuleContext) {
-	// return
+	return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -161,7 +161,7 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	oldFunction := this.currentFunction
 	defer func() { this.currentFunction = oldFunction }()
-	this.currentFunction = vm.NewFunctionStatement(name, returnType)
+	this.currentFunction = vm.NewFunctionDeclaration(name, returnType)
 
 	oldScope := this.scope
 	defer func() { this.scope = oldScope }()
