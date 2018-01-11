@@ -8,18 +8,18 @@ import (
 type Program interface {
 	AddStatement(s Statement)
 	Execute(env Environment)
-	ToString() string
+	String() string
 }
 
 type Statement interface {
 	Execute(env Environment)
-	ToString() string
+	String() string
 }
 
 type Expression interface {
 	Execute(env Environment) Object
 	Type() Type
-	ToString() string
+	String() string
 }
 
 type UnaryExpression interface {
@@ -59,10 +59,10 @@ func (this *program) Execute(env Environment) {
 	}
 }
 
-func (this *program) ToString() string {
+func (this *program) String() string {
 	txt := ""
 	for _, stmt := range this.statements {
-		txt += stmt.ToString() + "\n"
+		txt += stmt.String() + "\n"
 	}
 	return txt
 }
@@ -85,104 +85,61 @@ func NewDeclarationStatement(name string, value Expression) Statement {
 func (this *declarationStatement) Execute(env Environment) {
 	value := this.expression.Execute(env)
 	env.Declare(this.name, value)
-	fmt.Printf("%s :%s = %s;\n", this.name, value.Type(), value.Inspect())
+	fmt.Printf("%s :%v = %s;\n", this.name, value.Type(), value.Inspect())
 }
 
-func (this *declarationStatement) ToString() string {
-	return fmt.Sprintf("%s :%s = %s;",
+func (this *declarationStatement) String() string {
+	return fmt.Sprintf("%s :%v = %s;",
 		this.name,
 		this.expression.Type(),
-		this.expression.ToString(),
+		this.expression.String(),
 	)
 }
 
-type parameter struct {
-	name  string
-	type_ Type
-}
-
-func (this *parameter) GetName() string {
-	return this.name
-}
-
-func (this *parameter) GetType() Type {
-	return this.type_
-}
-
-type FunctionDeclaration interface {
-	Statement
-	AddParameter(name string, type_ Type)
-	getParameters() []*parameter
-	SetBody(s Statement)
-	GetBody() Statement
-	GetType() Type
-	GetReturnType() Type
-}
-
-type functionDeclaration struct {
-	name       string
-	params     []*parameter
-	returnType Type
-	body       Statement
-}
-
-func NewFunctionDeclaration(name string, returnType Type) FunctionDeclaration {
-	return &functionDeclaration{
-		name:       name,
-		params:     make([]*parameter, 0, 5),
-		returnType: returnType,
-	}
-}
-
-func (this *functionDeclaration) AddParameter(name string, type_ Type) {
-	this.params = append(this.params, &parameter{name, type_})
-}
-
-func (this *functionDeclaration) getParameters() []*parameter {
-	return this.params
-}
-
-func (this *functionDeclaration) SetBody(body Statement) {
-	this.body = body
-}
-
-func (this *functionDeclaration) GetBody() Statement {
-	return this.body
-}
-
-func (this *functionDeclaration) GetType() Type {
-	paramTypes := make([]Type, 0, len(this.params))
-	for _, param := range this.params {
-		paramTypes = append(paramTypes, param.GetType())
-	}
-
-	return GetFunctionType(paramTypes, this.returnType)
-}
-
-func (this *functionDeclaration) GetReturnType() Type {
-	return this.returnType
-}
-
-func (this *functionDeclaration) Execute(env Environment) {
-	env.Declare(this.name, &function{this})
-}
-
-func (this *functionDeclaration) ToString() string {
-	params := ""
-	for _, param := range this.params {
-		if len(params) > 0 {
-			params += ", "
-		}
-		params += param.name + " :" + string(param.type_)
-	}
-
-	if this.returnType != VOID {
-		return fmt.Sprintf("func %s(%s) :%s;", this.name, params, this.returnType)
-	} else {
-		return fmt.Sprintf("func %s(%s);", this.name, params)
-	}
-}
-
+// type parameter struct {
+// 	name  string
+// 	type_ Type
+// }
+//
+// func (this *parameter) GetName() string {
+// 	return this.name
+// }
+//
+// func (this *parameter) GetType() Type {
+// 	return this.type_
+// }
+//
+// type Lambda interface {
+// 	Expression
+// 	GetParamCount() int
+// 	GetParamName(i int) string
+// }
+//
+// type lambda struct {
+// 	typ  Type
+// 	body Function
+// }
+//
+// func NewLambda(typ Type) Lambda {
+// 	return &lambda{
+// 		name:       name,
+// 		params:     make([]*parameter, 0, 5),
+// 		returnType: returnType,
+// 	}
+// }
+//
+// func (this *lambda) Type() Type {
+// 	return this.typ
+// }
+//
+// func (this *lambda) Execute(env Environment) Object {
+// 	return this.body
+// }
+//
+// func (this *lambda) String() string {
+// 	return this.body.Inspect()
+// }
+//
 type ScopeStatement interface {
 	Statement
 	AddStatement(s Statement)
@@ -215,14 +172,14 @@ func (this *scopeStatement) Execute(env Environment) {
 	}
 }
 
-func (this *scopeStatement) ToString() string {
+func (this *scopeStatement) String() string {
 	if len(this.statements) == 0 {
 		return "{}"
 	}
 
 	retVal := "{ "
 	for _, stmt := range this.statements {
-		retVal += stmt.ToString()
+		retVal += stmt.String()
 	}
 	retVal += " }"
 
@@ -247,9 +204,9 @@ func (this *returnStatement) Execute(env Environment) {
 	env.SetReturning()
 }
 
-func (this *returnStatement) ToString() string {
+func (this *returnStatement) String() string {
 	if this.value != nil {
-		return "return " + this.value.ToString() + ";"
+		return "return " + this.value.String() + ";"
 	} else {
 		return "return;"
 	}
@@ -288,10 +245,10 @@ func (this *ifStatement) Execute(env Environment) {
 	}
 }
 
-func (this *ifStatement) ToString() string {
-	retVal := "if " + this.condition.ToString() + " " + this.effect.ToString()
+func (this *ifStatement) String() string {
+	retVal := "if " + this.condition.String() + " " + this.effect.String()
 	if this.alternative != nil {
-		retVal += " else " + this.alternative.ToString()
+		retVal += " else " + this.alternative.String()
 	}
 	return retVal
 }
@@ -317,12 +274,12 @@ func (this *loopStatement) Execute(env Environment) {
 	}
 }
 
-func (this *loopStatement) ToString() string {
+func (this *loopStatement) String() string {
 	retVal := "loop "
 	if this.label != "" {
 		retVal += this.label + " "
 	}
-	retVal += this.body.ToString()
+	retVal += this.body.String()
 	return retVal
 }
 
@@ -349,12 +306,12 @@ func (this *whileStatement) Execute(env Environment) {
 	}
 }
 
-func (this *whileStatement) ToString() string {
+func (this *whileStatement) String() string {
 	retVal := "loop "
 	if this.label != "" {
 		retVal += this.label + " "
 	}
-	retVal += "while " + this.body.ToString()
+	retVal += "while " + this.body.String()
 	return retVal
 }
 
@@ -381,12 +338,12 @@ func (this *untilStatement) Execute(env Environment) {
 	}
 }
 
-func (this *untilStatement) ToString() string {
+func (this *untilStatement) String() string {
 	retVal := "loop "
 	if this.label != "" {
 		retVal += this.label + " "
 	}
-	retVal += "until " + this.body.ToString()
+	retVal += "until " + this.body.String()
 	return retVal
 }
 
@@ -400,11 +357,11 @@ func NewExpressionStatement(e Expression) Statement {
 
 func (this *expressionStatement) Execute(env Environment) {
 	value := this.expression.Execute(env)
-	fmt.Printf("%s :%s = %s\n", this.ToString(), value.Type(), value.Inspect())
+	fmt.Printf("%s :%v = %s\n", this.String(), value.Type(), value.Inspect())
 }
 
-func (this *expressionStatement) ToString() string {
-	return this.expression.ToString() + ";"
+func (this *expressionStatement) String() string {
+	return this.expression.String() + ";"
 }
 
 // atoms
@@ -423,7 +380,7 @@ func (this *variableReference) Execute(env Environment) Object {
 	return env.Get(this.name)
 }
 
-func (this *variableReference) ToString() string {
+func (this *variableReference) String() string {
 	return this.name
 }
 
@@ -449,7 +406,7 @@ func (this *functionCall) Execute(env Environment) Object {
 	return env.Get(this.name).(Function).Call(env, this.params)
 }
 
-func (this *functionCall) ToString() string {
+func (this *functionCall) String() string {
 	retVal := this.name + "("
 
 	first := true
@@ -459,7 +416,7 @@ func (this *functionCall) ToString() string {
 		} else {
 			retVal += ", "
 		}
-		retVal += param.ToString()
+		retVal += param.String()
 	}
 	retVal += ")"
 
@@ -477,6 +434,46 @@ func NewFunctionCall(name string, params []Expression, returnType Type) Expressi
 // literals
 ///////////
 
+type literal struct {
+	Expression
+	value Object
+}
+
+func (this *literal) Type() Type {
+	return this.value.Type()
+}
+
+func (this *literal) Execute(env Environment) Object {
+	return this.value
+}
+
+func (this *literal) String() string {
+	return this.value.Inspect()
+}
+
+func NewLiteral(value Object) Expression {
+	return &literal{value: value}
+}
+
+type voidLiteral struct {
+}
+
+func (this *voidLiteral) Type() Type {
+	return NewSimpleType(VOID)
+}
+
+func (this *voidLiteral) Execute(env Environment) Object {
+	panic("cannot execute void literal")
+}
+
+func (this *voidLiteral) String() string {
+	return string(VOID)
+}
+
+func NewVoidLiteral() Expression {
+	return &voidLiteral{}
+}
+
 type integerLiteral struct {
 	value Integer
 }
@@ -489,7 +486,7 @@ func (this *integerLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
-func (this *integerLiteral) ToString() string {
+func (this *integerLiteral) String() string {
 	return fmt.Sprintf("%d", this.value.GetValue())
 }
 
@@ -513,7 +510,7 @@ func (this *realLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
-func (this *realLiteral) ToString() string {
+func (this *realLiteral) String() string {
 	return fmt.Sprintf("%f", this.value.GetValue())
 }
 
@@ -537,7 +534,7 @@ func (this *booleanLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
-func (this *booleanLiteral) ToString() string {
+func (this *booleanLiteral) String() string {
 	return fmt.Sprintf("%f", this.value.GetValue())
 }
 
@@ -548,19 +545,6 @@ func NewBooleanLiteral(s string) Expression {
 		return &booleanLiteral{value: &boolean{value: false}}
 	} else {
 		panic("unexpected boolean value")
-	}
-}
-
-func NewZeroLiteral(t Type) Expression {
-	switch t {
-	case INTEGER:
-		return &integerLiteral{value: &integer{value: VmInteger(0)}}
-	case REAL:
-		return &realLiteral{value: &real{value: VmReal(0.0)}}
-	case BOOLEAN:
-		return &booleanLiteral{value: &boolean{value: false}}
-	default:
-		panic("invalid type")
 	}
 }
 
@@ -575,7 +559,7 @@ type integerAddition struct {
 }
 
 func (this *integerAddition) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerAddition) Execute(env Environment) Object {
@@ -592,8 +576,8 @@ func (this *integerAddition) Right() Expression {
 	return this.right
 }
 
-func (this *integerAddition) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "+", this.right.ToString())
+func (this *integerAddition) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "+", this.right.String())
 }
 
 // +
@@ -604,7 +588,7 @@ type realAddition struct {
 }
 
 func (this *realAddition) Type() Type {
-	return REAL
+	return NewSimpleType(REAL)
 }
 
 func (this *realAddition) Execute(env Environment) Object {
@@ -621,8 +605,8 @@ func (this *realAddition) Right() Expression {
 	return this.right
 }
 
-func (this *realAddition) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "+", this.right.ToString())
+func (this *realAddition) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "+", this.right.String())
 }
 
 // -
@@ -633,7 +617,7 @@ type integerSubstraction struct {
 }
 
 func (this *integerSubstraction) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerSubstraction) Execute(env Environment) Object {
@@ -650,8 +634,8 @@ func (this *integerSubstraction) Right() Expression {
 	return this.right
 }
 
-func (this *integerSubstraction) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "-", this.right.ToString())
+func (this *integerSubstraction) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "-", this.right.String())
 }
 
 // -
@@ -662,7 +646,7 @@ type realSubstraction struct {
 }
 
 func (this *realSubstraction) Type() Type {
-	return REAL
+	return NewSimpleType(REAL)
 }
 
 func (this *realSubstraction) Execute(env Environment) Object {
@@ -679,8 +663,8 @@ func (this *realSubstraction) Right() Expression {
 	return this.right
 }
 
-func (this *realSubstraction) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "-", this.right.ToString())
+func (this *realSubstraction) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "-", this.right.String())
 }
 
 // *
@@ -691,7 +675,7 @@ type integerMultiplication struct {
 }
 
 func (this *integerMultiplication) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerMultiplication) Execute(env Environment) Object {
@@ -700,8 +684,8 @@ func (this *integerMultiplication) Execute(env Environment) Object {
 	return &integer{left.GetValue() * right.GetValue()}
 }
 
-func (this *integerMultiplication) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "*", this.right.ToString())
+func (this *integerMultiplication) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "*", this.right.String())
 }
 
 // *
@@ -712,7 +696,7 @@ type realMultiplication struct {
 }
 
 func (this *realMultiplication) Type() Type {
-	return REAL
+	return NewSimpleType(REAL)
 }
 
 func (this *realMultiplication) Execute(env Environment) Object {
@@ -721,8 +705,8 @@ func (this *realMultiplication) Execute(env Environment) Object {
 	return &real{left.GetValue() * right.GetValue()}
 }
 
-func (this *realMultiplication) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "*", this.right.ToString())
+func (this *realMultiplication) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "*", this.right.String())
 }
 
 // /
@@ -733,7 +717,7 @@ type integerDivision struct {
 }
 
 func (this *integerDivision) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerDivision) Execute(env Environment) Object {
@@ -742,8 +726,8 @@ func (this *integerDivision) Execute(env Environment) Object {
 	return &integer{left.GetValue() / right.GetValue()}
 }
 
-func (this *integerDivision) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "/", this.right.ToString())
+func (this *integerDivision) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "/", this.right.String())
 }
 
 // /
@@ -754,7 +738,7 @@ type realDivision struct {
 }
 
 func (this *realDivision) Type() Type {
-	return REAL
+	return NewSimpleType(REAL)
 }
 
 func (this *realDivision) Execute(env Environment) Object {
@@ -763,8 +747,8 @@ func (this *realDivision) Execute(env Environment) Object {
 	return &real{left.GetValue() / right.GetValue()}
 }
 
-func (this *realDivision) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "/", this.right.ToString())
+func (this *realDivision) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "/", this.right.String())
 }
 
 // %
@@ -775,7 +759,7 @@ type integerModulo struct {
 }
 
 func (this *integerModulo) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerModulo) Execute(env Environment) Object {
@@ -784,8 +768,8 @@ func (this *integerModulo) Execute(env Environment) Object {
 	return &integer{left.GetValue() % right.GetValue()}
 }
 
-func (this *integerModulo) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "%", this.right.ToString())
+func (this *integerModulo) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "%", this.right.String())
 }
 
 // |
@@ -796,7 +780,7 @@ type integerOr struct {
 }
 
 func (this *integerOr) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerOr) Execute(env Environment) Object {
@@ -805,8 +789,8 @@ func (this *integerOr) Execute(env Environment) Object {
 	return &integer{left.GetValue() | right.GetValue()}
 }
 
-func (this *integerOr) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "|", this.right.ToString())
+func (this *integerOr) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "|", this.right.String())
 }
 
 // ^
@@ -817,7 +801,7 @@ type integerXor struct {
 }
 
 func (this *integerXor) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerXor) Execute(env Environment) Object {
@@ -826,8 +810,8 @@ func (this *integerXor) Execute(env Environment) Object {
 	return &integer{left.GetValue() ^ right.GetValue()}
 }
 
-func (this *integerXor) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "^", this.right.ToString())
+func (this *integerXor) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "^", this.right.String())
 }
 
 // &
@@ -838,7 +822,7 @@ type integerAnd struct {
 }
 
 func (this *integerAnd) Type() Type {
-	return INTEGER
+	return NewSimpleType(INTEGER)
 }
 
 func (this *integerAnd) Execute(env Environment) Object {
@@ -847,8 +831,8 @@ func (this *integerAnd) Execute(env Environment) Object {
 	return &integer{left.GetValue() & right.GetValue()}
 }
 
-func (this *integerAnd) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), "&", this.right.ToString())
+func (this *integerAnd) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), "&", this.right.String())
 }
 
 // or
@@ -859,7 +843,7 @@ type booleanOr struct {
 }
 
 func (this *booleanOr) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *booleanOr) Execute(env Environment) Object {
@@ -871,8 +855,8 @@ func (this *booleanOr) Execute(env Environment) Object {
 	return &boolean{right}
 }
 
-func (this *booleanOr) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " or ", this.right.ToString())
+func (this *booleanOr) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " or ", this.right.String())
 }
 
 // and
@@ -883,7 +867,7 @@ type booleanAnd struct {
 }
 
 func (this *booleanAnd) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *booleanAnd) Execute(env Environment) Object {
@@ -895,8 +879,8 @@ func (this *booleanAnd) Execute(env Environment) Object {
 	return &boolean{right}
 }
 
-func (this *booleanAnd) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " and ", this.right.ToString())
+func (this *booleanAnd) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " and ", this.right.String())
 }
 
 // equal
@@ -907,7 +891,7 @@ type integerEqual struct {
 }
 
 func (this *integerEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerEqual) Execute(env Environment) Object {
@@ -916,8 +900,8 @@ func (this *integerEqual) Execute(env Environment) Object {
 	return &boolean{left == right}
 }
 
-func (this *integerEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+func (this *integerEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
 
 type realEqual struct {
@@ -926,7 +910,7 @@ type realEqual struct {
 }
 
 func (this *realEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realEqual) Execute(env Environment) Object {
@@ -935,8 +919,8 @@ func (this *realEqual) Execute(env Environment) Object {
 	return &boolean{left == right}
 }
 
-func (this *realEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+func (this *realEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
 
 type booleanEqual struct {
@@ -945,7 +929,7 @@ type booleanEqual struct {
 }
 
 func (this *booleanEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *booleanEqual) Execute(env Environment) Object {
@@ -954,8 +938,8 @@ func (this *booleanEqual) Execute(env Environment) Object {
 	return &boolean{left == right}
 }
 
-func (this *booleanEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+func (this *booleanEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
 
 type funcEqual struct {
@@ -964,7 +948,7 @@ type funcEqual struct {
 }
 
 func (this *funcEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *funcEqual) Execute(env Environment) Object {
@@ -973,8 +957,8 @@ func (this *funcEqual) Execute(env Environment) Object {
 	return &boolean{left.Equal(right)}
 }
 
-func (this *funcEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " == ", this.right.ToString())
+func (this *funcEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
 
 // notEqual
@@ -985,7 +969,7 @@ type integerNotEqual struct {
 }
 
 func (this *integerNotEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerNotEqual) Execute(env Environment) Object {
@@ -994,8 +978,8 @@ func (this *integerNotEqual) Execute(env Environment) Object {
 	return &boolean{left != right}
 }
 
-func (this *integerNotEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+func (this *integerNotEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
 
 type realNotEqual struct {
@@ -1004,7 +988,7 @@ type realNotEqual struct {
 }
 
 func (this *realNotEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realNotEqual) Execute(env Environment) Object {
@@ -1013,8 +997,8 @@ func (this *realNotEqual) Execute(env Environment) Object {
 	return &boolean{left != right}
 }
 
-func (this *realNotEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+func (this *realNotEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
 
 type booleanNotEqual struct {
@@ -1023,7 +1007,7 @@ type booleanNotEqual struct {
 }
 
 func (this *booleanNotEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *booleanNotEqual) Execute(env Environment) Object {
@@ -1032,8 +1016,8 @@ func (this *booleanNotEqual) Execute(env Environment) Object {
 	return &boolean{left != right}
 }
 
-func (this *booleanNotEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+func (this *booleanNotEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
 
 type funcNotEqual struct {
@@ -1042,7 +1026,7 @@ type funcNotEqual struct {
 }
 
 func (this *funcNotEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *funcNotEqual) Execute(env Environment) Object {
@@ -1051,8 +1035,8 @@ func (this *funcNotEqual) Execute(env Environment) Object {
 	return &boolean{!left.Equal(right)}
 }
 
-func (this *funcNotEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " != ", this.right.ToString())
+func (this *funcNotEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
 
 // lessThan
@@ -1063,7 +1047,7 @@ type integerLessThan struct {
 }
 
 func (this *integerLessThan) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerLessThan) Execute(env Environment) Object {
@@ -1072,8 +1056,8 @@ func (this *integerLessThan) Execute(env Environment) Object {
 	return &boolean{left < right}
 }
 
-func (this *integerLessThan) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " < ", this.right.ToString())
+func (this *integerLessThan) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " < ", this.right.String())
 }
 
 type realLessThan struct {
@@ -1082,7 +1066,7 @@ type realLessThan struct {
 }
 
 func (this *realLessThan) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realLessThan) Execute(env Environment) Object {
@@ -1091,8 +1075,8 @@ func (this *realLessThan) Execute(env Environment) Object {
 	return &boolean{left < right}
 }
 
-func (this *realLessThan) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " < ", this.right.ToString())
+func (this *realLessThan) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " < ", this.right.String())
 }
 
 // greaterThan
@@ -1103,7 +1087,7 @@ type integerGreaterThan struct {
 }
 
 func (this *integerGreaterThan) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerGreaterThan) Execute(env Environment) Object {
@@ -1112,8 +1096,8 @@ func (this *integerGreaterThan) Execute(env Environment) Object {
 	return &boolean{left > right}
 }
 
-func (this *integerGreaterThan) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " > ", this.right.ToString())
+func (this *integerGreaterThan) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " > ", this.right.String())
 }
 
 type realGreaterThan struct {
@@ -1122,7 +1106,7 @@ type realGreaterThan struct {
 }
 
 func (this *realGreaterThan) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realGreaterThan) Execute(env Environment) Object {
@@ -1131,8 +1115,8 @@ func (this *realGreaterThan) Execute(env Environment) Object {
 	return &boolean{left > right}
 }
 
-func (this *realGreaterThan) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " > ", this.right.ToString())
+func (this *realGreaterThan) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " > ", this.right.String())
 }
 
 // lessOrEqual
@@ -1143,7 +1127,7 @@ type integerLessOrEqual struct {
 }
 
 func (this *integerLessOrEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerLessOrEqual) Execute(env Environment) Object {
@@ -1152,8 +1136,8 @@ func (this *integerLessOrEqual) Execute(env Environment) Object {
 	return &boolean{left <= right}
 }
 
-func (this *integerLessOrEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " <= ", this.right.ToString())
+func (this *integerLessOrEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " <= ", this.right.String())
 }
 
 type realLessOrEqual struct {
@@ -1162,7 +1146,7 @@ type realLessOrEqual struct {
 }
 
 func (this *realLessOrEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realLessOrEqual) Execute(env Environment) Object {
@@ -1171,8 +1155,8 @@ func (this *realLessOrEqual) Execute(env Environment) Object {
 	return &boolean{left <= right}
 }
 
-func (this *realLessOrEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " <= ", this.right.ToString())
+func (this *realLessOrEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " <= ", this.right.String())
 }
 
 // greaterOrEqual
@@ -1183,7 +1167,7 @@ type integerGreaterOrEqual struct {
 }
 
 func (this *integerGreaterOrEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *integerGreaterOrEqual) Execute(env Environment) Object {
@@ -1192,8 +1176,8 @@ func (this *integerGreaterOrEqual) Execute(env Environment) Object {
 	return &boolean{left >= right}
 }
 
-func (this *integerGreaterOrEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " >= ", this.right.ToString())
+func (this *integerGreaterOrEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " >= ", this.right.String())
 }
 
 type realGreaterOrEqual struct {
@@ -1202,7 +1186,7 @@ type realGreaterOrEqual struct {
 }
 
 func (this *realGreaterOrEqual) Type() Type {
-	return BOOLEAN
+	return NewSimpleType(BOOLEAN)
 }
 
 func (this *realGreaterOrEqual) Execute(env Environment) Object {
@@ -1211,15 +1195,15 @@ func (this *realGreaterOrEqual) Execute(env Environment) Object {
 	return &boolean{left >= right}
 }
 
-func (this *realGreaterOrEqual) ToString() string {
-	return fmt.Sprintf("(%s%s%s)", this.left.ToString(), " >= ", this.right.ToString())
+func (this *realGreaterOrEqual) String() string {
+	return fmt.Sprintf("(%s%s%s)", this.left.String(), " >= ", this.right.String())
 }
 
 // NewBinaryExpression
 
 func NewBinaryExpression(left Expression, op string, right Expression) Expression {
-	lType := left.Type()
-	rType := right.Type()
+	lType := left.Type().GetKind()
+	rType := right.Type().GetKind()
 
 	if lType != rType {
 		panic("mismatching types")
@@ -1302,7 +1286,7 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 			retVal = &integerEqual{left, right}
 		} else if lType == REAL {
 			retVal = &realEqual{left, right}
-		} else if IsFunction(lType) {
+		} else if lType == FUNCTION {
 			retVal = &funcEqual{left, right}
 		} else {
 			panic("unsupported type")
@@ -1314,7 +1298,7 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 			retVal = &integerNotEqual{left, right}
 		} else if lType == REAL {
 			retVal = &realNotEqual{left, right}
-		} else if IsFunction(lType) {
+		} else if lType == FUNCTION {
 			retVal = &funcNotEqual{left, right}
 		} else {
 			panic("unsupported type")
@@ -1355,7 +1339,7 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 		panic("unsupported operand")
 	}
 
-	// fmt.Println(retVal.ToString())
+	// fmt.Println(retVal.String())
 	return retVal
 }
 
@@ -1381,9 +1365,9 @@ func (this *assignment) Execute(env Environment) Object {
 	return value
 }
 
-func (this *assignment) ToString() string {
+func (this *assignment) String() string {
 	return fmt.Sprintf("%s = %s",
 		this.name,
-		this.expression.ToString(),
+		this.expression.String(),
 	)
 }

@@ -26,6 +26,12 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#typeName.
 	VisitTypeName(ctx *TypeNameContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#SimpleType.
+	VisitSimpleType(ctx *SimpleTypeContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#FunctionType.
+	VisitFunctionType(ctx *FunctionTypeContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#function.
 	VisitFunction(ctx *FunctionContext) interface{}
 
@@ -70,6 +76,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#FunctionCall.
 	VisitFunctionCall(ctx *FunctionCallContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#Lambda.
+	VisitLambda(ctx *LambdaContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#assignmentOp.
 	VisitAssignmentOp(ctx *AssignmentOpContext) interface{}

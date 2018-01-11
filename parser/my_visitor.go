@@ -44,7 +44,7 @@ type MyVisitor struct {
 	errors          ErrorListener
 	program         vm.Program
 	scope           *scope
-	currentFunction vm.FunctionDeclaration
+	currentFunction vm.Type
 }
 
 func NewMyVisitor(errors ErrorListener) *MyVisitor {
@@ -106,6 +106,8 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 		return this.VisitVariableExpression(ctx)
 	case *FunctionCallContext:
 		return this.VisitFunctionCall(ctx)
+	case *LambdaContext:
+		return this.VisitLambda(ctx)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx))
 	}
@@ -124,11 +126,11 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 		value = this.VisitExpression(ctx.GetValue())
 	}
 
-	if type_ != "" && value != nil {
-		if type_ != value.Type() {
+	if type_ != nil && value != nil {
+		if !type_.Equal(value.Type()) {
 			panic("type mismatch")
 		}
-	} else if type_ != "" {
+	} else if type_ != nil {
 		// already have type, nothing to do
 	} else if value != nil {
 		type_ = value.Type()
@@ -145,7 +147,7 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 	if value != nil {
 		return vm.NewDeclarationStatement(name, value)
 	} else {
-		return vm.NewDeclarationStatement(name, vm.NewZeroLiteral(type_))
+		return vm.NewDeclarationStatement(name, vm.NewLiteral(type_.GetZero()))
 	}
 }
 
@@ -154,62 +156,127 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	name := ctx.GetIdentifier().GetText()
 
-	var returnType vm.Type = vm.VOID
+	paramNames, paramTypes := this.VisitParams(ctx.GetParams())
+	// len(paramNames) == len(paramTypes)
+
+	var returnType vm.Type
 	if ctx.GetReturnType() != nil {
 		returnType = this.VisitTypeName(ctx.GetReturnType())
+	} else {
+		returnType = vm.NewSimpleType(vm.VOID)
 	}
+
+	typ := vm.NewFunctionType(name, paramTypes, returnType)
+	// declaration of this function is made in the proper, outer scope
+	this.scope.declare(name, typ)
+
+	// now prepare the scope before parsing function body which will reference
+	// parameters etc.
 
 	oldFunction := this.currentFunction
 	defer func() { this.currentFunction = oldFunction }()
-	this.currentFunction = vm.NewFunctionDeclaration(name, returnType)
+	this.currentFunction = typ
 
 	oldScope := this.scope
 	defer func() { this.scope = oldScope }()
 	this.scope = newScope(this.scope)
+	// add parameters as named variables
+	for i := 0; i < len(paramNames); i++ {
+		this.scope.declare(paramNames[i], paramTypes[i])
+	}
 
-	this.VisitParams(ctx.GetParams())
-
-	this.currentFunction.SetBody(this.VisitScope(ctx.GetBody()))
-
-	this.scope = oldScope // need to manually set it so that the declaration is made in proper scope
-	this.scope.declare(name, this.currentFunction.GetType())
-
-	return this.currentFunction
+	return vm.NewDeclarationStatement(
+		name, vm.NewLiteral(
+			vm.NewFunction(typ, paramNames, this.VisitScope(ctx.GetBody())),
+		),
+	)
 }
 
-func (this *MyVisitor) VisitParams(ctx IParamDeclContext) {
+type param struct {
+	name string
+	typ  vm.Type
+}
+
+func (this *MyVisitor) VisitParams(ctx IParamDeclContext) (paramNames []string, paramTypes []vm.Type) {
 	trace(ctx)
 
+	names := make([]string, 0, 10)
+	types := make([]vm.Type, 0, 10)
+
 	for _, child := range ctx.GetParamGroup() {
-		this.VisitCombinedParam(child)
+		newNames, newTypes := this.VisitCombinedParam(child)
+		for _, name := range newNames {
+			names = append(names, name)
+		}
+		for _, typ := range newTypes {
+			types = append(types, typ)
+		}
 	}
+
+	return names, types
 }
 
-func (this *MyVisitor) VisitCombinedParam(ctx ICombinedParamContext) {
+func (this *MyVisitor) VisitCombinedParam(ctx ICombinedParamContext) (names []string, types []vm.Type) {
 	trace(ctx)
 
 	returnType := this.VisitTypeName(ctx.GetParamType())
 
+	names = make([]string, 0, 3)
+	types = make([]vm.Type, 0, 3)
 	for _, name := range ctx.GetNames() {
-		this.currentFunction.AddParameter(name.GetText(), returnType)
+		names = append(names, name.GetText())
+		types = append(types, returnType)
+	}
+
+	return names, types
+}
+
+func (this *MyVisitor) VisitTypeName(ctx interface{}) vm.Type {
+	switch ctx := ctx.(type) {
+	case *TypeNameContext:
+		return this.VisitTypeName(ctx.GetChild(0))
+	case *SimpleTypeContext:
+		return this.VisitSimpleType(ctx)
+	case *FunctionTypeContext:
+		return this.VisitFunctionType(ctx)
+	default:
+		panic("unknown type") // grammar should not allow this
 	}
 }
 
-func (this *MyVisitor) VisitTypeName(ctx ITypeNameContext) vm.Type {
+func (this *MyVisitor) VisitSimpleType(ctx *SimpleTypeContext) vm.Type {
 	trace(ctx)
 
 	switch ctx.GetText() {
 	case "int":
-		return vm.INTEGER
+		return vm.NewSimpleType(vm.INTEGER)
 	case "real":
-		return vm.REAL
+		return vm.NewSimpleType(vm.REAL)
 	case "string":
-		return vm.STRING
+		return vm.NewSimpleType(vm.STRING)
 	case "bool":
-		return vm.BOOLEAN
+		return vm.NewSimpleType(vm.BOOLEAN)
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
+}
+
+func (this *MyVisitor) VisitFunctionType(ctx *FunctionTypeContext) vm.Type {
+	trace(ctx)
+
+	paramTypes := make([]vm.Type, 0, 10)
+	for _, param := range ctx.GetParamTypes() {
+		paramTypes = append(paramTypes, this.VisitTypeName(param))
+	}
+
+	var returnType vm.Type
+	if ctx.GetReturnType() != nil {
+		returnType = this.VisitTypeName(ctx.GetReturnType())
+	} else {
+		returnType = vm.NewSimpleType(vm.VOID)
+	}
+
+	return vm.NewFunctionType("", paramTypes, returnType)
 }
 
 func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
@@ -232,7 +299,7 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 		retVal = this.VisitExpression(ctx.GetRetVal())
 		retType = retVal.Type()
 	} else {
-		retType = vm.VOID
+		retType = vm.NewSimpleType(vm.VOID)
 	}
 
 	if this.currentFunction == nil {
@@ -240,22 +307,22 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			"return statement outside function declaration")
 	} else {
-		declType := vm.GetFunctionReturnType(this.currentFunction.GetType())
+		declType := this.currentFunction.GetResultType()
 
-		if declType == vm.VOID {
-			if retType != vm.VOID {
+		if declType.GetKind() == vm.VOID {
+			if retType.GetKind() != vm.VOID {
 				token := ctx.GetRetVal().GetStart()
 				this.errors.Error(token.GetLine(), token.GetColumn(),
 					fmt.Sprintf("return value provided when none expected"))
 			}
-		} else if retType == vm.VOID {
+		} else if retType.GetKind() == vm.VOID {
 			token := ctx.GetRetVal().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
 				fmt.Sprintf("return value required"))
-		} else if declType != retVal.Type() {
+		} else if !declType.Equal(retType) {
 			token := ctx.GetRetVal().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
-				fmt.Sprintf("return value mismatch\nExpected: %s\n     Got: %s",
+				fmt.Sprintf("return value mismatch\nExpected: %v\n     Got: %v",
 					declType, retVal.Type()))
 		}
 	}
@@ -274,10 +341,10 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 
 	for i, condCtx := range conditions {
 		condition := this.VisitExpression(condCtx)
-		if condition.Type() != vm.BOOLEAN {
+		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := condCtx.GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
-				"if condition must be a boolean expression, but it is "+string(condition.Type()))
+				"'if' condition must be a boolean expression, but it is "+condition.Type().String())
 		}
 
 		effect := this.VisitScope(effects[i])
@@ -313,10 +380,10 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 		isWhile = ctx.GetKind().GetText() == "while"
 
 		condition = this.VisitExpression(ctx.GetCondition())
-		if condition.Type() != vm.BOOLEAN {
+		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := ctx.GetCondition().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
-				"if condition must be a boolean expression, but it is "+string(condition.Type()))
+				"if condition must be a boolean expression, but it is "+condition.Type().String())
 		}
 	}
 
@@ -358,7 +425,7 @@ func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
 
 	right := this.VisitExpression(ctx.right)
 
-	if variable.type_ != right.Type() {
+	if !variable.type_.Equal(right.Type()) {
 		token := ctx.GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", variable.type_, right.Type()))
@@ -445,9 +512,9 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 	var returnType vm.Type
 	if !declared {
 		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared function")
-		returnType = vm.VOID
+		returnType = vm.NewSimpleType(vm.VOID)
 	} else {
-		returnType = vm.GetFunctionReturnType(variable.type_)
+		returnType = variable.type_.GetResultType()
 	}
 
 	params := make([]vm.Expression, 0, len(ctx.GetParams()))
@@ -458,13 +525,48 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 		paramTypes = append(paramTypes, expression.Type())
 	}
 
-	callType := vm.GetFunctionType(paramTypes, returnType)
+	callType := vm.NewFunctionType("", paramTypes, returnType)
 
-	if declared && callType != variable.type_ {
+	if declared && !callType.Equal(variable.type_) {
 		token := ctx.GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("function parameter mismatch\nExpected: %s\n     Got: %s", variable.type_, callType))
 	}
 
 	return vm.NewFunctionCall(name, params, returnType)
+}
+
+func (this *MyVisitor) VisitLambda(ctx *LambdaContext) vm.Expression {
+	trace(ctx)
+
+	paramNames, paramTypes := this.VisitParams(ctx.GetParams())
+	// len(paramNames) == len(paramTypes)
+
+	var returnType vm.Type
+	if ctx.GetReturnType() != nil {
+		returnType = this.VisitTypeName(ctx.GetReturnType())
+	} else {
+		returnType = vm.NewSimpleType(vm.VOID)
+	}
+
+	typ := vm.NewFunctionType("", paramTypes, returnType)
+
+	// now prepare the scope before parsing function body which will reference
+	// parameters etc.
+
+	oldFunction := this.currentFunction
+	defer func() { this.currentFunction = oldFunction }()
+	this.currentFunction = typ
+
+	oldScope := this.scope
+	defer func() { this.scope = oldScope }()
+	this.scope = newScope(this.scope)
+	// add parameters as named variables
+	for i := 0; i < len(paramNames); i++ {
+		this.scope.declare(paramNames[i], paramTypes[i])
+	}
+
+	return vm.NewLiteral(
+		vm.NewFunction(typ, paramNames, this.VisitScope(ctx.GetBody())),
+	)
 }

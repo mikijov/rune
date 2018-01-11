@@ -32,8 +32,13 @@ declaration
     : identifier=IDENTIFIER ':=' value=expression
     | identifier=IDENTIFIER ':' type_=typeName ('=' value=expression)?
     ;
-typeName
-    : 'int' | 'real' | 'string' | 'bool'
+typeName: typeName2;
+typeName2
+    : 'int' # SimpleType
+    | 'real' # SimpleType
+    | 'string' # SimpleType
+    | 'bool' # SimpleType
+    | 'func' '(' (paramTypes+=typeName2 (',' paramTypes+=typeName2)*)? ')' (':' returnType=typeName2)? # FunctionType
     // | 'list' | 'map'
     ;
 
@@ -63,9 +68,7 @@ ifStatement
 loop: 'loop' (kind=('while'|'until') condition=expression)? body=scope
     ;
 
-expression: expression2
-    ;
-
+expression: expression2;
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | op='-' value=expression2 # UnaryExpression
@@ -80,7 +83,8 @@ expression2
     | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
     | value=literal # LiteralPassthrough
     | name=IDENTIFIER # VariableExpression
-    | name=IDENTIFIER '(' (params+=expression (',' params+=expression)*)? ')' # FunctionCall
+    | name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # FunctionCall
+    | 'func' params=paramDecl (':' returnType=typeName)? body=scope # Lambda
     ;
 
 assignmentOp

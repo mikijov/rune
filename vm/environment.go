@@ -47,7 +47,7 @@ func NewEnvironment(outer Environment) Environment {
 		fc = outer.(*environment).functionContext
 	} else {
 		fc = &functionContext{
-			retVal: Zero(VOID),
+			retVal: NewSimpleType(VOID).GetZero(),
 		}
 	}
 
@@ -63,7 +63,7 @@ func NewFunctionEnvironment(outer Environment, returnType Type) Environment {
 		outer: outer,
 		store: make(map[string]Object),
 		functionContext: &functionContext{
-			retVal: Zero(returnType),
+			retVal: returnType.GetZero(),
 		},
 	}
 }
@@ -71,18 +71,18 @@ func NewFunctionEnvironment(outer Environment, returnType Type) Environment {
 func go2runeType(typ reflect.Type) (Type, error) {
 	switch typ.Kind() {
 	case reflect.Int64:
-		return INTEGER, nil
+		return NewSimpleType(INTEGER), nil
 	case reflect.Float64:
-		return REAL, nil
+		return NewSimpleType(REAL), nil
 	case reflect.Bool:
-		return BOOLEAN, nil
+		return NewSimpleType(BOOLEAN), nil
 	case reflect.String:
-		return STRING, nil
+		return NewSimpleType(STRING), nil
 	// TODO: implement support for passing Environment to user function
 	// case reflect.Interface:
 	// 	return ?
 	default:
-		return VOID, errors.New("unsupported type")
+		return NewSimpleType(VOID), errors.New("unsupported type")
 	}
 }
 
@@ -101,9 +101,18 @@ func (this *environment) DeclareUserFunction(name string, fn interface{}) error 
 
 	typ := val.Type()
 
+	paramTypes := make([]Type, 0, typ.NumIn())
+	for i := 0; i < typ.NumIn(); i += 1 {
+		paramType, err := go2runeType(typ.In(i))
+		if err != nil {
+			return err
+		}
+		paramTypes = append(paramTypes, paramType)
+	}
+
 	var returnType Type
 	if typ.NumOut() == 0 {
-		returnType = VOID
+		returnType = NewSimpleType(VOID)
 	} else if typ.NumOut() > 1 {
 		return errors.New("function can have no or one return value")
 	} else {
@@ -113,17 +122,8 @@ func (this *environment) DeclareUserFunction(name string, fn interface{}) error 
 		}
 	}
 
-	fdecl := NewFunctionDeclaration(name, returnType)
-
-	for i := 0; i < typ.NumIn(); i += 1 {
-		paramType, err := go2runeType(typ.In(i))
-		if err != nil {
-			return err
-		}
-		fdecl.AddParameter(fmt.Sprintf("param%d", i), paramType)
-	}
-
-	fdecl.SetBody(nil) // TODO: make actual function call
+	functionType := NewFunctionType("", paramTypes, returnType)
+	this.Declare(name, NewUserFunction(functionType, val))
 
 	return nil
 }
