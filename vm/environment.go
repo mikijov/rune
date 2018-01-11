@@ -122,7 +122,7 @@ func (this *environment) DeclareUserFunction(name string, fn interface{}) error 
 		}
 	}
 
-	functionType := NewFunctionType("", paramTypes, returnType)
+	functionType := NewFunctionType(paramTypes, returnType)
 	this.Declare(name, NewUserFunction(functionType, val))
 
 	return nil

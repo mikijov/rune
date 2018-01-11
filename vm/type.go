@@ -14,7 +14,6 @@ type VmInteger int64
 type VmReal float64
 
 type Type interface {
-	GetName() string
 	GetKind() Kind
 	String() string
 	Equal(other Type) bool
@@ -25,19 +24,13 @@ type Type interface {
 }
 
 type simpleType struct {
-	name string
 	kind Kind
 }
 
 func NewSimpleType(kind Kind) Type {
 	return &simpleType{
-		name: string(kind),
 		kind: kind,
 	}
-}
-
-func (this *simpleType) GetName() string {
-	return this.name
 }
 
 func (this *simpleType) GetKind() Kind {
@@ -88,22 +81,15 @@ func (this *simpleType) GetZero() Object {
 }
 
 type functionType struct {
-	// TODO: is name really necessary?
-	name       string
 	paramTypes []Type
 	returnType Type
 }
 
-func NewFunctionType(name string, paramTypes []Type, returnType Type) Type {
+func NewFunctionType(paramTypes []Type, returnType Type) Type {
 	return &functionType{
-		name:       name,
 		paramTypes: paramTypes,
 		returnType: returnType,
 	}
-}
-
-func (this *functionType) GetName() string {
-	return this.name
 }
 
 func (this *functionType) GetKind() Kind {

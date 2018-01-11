@@ -166,7 +166,7 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
 
-	typ := vm.NewFunctionType(name, paramTypes, returnType)
+	typ := vm.NewFunctionType(paramTypes, returnType)
 	// declaration of this function is made in the proper, outer scope
 	this.scope.declare(name, typ)
 
@@ -276,7 +276,7 @@ func (this *MyVisitor) VisitFunctionType(ctx *FunctionTypeContext) vm.Type {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
 
-	return vm.NewFunctionType("", paramTypes, returnType)
+	return vm.NewFunctionType(paramTypes, returnType)
 }
 
 func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
@@ -525,7 +525,7 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 		paramTypes = append(paramTypes, expression.Type())
 	}
 
-	callType := vm.NewFunctionType("", paramTypes, returnType)
+	callType := vm.NewFunctionType(paramTypes, returnType)
 
 	if declared && !callType.Equal(variable.type_) {
 		token := ctx.GetStart()
@@ -549,7 +549,7 @@ func (this *MyVisitor) VisitLambda(ctx *LambdaContext) vm.Expression {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
 
-	typ := vm.NewFunctionType("", paramTypes, returnType)
+	typ := vm.NewFunctionType(paramTypes, returnType)
 
 	// now prepare the scope before parsing function body which will reference
 	// parameters etc.
