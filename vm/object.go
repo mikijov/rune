@@ -11,17 +11,6 @@ type Object interface {
 	Value() reflect.Value
 }
 
-func Assign(dest, src Object) {
-	switch dest := dest.(type) {
-	case Integer:
-		dest.SetValue(src.(Integer).GetValue())
-	case Real:
-		dest.SetValue(src.(Real).GetValue())
-	default:
-		panic("unknown type")
-	}
-}
-
 type void struct {
 }
 

@@ -16,16 +16,16 @@ type ErrorListener interface {
 }
 
 func trace(ctx antlr.ParserRuleContext) {
-	return
+	// return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
 	// file, line := f.FileLine(pc[0])
 	// fmt.Printf("%s:%d %s\n", file, line, f.Name())
 	fmt.Printf("%s(%s)\n", f.Name(), ctx.GetText())
-
 	if ctx != nil {
 		fmt.Printf("%T\n", ctx)
+		return
 		for i, child := range ctx.GetChildren() {
 			switch child := child.(type) {
 			case antlr.ParserRuleContext:

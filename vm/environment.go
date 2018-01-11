@@ -137,11 +137,20 @@ func (this *environment) Declare(name string, value Object) {
 }
 
 func (this *environment) Set(name string, value Object) {
-	obj := this.Get(name)
-	if obj == nil {
-		panic(fmt.Sprintf("undeclared variable: %s", name))
+	obj, ok := this.store[name]
+	if ok {
+		// TODO: this check should have been done statically by the compiler
+		if !obj.Type().Equal(value.Type()) {
+			panic(fmt.Sprintf("type mismatch assigning: %s. %v != %v", name, obj.Type(), value.Type()))
+		}
+		this.store[name] = value
+	} else {
+		if this.outer != nil {
+			this.outer.Set(name, value)
+		} else {
+			panic(fmt.Sprintf("undeclared variable: %s", name))
+		}
 	}
-	Assign(obj, value)
 }
 
 func (this *environment) Get(name string) Object {
@@ -153,7 +162,11 @@ func (this *environment) Get(name string) Object {
 }
 
 func (this *environment) SetReturnValue(value Object) {
-	Assign(this.functionContext.retVal, value)
+	// TODO: this check should have been done statically by the compiler
+	if !this.functionContext.retVal.Type().Equal(value.Type()) {
+		panic(fmt.Sprintf("type mismatch returning: %v != %v", this.functionContext.retVal.Type(), value.Type()))
+	}
+	this.functionContext.retVal = value
 }
 
 func (this *environment) GetReturnValue() Object {
