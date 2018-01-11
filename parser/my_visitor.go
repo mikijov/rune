@@ -43,7 +43,7 @@ type MyVisitor struct {
 	*antlr.BaseParseTreeVisitor
 	errors          ErrorListener
 	program         vm.Program
-	scope           *scope
+	scope           Scope
 	currentFunction vm.Type
 }
 
@@ -51,7 +51,7 @@ func NewMyVisitor(errors ErrorListener) *MyVisitor {
 	return &MyVisitor{
 		errors:  errors,
 		program: vm.NewProgram(),
-		scope:   newScope(nil),
+		scope:   NewScope(nil),
 	}
 }
 
@@ -139,8 +139,7 @@ func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
 	}
 
 	name := ctx.GetIdentifier().GetText()
-	_, ok := this.scope.declare(name, type_)
-	if !ok {
+	if !this.scope.Declare(name, type_) {
 		panic("variable redeclared")
 	}
 
@@ -168,7 +167,7 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	typ := vm.NewFunctionType(paramTypes, returnType)
 	// declaration of this function is made in the proper, outer scope
-	this.scope.declare(name, typ)
+	this.scope.Declare(name, typ)
 
 	// now prepare the scope before parsing function body which will reference
 	// parameters etc.
@@ -179,10 +178,10 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	oldScope := this.scope
 	defer func() { this.scope = oldScope }()
-	this.scope = newScope(this.scope)
+	this.scope = NewScope(this.scope)
 	// add parameters as named variables
 	for i := 0; i < len(paramNames); i++ {
-		this.scope.declare(paramNames[i], paramTypes[i])
+		this.scope.Declare(paramNames[i], paramTypes[i])
 	}
 
 	return vm.NewDeclarationStatement(
@@ -416,19 +415,17 @@ func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) v
 func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
 	trace(ctx)
 
+	right := this.VisitExpression(ctx.GetRight())
+
 	name := ctx.GetLeft().GetText()
-	variable, declared := this.scope.get(name)
-	if !declared {
+	typ := this.scope.Get(name)
+	if typ == nil {
 		token := ctx.GetLeft()
 		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared variable")
-	}
-
-	right := this.VisitExpression(ctx.right)
-
-	if !variable.type_.Equal(right.Type()) {
+	} else if !typ.Equal(right.Type()) {
 		token := ctx.GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", variable.type_, right.Type()))
+			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", typ, right.Type()))
 	}
 
 	switch ctx.GetOp().GetText() {
@@ -436,28 +433,28 @@ func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
 		return vm.NewAssignment(name, right)
 	case "+=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "+", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "+", right))
 	case "-=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "-", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "-", right))
 	case "*=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "*", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "*", right))
 	case "/=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "/", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "/", right))
 	case "%=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "%", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "%", right))
 	case "&=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "&", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "&", right))
 	case "|=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "|", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "|", right))
 	case "^=":
 		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, variable.type_), "^", right))
+			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "^", right))
 	default:
 		panic("unknown operation")
 	}
@@ -495,12 +492,13 @@ func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) v
 
 	token := ctx.GetName()
 	name := token.GetText()
-	variable, declared := this.scope.get(name)
-	if !declared {
+	typ := this.scope.Get(name)
+	if typ == nil {
 		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared variable")
+		return nil
+	} else {
+		return vm.NewVariableReference(name, typ)
 	}
-
-	return vm.NewVariableReference(name, variable.type_)
 }
 
 func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression {
@@ -508,13 +506,13 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 
 	token := ctx.GetName()
 	name := token.GetText()
-	variable, declared := this.scope.get(name)
+	typ := this.scope.Get(name)
 	var returnType vm.Type
-	if !declared {
+	if typ == nil {
 		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared function")
 		returnType = vm.NewSimpleType(vm.VOID)
 	} else {
-		returnType = variable.type_.GetResultType()
+		returnType = typ.GetResultType()
 	}
 
 	params := make([]vm.Expression, 0, len(ctx.GetParams()))
@@ -527,10 +525,10 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 
 	callType := vm.NewFunctionType(paramTypes, returnType)
 
-	if declared && !callType.Equal(variable.type_) {
+	if typ != nil && !callType.Equal(typ) {
 		token := ctx.GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("function parameter mismatch\nExpected: %s\n     Got: %s", variable.type_, callType))
+			fmt.Sprintf("function parameter mismatch\nExpected: %s\n     Got: %s", typ, callType))
 	}
 
 	return vm.NewFunctionCall(name, params, returnType)
@@ -560,10 +558,10 @@ func (this *MyVisitor) VisitLambda(ctx *LambdaContext) vm.Expression {
 
 	oldScope := this.scope
 	defer func() { this.scope = oldScope }()
-	this.scope = newScope(this.scope)
+	this.scope = NewScope(this.scope)
 	// add parameters as named variables
 	for i := 0; i < len(paramNames); i++ {
-		this.scope.declare(paramNames[i], paramTypes[i])
+		this.scope.Declare(paramNames[i], paramTypes[i])
 	}
 
 	return vm.NewLiteral(

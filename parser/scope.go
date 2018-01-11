@@ -1,45 +1,34 @@
 package parser
 
 import (
-	"fmt"
-
 	"mikijov/rune/vm"
 )
 
-type variable struct {
-	value *vm.Object
-	type_ vm.Type
+type Scope interface {
+	Declare(name string, typ vm.Type) bool
+	Get(name string) vm.Type
 }
 
 type scope struct {
-	store map[string]*variable
-	outer *scope
+	store map[string]vm.Type
+	outer Scope
 }
 
-func newScope(outer *scope) *scope {
+func NewScope(outer Scope) Scope {
 	return &scope{
-		store: make(map[string]*variable),
+		store: make(map[string]vm.Type),
 		outer: outer,
 	}
 }
 
-func (s *scope) declare(name string, type_ vm.Type) (*variable, bool) {
+func (s *scope) Declare(name string, typ vm.Type) bool {
 	if _, ok := s.store[name]; ok {
-		fmt.Printf("%s already declared\n", name)
-		return nil, false // already declared in the current scope
+		return false // already declared in the current scope
 	}
-	retVal := &variable{
-		type_: type_,
-	}
-	s.store[name] = retVal
-	// fmt.Printf("%s :%s\n", name, type_)
-	return retVal, true
+	s.store[name] = typ
+	return true
 }
 
-func (s *scope) get(name string) (*variable, bool) {
-	obj, ok := s.store[name]
-	if !ok && s.outer != nil {
-		obj, ok = s.outer.get(name)
-	}
-	return obj, ok
+func (s *scope) Get(name string) vm.Type {
+	return s.store[name]
 }
