@@ -4,7 +4,6 @@
 
 ### v1
 
-- external functions
 - arrays and slices
 - error handling
 

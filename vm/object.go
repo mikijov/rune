@@ -11,12 +11,31 @@ type Object interface {
 	Value() reflect.Value
 }
 
+func ObjectFromValue(typ Type, val reflect.Value) Object {
+	switch typ.GetKind() {
+	case INTEGER:
+		return &integer{value: VmInteger(val.Int())}
+	case REAL:
+		return &real{value: VmReal(val.Float())}
+	case STRING:
+		return &string_{value: val.String()}
+	case BOOLEAN:
+		return &boolean{value: val.Bool()}
+	case VOID:
+		return &void{}
+	case FUNCTION:
+		return val.Interface().(Function)
+	default:
+		panic("invalid type")
+	}
+}
+
 type void struct {
 }
 
 func (this *void) Type() Type           { return NewSimpleType(VOID) }
 func (this *void) Inspect() string      { return string(VOID) }
-func (this *void) Value() reflect.Value { return reflect.ValueOf(nil) }
+func (this *void) Value() reflect.Value { return reflect.ValueOf(VOID) }
 
 type Integer interface {
 	Object
@@ -30,7 +49,7 @@ type integer struct {
 
 func (this *integer) Type() Type               { return NewSimpleType(INTEGER) }
 func (this *integer) Inspect() string          { return fmt.Sprintf("%d", this.value) }
-func (this *integer) Value() reflect.Value     { return reflect.ValueOf(this.value) }
+func (this *integer) Value() reflect.Value     { return reflect.ValueOf(int64(this.value)) }
 func (this *integer) GetValue() VmInteger      { return this.value }
 func (this *integer) SetValue(value VmInteger) { this.value = value }
 
@@ -46,7 +65,7 @@ type real struct {
 
 func (this *real) Type() Type            { return NewSimpleType(REAL) }
 func (this *real) Inspect() string       { return fmt.Sprintf("%f", this.value) }
-func (this *real) Value() reflect.Value  { return reflect.ValueOf(this.value) }
+func (this *real) Value() reflect.Value  { return reflect.ValueOf(float64(this.value)) }
 func (this *real) GetValue() VmReal      { return this.value }
 func (this *real) SetValue(value VmReal) { this.value = value }
 
@@ -179,12 +198,17 @@ func (this *userFunction) Call(env Environment, params []Expression) Object {
 		valueParams = append(valueParams, val.Value())
 	}
 
-	this.value.Call(valueParams)
-
-	return nil
+	returnValues := this.value.Call(valueParams)
+	returnType := this.typ.GetResultType()
+	if returnType.GetKind() == VOID {
+		return returnType.GetZero()
+	} else {
+		return ObjectFromValue(returnType, returnValues[0])
+	}
 }
 
 func (this *userFunction) Equal(other Function) bool {
+	// TODO: return simply DeepEqual; no need to cast
 	o, ok := other.(*userFunction)
 	if !ok {
 		return false

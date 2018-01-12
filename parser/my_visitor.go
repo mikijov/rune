@@ -47,12 +47,21 @@ type MyVisitor struct {
 	currentFunction vm.Type
 }
 
-func NewMyVisitor(errors ErrorListener) *MyVisitor {
-	return &MyVisitor{
+func NewMyVisitor(errors ErrorListener, ext vm.Externals) *MyVisitor {
+	retVal := &MyVisitor{
 		errors:  errors,
 		program: vm.NewProgram(),
 		scope:   NewScope(nil),
 	}
+
+	if ext != nil {
+		for i := 0; i < ext.GetDeclCount(); i++ {
+			name, value := ext.GetDecl(i)
+			retVal.scope.Declare(name, value.Type())
+		}
+	}
+
+	return retVal
 }
 
 func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
