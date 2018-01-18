@@ -24,8 +24,7 @@ func add(x, y int64) int64 {
 	return x + y
 }
 
-func Compile(filename string, ext vm.Externals) (vm.Program, Messages) {
-	input := antlr.NewFileStream(os.Args[1])
+func compile(input antlr.CharStream, ext vm.Externals) (vm.Program, Messages) {
 	lexer := parser.NewRuneLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
 
@@ -45,12 +44,22 @@ func Compile(filename string, ext vm.Externals) (vm.Program, Messages) {
 	return program, errors
 }
 
+func Compile(code string, ext vm.Externals) (vm.Program, Messages) {
+	input := antlr.NewInputStream(code)
+	return compile(input, ext)
+}
+
+func CompileFile(filename string, ext vm.Externals) (vm.Program, Messages) {
+	input := antlr.NewFileStream(filename)
+	return compile(input, ext)
+}
+
 func main() {
 	externals := vm.NewExternals()
 	externals.DeclareUserFunction("hello", helloWorld)
 	externals.DeclareUserFunction("add", add)
 
-	program, messages := Compile(os.Args[1], externals)
+	program, messages := CompileFile(os.Args[1], externals)
 
 	// check for errors
 	if len(messages.GetErrors()) > 0 {

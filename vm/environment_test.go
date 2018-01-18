@@ -1,93 +1,113 @@
 package vm
 
 import (
-	"fmt"
 	"testing"
 )
 
 func TestEnvironment(t *testing.T) {
-	fmt.Println("test1")
-
 	i := &integer{value: 123}
+	i1 := &integer{value: 321}
 	r := &real{value: 456.789}
+	r1 := &real{value: 654.987}
 
 	env := NewEnvironment(nil)
 
-	if env.GetInteger("x") != nil {
+	if env.Get("x") != nil {
 		t.Error("variable should not be defined")
 	}
-	if env.GetReal("y") != nil {
+	if env.Get("y") != nil {
 		t.Error("variable should not be defined")
 	}
 
-	env.SetInteger("x", i)
-	if env.GetInteger("x").GetValue() != i.GetValue() {
+	env.Declare("x", i)
+	if env.Get("x").(Integer).GetValue() != i.GetValue() {
 		t.Error("wrong value")
 	}
 
-	env.SetReal("y", r)
-	if env.GetReal("y").GetValue() != r.GetValue() {
+	env.Declare("y", r)
+	if env.Get("y").(Real).GetValue() != r.GetValue() {
 		t.Error("wrong value")
+	}
+
+	env.Set("x", i1)
+	if env.Get("x").(Integer).GetValue() != i1.GetValue() {
+		t.Error("wrong value")
+	}
+
+	env.Set("y", r1)
+	if env.Get("y").(Real).GetValue() != r1.GetValue() {
+		t.Error("wrong value")
+	}
+
+	expected := map[string]bool{
+		"x": false,
+		"y": false,
+	}
+	for _, variable := range env.GetLocalVariables() {
+		encoutered, ok := expected[variable]
+		if !ok {
+			t.Errorf("unexpected variable '%s'", variable)
+			continue
+		}
+		if encoutered {
+			t.Errorf("repeated variable '%s'", variable)
+			continue
+		}
+		expected[variable] = true
+	}
+	for name, encoutered := range expected {
+		if !encoutered {
+			t.Errorf("expected but not declared '%s'", name)
+		}
 	}
 }
 
 func TestEnvironmentScope(t *testing.T) {
-	fmt.Println("test2")
-
 	i := &integer{value: 123}
 	i2 := &integer{value: 321}
 	r := &real{value: 456.789}
 
 	outer := NewEnvironment(nil)
-
-	// check it's empty
-	if outer.GetInteger("x") != nil {
-		t.Error("variable should not be defined")
-	}
-	if outer.GetReal("y") != nil {
-		t.Error("variable should not be defined")
-	}
-
-	outer.SetInteger("x", i)
-	outer.SetReal("y", r)
-
-	// test basic get
-	if outer.GetInteger("x").GetValue() != i.GetValue() {
-		t.Error("wrong value")
-	}
-	if outer.GetReal("y").GetValue() != r.GetValue() {
-		t.Error("wrong value")
-	}
-
 	inner := NewEnvironment(outer)
 
 	// test that outer scope is visible from the inner one
-	if inner.GetInteger("x").GetValue() != i.GetValue() {
+	outer.Declare("x", i)
+	outer.Declare("y", r)
+	if outer.Get("x").(Integer).GetValue() != i.GetValue() {
 		t.Error("wrong value")
 	}
-	if inner.GetReal("y").GetValue() != r.GetValue() {
+	if outer.Get("y").(Real).GetValue() != r.GetValue() {
+		t.Error("wrong value")
+	}
+	if inner.Get("x").(Integer).GetValue() != i.GetValue() {
+		t.Error("wrong value")
+	}
+	if inner.Get("y").(Real).GetValue() != r.GetValue() {
 		t.Error("wrong value")
 	}
 
 	// test that vars set in inner scope are not visible in the outer one
-	inner.SetInteger("a", i)
-	inner.SetReal("b", r)
-	if inner.GetInteger("a").GetValue() != i.GetValue() {
+	inner.Declare("a", i)
+	inner.Declare("b", r)
+	if inner.Get("a").(Integer).GetValue() != i.GetValue() {
 		t.Error("wrong value")
 	}
-	if inner.GetReal("b").GetValue() != r.GetValue() {
+	if inner.Get("b").(Real).GetValue() != r.GetValue() {
 		t.Error("wrong value")
 	}
-	if outer.GetInteger("a") != nil {
+	if outer.Get("a") != nil {
 		t.Error("should not be visible")
 	}
-	if outer.GetReal("b") != nil {
+	if outer.Get("b") != nil {
 		t.Error("should not be visible")
 	}
 
 	// test updating value in the outer scope form the inner one
-	inner.SetInteger("x", i2)
-	if outer.GetInteger("x").GetValue() != i2.GetValue() {
+	inner.Set("x", i2)
+	if outer.Get("x").(Integer).GetValue() != i2.GetValue() {
+		t.Error("wrong value")
+	}
+	if inner.Get("x").(Integer).GetValue() != i2.GetValue() {
 		t.Error("wrong value")
 	}
 }

@@ -16,7 +16,7 @@ type ErrorListener interface {
 }
 
 func trace(ctx antlr.ParserRuleContext) {
-	// return
+	return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -344,8 +344,8 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 	conditions := ctx.GetConditions()
 	effects := ctx.GetEffects()
 
-	var retVal vm.IfStatement
-	var current vm.IfStatement
+	var retVal vm.IfStatement     // first if which will acutually be returned
+	var previousIf vm.IfStatement // current if used to chain ifs
 
 	for i, condCtx := range conditions {
 		condition := this.VisitExpression(condCtx)
@@ -359,16 +359,17 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 
 		if retVal == nil {
 			retVal = vm.NewIfStatement(condition, effect, nil)
-			current = retVal
+			previousIf = retVal
 		} else {
-			nestedIf := vm.NewIfStatement(condition, effect, nil)
-			current.SetAlternative(nestedIf)
-			current = nestedIf
+			// make new if the alternative of the previous one
+			chainedIf := vm.NewIfStatement(condition, effect, nil)
+			previousIf.SetAlternative(chainedIf)
+			previousIf = chainedIf
 		}
 	}
 
 	if ctx.GetAlternative() != nil {
-		current.SetAlternative(this.VisitScope(ctx.GetAlternative()))
+		previousIf.SetAlternative(this.VisitScope(ctx.GetAlternative()))
 	}
 
 	return retVal

@@ -7,8 +7,9 @@ import (
 
 type Object interface {
 	Type() Type
-	Inspect() string
+	String() string
 	Value() reflect.Value
+	Equal(other Object) bool
 }
 
 func ObjectFromValue(typ Type, val reflect.Value) Object {
@@ -34,45 +35,61 @@ type void struct {
 }
 
 func (this *void) Type() Type           { return NewSimpleType(VOID) }
-func (this *void) Inspect() string      { return string(VOID) }
-func (this *void) Value() reflect.Value { return reflect.ValueOf(VOID) }
+func (this *void) String() string       { return string(VOID) }
+func (this *void) Value() reflect.Value { return reflect.ValueOf(nil) }
+
+func (this *void) Equal(other Object) bool {
+	_, ok := other.(*void)
+	return ok
+}
 
 type Integer interface {
 	Object
 	GetValue() VmInteger
-	SetValue(value VmInteger)
 }
 
 type integer struct {
 	value VmInteger
 }
 
-func (this *integer) Type() Type               { return NewSimpleType(INTEGER) }
-func (this *integer) Inspect() string          { return fmt.Sprintf("%d", this.value) }
-func (this *integer) Value() reflect.Value     { return reflect.ValueOf(int64(this.value)) }
-func (this *integer) GetValue() VmInteger      { return this.value }
-func (this *integer) SetValue(value VmInteger) { this.value = value }
+func (this *integer) Type() Type           { return NewSimpleType(INTEGER) }
+func (this *integer) String() string       { return fmt.Sprintf("%d", this.value) }
+func (this *integer) Value() reflect.Value { return reflect.ValueOf(int64(this.value)) }
+func (this *integer) GetValue() VmInteger  { return this.value }
+
+func (this *integer) Equal(other Object) bool {
+	o, ok := other.(*integer)
+	if !ok {
+		return false
+	}
+	return this.value == o.value
+}
 
 type Real interface {
 	Object
 	GetValue() VmReal
-	SetValue(value VmReal)
 }
 
 type real struct {
 	value VmReal
 }
 
-func (this *real) Type() Type            { return NewSimpleType(REAL) }
-func (this *real) Inspect() string       { return fmt.Sprintf("%f", this.value) }
-func (this *real) Value() reflect.Value  { return reflect.ValueOf(float64(this.value)) }
-func (this *real) GetValue() VmReal      { return this.value }
-func (this *real) SetValue(value VmReal) { this.value = value }
+func (this *real) Type() Type           { return NewSimpleType(REAL) }
+func (this *real) String() string       { return fmt.Sprintf("%f", this.value) }
+func (this *real) Value() reflect.Value { return reflect.ValueOf(float64(this.value)) }
+func (this *real) GetValue() VmReal     { return this.value }
+
+func (this *real) Equal(other Object) bool {
+	o, ok := other.(*real)
+	if !ok {
+		return false
+	}
+	return this.value == o.value
+}
 
 type Boolean interface {
 	Object
 	GetValue() bool
-	SetValue(value bool)
 }
 
 type boolean struct {
@@ -80,31 +97,44 @@ type boolean struct {
 }
 
 func (this *boolean) Type() Type           { return NewSimpleType(BOOLEAN) }
-func (this *boolean) Inspect() string      { return fmt.Sprintf("%t", this.value) }
+func (this *boolean) String() string       { return fmt.Sprintf("%t", this.value) }
 func (this *boolean) Value() reflect.Value { return reflect.ValueOf(this.value) }
 func (this *boolean) GetValue() bool       { return this.value }
-func (this *boolean) SetValue(value bool)  { this.value = value }
+
+func (this *boolean) Equal(other Object) bool {
+	o, ok := other.(*boolean)
+	if !ok {
+		return false
+	}
+	return this.value == o.value
+}
 
 type String interface {
 	Object
 	GetValue() string
-	SetValue(value string)
 }
 
 type string_ struct {
 	value string
 }
 
-func (this *string_) Type() Type            { return NewSimpleType(STRING) }
-func (this *string_) Inspect() string       { return this.value }
-func (this *string_) Value() reflect.Value  { return reflect.ValueOf(this.value) }
-func (this *string_) GetValue() string      { return this.value }
-func (this *string_) SetValue(value string) { this.value = value }
+func (this *string_) Type() Type           { return NewSimpleType(STRING) }
+func (this *string_) String() string       { return this.value }
+func (this *string_) Value() reflect.Value { return reflect.ValueOf(this.value) }
+func (this *string_) GetValue() string     { return this.value }
+
+func (this *string_) Equal(other Object) bool {
+	o, ok := other.(*string_)
+	if !ok {
+		return false
+	}
+	return this.value == o.value
+}
 
 type Function interface {
 	Object
 	Call(env Environment, params []Expression) Object
-	Equal(other Function) bool
+	// Equal(other Function) bool
 }
 
 type zeroFunction struct {
@@ -118,7 +148,7 @@ func NewZeroFunction(typ Type) Function {
 }
 
 func (this *zeroFunction) Type() Type           { return this.typ }
-func (this *zeroFunction) Inspect() string      { return "nil" }
+func (this *zeroFunction) String() string       { return "nil" }
 func (this *zeroFunction) Value() reflect.Value { return reflect.ValueOf(nil) }
 
 func (this *zeroFunction) Call(env Environment, params []Expression) Object {
@@ -126,8 +156,14 @@ func (this *zeroFunction) Call(env Environment, params []Expression) Object {
 	return nil
 }
 
-func (this *zeroFunction) Equal(other Function) bool {
-	return this.typ.Equal(other.Type())
+func (this *zeroFunction) Equal(other Object) bool {
+	// TODO: return simply DeepEqual; no need to cast
+	o, ok := other.(*zeroFunction)
+	if !ok {
+		return false
+	} else {
+		return reflect.DeepEqual(this, o)
+	}
 }
 
 type function struct {
@@ -145,7 +181,7 @@ func NewFunction(typ Type, paramNames []string, body Statement) Function {
 }
 
 func (this *function) Type() Type           { return this.typ }
-func (this *function) Inspect() string      { return this.typ.String() }
+func (this *function) String() string       { return this.typ.String() }
 func (this *function) Value() reflect.Value { return reflect.ValueOf(this) }
 
 func (this *function) Call(env Environment, params []Expression) Object {
@@ -166,7 +202,7 @@ func (this *function) Call(env Environment, params []Expression) Object {
 	return funcEnv.GetReturnValue()
 }
 
-func (this *function) Equal(other Function) bool {
+func (this *function) Equal(other Object) bool {
 	o, ok := other.(*function)
 	if !ok {
 		return false
@@ -188,7 +224,7 @@ func NewUserFunction(typ Type, value reflect.Value) Function {
 }
 
 func (this *userFunction) Type() Type           { return this.typ }
-func (this *userFunction) Inspect() string      { return "user function" }
+func (this *userFunction) String() string       { return "user function" }
 func (this *userFunction) Value() reflect.Value { return this.value }
 
 func (this *userFunction) Call(env Environment, params []Expression) Object {
@@ -207,7 +243,7 @@ func (this *userFunction) Call(env Environment, params []Expression) Object {
 	}
 }
 
-func (this *userFunction) Equal(other Function) bool {
+func (this *userFunction) Equal(other Object) bool {
 	// TODO: return simply DeepEqual; no need to cast
 	o, ok := other.(*userFunction)
 	if !ok {

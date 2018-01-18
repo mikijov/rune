@@ -4,17 +4,18 @@
 
 ### v1
 
+- tests
 - arrays and slices
 - error handling
 
 ### future
 
+- structs
+- imports/modules
 - allow passing Environment to user functions
 - implement variadic functions
 - support for variadic user functions
 - maps
-- lambda's
-- imports/modules
 
 ## syntax
 

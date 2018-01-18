@@ -20,11 +20,7 @@ type Environment interface {
 	SetError(msg string)
 	GetError() (failed bool, msg string)
 
-	GetInteger(name string) Integer
-	GetReal(name string) Real
-
-	SetInteger(name string, value Integer)
-	SetReal(name string, value Real)
+	GetLocalVariables() []string
 }
 
 type functionContext struct {
@@ -154,36 +150,14 @@ func (this *environment) GetError() (failed bool, msg string) {
 	return this.functionContext.errorFlag, this.functionContext.errorMsg
 }
 
-func (this *environment) SetInteger(name string, value Integer) {
-	obj := this.GetInteger(name)
-	if obj != nil {
-		obj.SetValue(value.GetValue())
-	} else {
-		this.store[name] = value
-	}
-}
+func (this *environment) GetLocalVariables() []string {
+	retVal := make([]string, len(this.store))
 
-func (this *environment) SetReal(name string, value Real) {
-	obj := this.GetReal(name)
-	if obj != nil {
-		obj.SetValue(value.GetValue())
-	} else {
-		this.store[name] = value
+	i := 0
+	for k := range this.store {
+		retVal[i] = k
+		i++
 	}
-}
 
-func (this *environment) GetInteger(name string) Integer {
-	obj, ok := this.store[name].(Integer)
-	if !ok && this.outer != nil {
-		return this.outer.GetInteger(name)
-	}
-	return obj
-}
-
-func (this *environment) GetReal(name string) Real {
-	obj, ok := this.store[name].(Real)
-	if !ok && this.outer != nil {
-		return this.outer.GetReal(name)
-	}
-	return obj
+	return retVal
 }

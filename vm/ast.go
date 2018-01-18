@@ -5,28 +5,34 @@ import (
 	"strconv"
 )
 
+// Program is a series of statements.
 type Program interface {
 	AddStatement(s Statement)
 	Execute(env Environment)
 	String() string
 }
 
+// Statement is a construct that does not have a value.
 type Statement interface {
 	Execute(env Environment)
 	String() string
 }
 
+// Expression is a construct that has a value that can be assigned.
 type Expression interface {
 	Execute(env Environment) Object
 	Type() Type
 	String() string
 }
 
+// UnaryExpression expands on Expression and has only an operator and a single
+// operand.
 type UnaryExpression interface {
 	Expression
 	Operand() Object
 }
 
+// BinaryExpression expands on Expression and has operator and two operands.
 type BinaryExpression interface {
 	Expression
 	Left() Expression
@@ -40,6 +46,7 @@ type program struct {
 	statements []Statement
 }
 
+// NewProgram creates new Program.
 func NewProgram() Program {
 	return &program{
 		statements: make([]Statement, 0, 5),
@@ -75,6 +82,9 @@ type declarationStatement struct {
 	expression Expression
 }
 
+// NewDeclarationStatement creates new declaration Statement. When executed it
+// will declare new variable in the current scope and then assign initial value
+// to it.
 func NewDeclarationStatement(name string, value Expression) Statement {
 	return &declarationStatement{
 		name:       name,
@@ -85,7 +95,7 @@ func NewDeclarationStatement(name string, value Expression) Statement {
 func (this *declarationStatement) Execute(env Environment) {
 	value := this.expression.Execute(env)
 	env.Declare(this.name, value)
-	fmt.Printf("%s :%v = %s;\n", this.name, value.Type(), value.Inspect())
+	// fmt.Printf("%s :%v = %s;\n", this.name, value.Type(), value.String())
 }
 
 func (this *declarationStatement) String() string {
@@ -96,50 +106,8 @@ func (this *declarationStatement) String() string {
 	)
 }
 
-// type parameter struct {
-// 	name  string
-// 	type_ Type
-// }
-//
-// func (this *parameter) GetName() string {
-// 	return this.name
-// }
-//
-// func (this *parameter) GetType() Type {
-// 	return this.type_
-// }
-//
-// type Lambda interface {
-// 	Expression
-// 	GetParamCount() int
-// 	GetParamName(i int) string
-// }
-//
-// type lambda struct {
-// 	typ  Type
-// 	body Function
-// }
-//
-// func NewLambda(typ Type) Lambda {
-// 	return &lambda{
-// 		name:       name,
-// 		params:     make([]*parameter, 0, 5),
-// 		returnType: returnType,
-// 	}
-// }
-//
-// func (this *lambda) Type() Type {
-// 	return this.typ
-// }
-//
-// func (this *lambda) Execute(env Environment) Object {
-// 	return this.body
-// }
-//
-// func (this *lambda) String() string {
-// 	return this.body.Inspect()
-// }
-//
+// ScopeStatement is a statement representing a list of statements all enclosed
+// within a scope that determines variable lifetime.
 type ScopeStatement interface {
 	Statement
 	AddStatement(s Statement)
@@ -149,6 +117,9 @@ type scopeStatement struct {
 	statements []Statement
 }
 
+// NewScopeStatement creates new Statement representing a scope. Most importantly
+// a scope determines lifetime of variables. Like a Program, scope consists of
+// statements.
 func NewScopeStatement() ScopeStatement {
 	return &scopeStatement{
 		statements: make([]Statement, 0, 5),
@@ -190,6 +161,10 @@ type returnStatement struct {
 	value Expression
 }
 
+// NewReturnStatement creates new return Statement. Return when executed, return
+// statement indicates to the VM that the current function should return. In
+// addition it handles returning result value to the caller. It is illegal to
+// execute a return statement outside of a function.
 func NewReturnStatement(retVal Expression) Statement {
 	return &returnStatement{
 		value: retVal,
@@ -207,11 +182,14 @@ func (this *returnStatement) Execute(env Environment) {
 func (this *returnStatement) String() string {
 	if this.value != nil {
 		return "return " + this.value.String() + ";"
-	} else {
-		return "return;"
 	}
+	return "return;"
 }
 
+// IfStatement represents an if statement. It has a condition which determines
+// if the effect is executed. Optionally is also has an alternative. Alternative
+// is the 'else' portion of the if statement and is executed if the condition
+// is not true.
 type IfStatement interface {
 	Statement
 	SetAlternative(alternative Statement)
@@ -223,6 +201,7 @@ type ifStatement struct {
 	alternative Statement
 }
 
+// NewIfStatement creates an if statement.
 func NewIfStatement(condition Expression, effect, alternative Statement) IfStatement {
 	return &ifStatement{
 		condition:   condition,
@@ -258,6 +237,9 @@ type loopStatement struct {
 	body  Statement
 }
 
+// NewLoopStatement creates a loop statement. Simple loop statement does not
+// have a condition and will be executed infinitely or until break or return
+// statement is executed.
 func NewLoopStatement(label string, body Statement) Statement {
 	return &loopStatement{
 		label: label,
@@ -289,6 +271,10 @@ type whileStatement struct {
 	body      Statement
 }
 
+// NewWhileStatement creates a while loop statement. Condition is executed before
+// each iteration through the body, and the body is executed only if the condition
+// is true. This means if the first condition check fails, the body is never
+// executed.
 func NewWhileStatement(label string, condition Expression, body Statement) Statement {
 	return &whileStatement{
 		label:     label,
@@ -321,6 +307,9 @@ type untilStatement struct {
 	body      Statement
 }
 
+// NewUntilStatement creates an until loop statement. Condition is executed after
+// each iteration through the body. This means that the body is always executed
+// at least once.
 func NewUntilStatement(label string, condition Expression, body Statement) Statement {
 	return &untilStatement{
 		label:     label,
@@ -351,13 +340,18 @@ type expressionStatement struct {
 	expression Expression
 }
 
+// NewExpressionStatement creates a statement that evaluates an expression. The
+// value of the expression is ignored. Example of an expression is '5;' whose
+// value is 5 but nothing is done with it. The most common use of an expression
+// statement is to call a function but ignoring it's return value.
 func NewExpressionStatement(e Expression) Statement {
 	return &expressionStatement{expression: e}
 }
 
 func (this *expressionStatement) Execute(env Environment) {
-	value := this.expression.Execute(env)
-	fmt.Printf("%s :%v = %s\n", this.String(), value.Type(), value.Inspect())
+	this.expression.Execute(env)
+	// value := this.expression.Execute(env)
+	// fmt.Printf("%s :%v = %s\n", this.String(), value.Type(), value.String())
 }
 
 func (this *expressionStatement) String() string {
@@ -368,12 +362,12 @@ func (this *expressionStatement) String() string {
 ////////
 
 type variableReference struct {
-	name  string
-	type_ Type
+	name string
+	typ  Type
 }
 
 func (this *variableReference) Type() Type {
-	return this.type_
+	return this.typ
 }
 
 func (this *variableReference) Execute(env Environment) Object {
@@ -384,10 +378,12 @@ func (this *variableReference) String() string {
 	return this.name
 }
 
-func NewVariableReference(name string, type_ Type) Expression {
+// NewVariableReference creates expression which evaluates to value of variable
+// in scope.
+func NewVariableReference(name string, typ Type) Expression {
 	return &variableReference{
-		name:  name,
-		type_: type_,
+		name: name,
+		typ:  typ,
 	}
 }
 
@@ -423,6 +419,8 @@ func (this *functionCall) String() string {
 	return retVal
 }
 
+// NewFunctionCall creates new expression which evaluates to the return value of
+// the function it is calling.
 func NewFunctionCall(name string, params []Expression, returnType Type) Expression {
 	return &functionCall{
 		name:       name,
@@ -448,9 +446,10 @@ func (this *literal) Execute(env Environment) Object {
 }
 
 func (this *literal) String() string {
-	return this.value.Inspect()
+	return this.value.String()
 }
 
+// NewLiteral creates expression which evaluates to the literal value.
 func NewLiteral(value Object) Expression {
 	return &literal{value: value}
 }
@@ -487,7 +486,7 @@ func (this *integerLiteral) Execute(env Environment) Object {
 }
 
 func (this *integerLiteral) String() string {
-	return fmt.Sprintf("%d", this.value.GetValue())
+	return this.value.String()
 }
 
 func NewIntegerLiteral(s string) Expression {
@@ -511,7 +510,7 @@ func (this *realLiteral) Execute(env Environment) Object {
 }
 
 func (this *realLiteral) String() string {
-	return fmt.Sprintf("%f", this.value.GetValue())
+	return this.value.String()
 }
 
 func NewRealLiteral(s string) Expression {
@@ -535,7 +534,7 @@ func (this *booleanLiteral) Execute(env Environment) Object {
 }
 
 func (this *booleanLiteral) String() string {
-	return fmt.Sprintf("%f", this.value.GetValue())
+	return this.value.String()
 }
 
 func NewBooleanLiteral(s string) Expression {
