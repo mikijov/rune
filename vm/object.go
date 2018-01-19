@@ -2,6 +2,7 @@ package vm
 
 import (
 	"fmt"
+	"math"
 	"reflect"
 )
 
@@ -34,6 +35,7 @@ func ObjectFromValue(typ Type, val reflect.Value) Object {
 type void struct {
 }
 
+func NewVoid() Object                   { return &void{} }
 func (this *void) Type() Type           { return NewSimpleType(VOID) }
 func (this *void) String() string       { return string(VOID) }
 func (this *void) Value() reflect.Value { return reflect.ValueOf(nil) }
@@ -52,6 +54,7 @@ type integer struct {
 	value VmInteger
 }
 
+func NewInteger(val VmInteger) Integer     { return &integer{val} }
 func (this *integer) Type() Type           { return NewSimpleType(INTEGER) }
 func (this *integer) String() string       { return fmt.Sprintf("%d", this.value) }
 func (this *integer) Value() reflect.Value { return reflect.ValueOf(int64(this.value)) }
@@ -74,6 +77,7 @@ type real struct {
 	value VmReal
 }
 
+func NewReal(val VmReal) Real           { return &real{val} }
 func (this *real) Type() Type           { return NewSimpleType(REAL) }
 func (this *real) String() string       { return fmt.Sprintf("%f", this.value) }
 func (this *real) Value() reflect.Value { return reflect.ValueOf(float64(this.value)) }
@@ -84,7 +88,9 @@ func (this *real) Equal(other Object) bool {
 	if !ok {
 		return false
 	}
-	return this.value == o.value
+	// compares floats while ignoring last bit
+	// fmt.Printf("%f: %d . %d\n", this.value, math.Float64bits(float64(this.value)), math.Float64bits(float64(o.value)))
+	return math.Nextafter(float64(this.value), float64(o.value)) == float64(o.value)
 }
 
 type Boolean interface {
@@ -96,6 +102,7 @@ type boolean struct {
 	value bool
 }
 
+func NewBoolean(val bool) Boolean          { return &boolean{val} }
 func (this *boolean) Type() Type           { return NewSimpleType(BOOLEAN) }
 func (this *boolean) String() string       { return fmt.Sprintf("%t", this.value) }
 func (this *boolean) Value() reflect.Value { return reflect.ValueOf(this.value) }
@@ -118,6 +125,7 @@ type string_ struct {
 	value string
 }
 
+func NewString(val string) String          { return &string_{val} }
 func (this *string_) Type() Type           { return NewSimpleType(STRING) }
 func (this *string_) String() string       { return this.value }
 func (this *string_) Value() reflect.Value { return reflect.ValueOf(this.value) }

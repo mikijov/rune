@@ -65,30 +65,33 @@ ifStatement
             ('else' alternative=scope)?
     ;
 
-loop: 'loop' (kind=('while'|'until') condition=expression)? body=scope
+// loop: 'loop' (kind=('while'|'until') condition=expression)? body=scope
+loop: 'loop' (kind='while' condition=expression)? body=scope
     ;
 
 expression: expression2;
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
-    | op='-' value=expression2 # UnaryExpression
-    | left=IDENTIFIER op=assignmentOp right=expression2 # Assignment
-    | left=expression2 op='or' right=expression2 # BinaryExpression
-    | left=expression2 op='and' right=expression2 # BinaryExpression
-    | left=expression2 op=('<'|'>'|'=='|'>='|'<='|'!=') right=expression2 # BinaryExpression
-    | left=expression2 op='|' right=expression2 # BinaryExpression
-    | left=expression2 op='^' right=expression2 # BinaryExpression
-    | left=expression2 op='&' right=expression2 # BinaryExpression
-    | left=expression2 op=('*'|'/'|'%') right=expression2 # BinaryExpression
-    | left=expression2 op=('+'|'-') right=expression2 # BinaryExpression
-    | value=literal # LiteralPassthrough
-    | name=IDENTIFIER # VariableExpression
     | name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # FunctionCall
+    | op=unaryOp value=expression2 # UnaryExpression
+    | left=expression2 op=('*'|'/'|'%'|'&') right=expression2 # BinaryExpression
+    | left=expression2 op=('+'|'-'|'|'|'^') right=expression2 # BinaryExpression
+    // | left=expression2 op=('<<'|'>>') right=expression2 # BinaryExpression
+    | left=expression2 op=('<'|'>'|'=='|'>='|'<='|'!=') right=expression2 # BinaryExpression
+    | left=expression2 op='and' right=expression2 # BinaryExpression
+    | left=expression2 op='or' right=expression2 # BinaryExpression
+    | left=IDENTIFIER op=assignmentOp right=expression2 # Assignment
+    | value=literal # LiteralPassthrough
     | 'func' params=paramDecl (':' returnType=typeName)? body=scope # Lambda
+    | name=IDENTIFIER # VariableExpression
     ;
 
+unaryOp
+    /* 'not' | '!' | '+' | '*' | '&' | '~' etc... */
+    : '-'
+    ;
 assignmentOp
-    /* : '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>=' | '**=' | '//=' */
+    /* : '<<=' | '>>=' | '**=' | '//=' */
     : '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^='
     ;
 literal

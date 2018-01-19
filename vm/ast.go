@@ -301,41 +301,41 @@ func (this *whileStatement) String() string {
 	return retVal
 }
 
-type untilStatement struct {
-	label     string
-	condition Expression
-	body      Statement
-}
-
-// NewUntilStatement creates an until loop statement. Condition is executed after
-// each iteration through the body. This means that the body is always executed
-// at least once.
-func NewUntilStatement(label string, condition Expression, body Statement) Statement {
-	return &untilStatement{
-		label:     label,
-		condition: condition,
-		body:      body,
-	}
-}
-
-func (this *untilStatement) Execute(env Environment) {
-	for this.condition.Execute(env).(Boolean).GetValue() {
-		this.body.Execute(env)
-		if env.IsReturning() {
-			return
-		}
-	}
-}
-
-func (this *untilStatement) String() string {
-	retVal := "loop "
-	if this.label != "" {
-		retVal += this.label + " "
-	}
-	retVal += "until " + this.body.String()
-	return retVal
-}
-
+// type untilStatement struct {
+// 	label     string
+// 	condition Expression
+// 	body      Statement
+// }
+//
+// // NewUntilStatement creates an until loop statement. Condition is executed after
+// // each iteration through the body. This means that the body is always executed
+// // at least once.
+// func NewUntilStatement(label string, condition Expression, body Statement) Statement {
+// 	return &untilStatement{
+// 		label:     label,
+// 		condition: condition,
+// 		body:      body,
+// 	}
+// }
+//
+// func (this *untilStatement) Execute(env Environment) {
+// 	for this.condition.Execute(env).(Boolean).GetValue() {
+// 		this.body.Execute(env)
+// 		if env.IsReturning() {
+// 			return
+// 		}
+// 	}
+// }
+//
+// func (this *untilStatement) String() string {
+// 	retVal := "loop "
+// 	if this.label != "" {
+// 		retVal += this.label + " "
+// 	}
+// 	retVal += "until " + this.body.String()
+// 	return retVal
+// }
+//
 type expressionStatement struct {
 	expression Expression
 }
@@ -894,9 +894,9 @@ func (this *integerEqual) Type() Type {
 }
 
 func (this *integerEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Integer).GetValue()
-	right := this.right.Execute(env).(Integer).GetValue()
-	return &boolean{left == right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{left.Equal(right)}
 }
 
 func (this *integerEqual) String() string {
@@ -913,9 +913,9 @@ func (this *realEqual) Type() Type {
 }
 
 func (this *realEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Real).GetValue()
-	right := this.right.Execute(env).(Real).GetValue()
-	return &boolean{left == right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{left.Equal(right)}
 }
 
 func (this *realEqual) String() string {
@@ -932,9 +932,9 @@ func (this *booleanEqual) Type() Type {
 }
 
 func (this *booleanEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Boolean).GetValue()
-	right := this.right.Execute(env).(Boolean).GetValue()
-	return &boolean{left == right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{left.Equal(right)}
 }
 
 func (this *booleanEqual) String() string {
@@ -951,8 +951,8 @@ func (this *funcEqual) Type() Type {
 }
 
 func (this *funcEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Function)
-	right := this.right.Execute(env).(Function)
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
 	return &boolean{left.Equal(right)}
 }
 
@@ -972,9 +972,9 @@ func (this *integerNotEqual) Type() Type {
 }
 
 func (this *integerNotEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Integer).GetValue()
-	right := this.right.Execute(env).(Integer).GetValue()
-	return &boolean{left != right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{!left.Equal(right)}
 }
 
 func (this *integerNotEqual) String() string {
@@ -991,9 +991,9 @@ func (this *realNotEqual) Type() Type {
 }
 
 func (this *realNotEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Real).GetValue()
-	right := this.right.Execute(env).(Real).GetValue()
-	return &boolean{left != right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{!left.Equal(right)}
 }
 
 func (this *realNotEqual) String() string {
@@ -1010,9 +1010,9 @@ func (this *booleanNotEqual) Type() Type {
 }
 
 func (this *booleanNotEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Boolean).GetValue()
-	right := this.right.Execute(env).(Boolean).GetValue()
-	return &boolean{left != right}
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
+	return &boolean{!left.Equal(right)}
 }
 
 func (this *booleanNotEqual) String() string {
@@ -1029,8 +1029,8 @@ func (this *funcNotEqual) Type() Type {
 }
 
 func (this *funcNotEqual) Execute(env Environment) Object {
-	left := this.left.Execute(env).(Function)
-	right := this.right.Execute(env).(Function)
+	left := this.left.Execute(env)
+	right := this.right.Execute(env)
 	return &boolean{!left.Equal(right)}
 }
 

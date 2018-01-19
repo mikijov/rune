@@ -7,6 +7,7 @@
 - tests
 - arrays and slices
 - error handling
+- break and continue
 
 ### future
 

@@ -99,8 +99,12 @@ func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
 	switch ctx := ctx.(type) {
 	case *ExpressionContext:
 		return this.VisitExpression(ctx.GetChild(0))
+	case *ExpressionPassthroughContext:
+		return this.VisitExpression(ctx.GetChild(1)) // skip parenthesis
 	case *BinaryExpressionContext:
 		return this.VisitBinaryExpression(ctx)
+	// case *UnaryExpressionContext:
+	// 	return this.VisitUnaryExpression(ctx)
 	case *AssignmentContext:
 		return this.VisitAssignment(ctx)
 	case *LiteralPassthroughContext:
@@ -384,10 +388,10 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 	// }
 
 	var condition vm.Expression
-	var isWhile bool
+	// var isWhile bool
 	if ctx.GetCondition() != nil {
-		isWhile = ctx.GetKind().GetText() == "while"
-
+		// isWhile = ctx.GetKind().GetText() == "while"
+		//
 		condition = this.VisitExpression(ctx.GetCondition())
 		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := ctx.GetCondition().GetStart()
@@ -400,11 +404,14 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 
 	if condition == nil {
 		return vm.NewLoopStatement(label, body)
-	} else if isWhile {
-		return vm.NewWhileStatement(label, condition, body)
 	} else {
-		return vm.NewUntilStatement(label, condition, body)
+		return vm.NewWhileStatement(label, condition, body)
 	}
+	// } else if isWhile {
+	// 	return vm.NewWhileStatement(label, condition, body)
+	// } else {
+	// 	return vm.NewUntilStatement(label, condition, body)
+	// }
 }
 
 func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {

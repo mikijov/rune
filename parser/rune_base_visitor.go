@@ -96,6 +96,10 @@ func (v *BaseRuneVisitor) VisitLambda(ctx *LambdaContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitUnaryOp(ctx *UnaryOpContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitAssignmentOp(ctx *AssignmentOpContext) interface{} {
 	return v.VisitChildren(ctx)
 }
