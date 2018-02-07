@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/vm"
 )
 
 func TestDeclarations(t *testing.T) {

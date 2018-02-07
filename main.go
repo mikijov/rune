@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"mikijov/rune/parser"
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/parser"
+	"github.com/mikijov/rune/vm"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )

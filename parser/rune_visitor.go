@@ -5,7 +5,7 @@ package parser // Rune
 import "github.com/antlr/antlr4/runtime/Go/antlr"
 
 import (
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/vm"
 )
 
 var _ vm.Type // inhibit unused import error

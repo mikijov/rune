@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/vm"
 )
 
 type Scope interface {

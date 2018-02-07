@@ -8,7 +8,7 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/vm"
 )
 
 type ErrorListener interface {

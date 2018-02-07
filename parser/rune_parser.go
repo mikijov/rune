@@ -11,7 +11,7 @@ import (
 )
 
 import (
-	"mikijov/rune/vm"
+	"github.com/mikijov/rune/vm"
 )
 
 var _ vm.Type // inhibit unused import error
