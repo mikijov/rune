@@ -1,3 +1,17 @@
+// Copyright © 2018 Milutin Jovanović jovanovic.milutin@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package vm
 
 import (
@@ -469,6 +483,7 @@ func (this *voidLiteral) String() string {
 	return string(VOID)
 }
 
+// NewVoidLiteral creates expression representing void value.
 func NewVoidLiteral() Expression {
 	return &voidLiteral{}
 }
@@ -489,6 +504,7 @@ func (this *integerLiteral) String() string {
 	return this.value.String()
 }
 
+// NewIntegerLiteral creates expression representing literal integer value.
 func NewIntegerLiteral(s string) Expression {
 	val, err := strconv.ParseInt(s, 10, 0)
 	if err != nil {
@@ -513,6 +529,7 @@ func (this *realLiteral) String() string {
 	return this.value.String()
 }
 
+// NewRealLiteral creates expression representing literal real value.
 func NewRealLiteral(s string) Expression {
 	val, err := strconv.ParseFloat(s, 64)
 	if err != nil {
@@ -537,6 +554,7 @@ func (this *booleanLiteral) String() string {
 	return this.value.String()
 }
 
+// NewBooleanLiteral creates expression representing literal boolean value.
 func NewBooleanLiteral(s string) Expression {
 	if s == "true" {
 		return &booleanLiteral{value: &boolean{value: true}}
@@ -1200,6 +1218,8 @@ func (this *realGreaterOrEqual) String() string {
 
 // NewBinaryExpression
 
+// NewBinaryExpression creates new expression which represent a binary operation
+// like addition or multiplication.
 func NewBinaryExpression(left Expression, op string, right Expression) Expression {
 	lType := left.Type().GetKind()
 	rType := right.Type().GetKind()
@@ -1347,6 +1367,8 @@ type assignment struct {
 	expression Expression
 }
 
+// NewAssignment creates new expression which assign a value to a variable and
+// the same value being the value for the whole expression.
 func NewAssignment(name string, value Expression) Expression {
 	return &assignment{
 		name:       name,

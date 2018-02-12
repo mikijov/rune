@@ -1,0 +1,11 @@
+{
+  "Linters": {
+      "golint": {
+        "Command": "golint -disable_check \"receiver name should\" -disable_check \"if block ends with a return\""
+      }
+  },
+  "Exclude": [
+    "vendor/*",
+    "parser/rune_*"
+  ]
+}

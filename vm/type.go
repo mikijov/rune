@@ -1,5 +1,20 @@
+// Copyright © 2018 Milutin Jovanović jovanovic.milutin@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package vm
 
+// Constants identifying kinds of rune data types.
 const (
 	VOID     Kind = "void"
 	INTEGER       = "int"
@@ -9,10 +24,18 @@ const (
 	FUNCTION      = "func"
 )
 
+// Kind is a higher level of grouping of data types in rune. E.g. all functions
+// belong to a FUNCTION kind even though each different function signature is a
+// separate type.
 type Kind string
+
+// VmInteger determines the underlying type rune uses to represent integers.
 type VmInteger int64
+
+// VmReal determines the underlying type rune uses to represent real numbers.
 type VmReal float64
 
+// Type interface describes every type in rune.
 type Type interface {
 	GetKind() Kind
 	String() string
@@ -27,6 +50,8 @@ type simpleType struct {
 	kind Kind
 }
 
+// NewSimpleType creates Type that represents simple rune type like integer or
+// real. Currently all types other then functions are simple types.
 func NewSimpleType(kind Kind) Type {
 	return &simpleType{
 		kind: kind,
@@ -68,7 +93,7 @@ func (this *simpleType) GetZero() Object {
 	case REAL:
 		return &real{value: VmReal(0.0)}
 	case STRING:
-		return &string_{value: ""}
+		return &strng{value: ""}
 	case BOOLEAN:
 		return &boolean{value: false}
 	case VOID:
@@ -85,6 +110,7 @@ type functionType struct {
 	returnType Type
 }
 
+// NewFunctionType creates Type that represents functions.
 func NewFunctionType(paramTypes []Type, returnType Type) Type {
 	return &functionType{
 		paramTypes: paramTypes,

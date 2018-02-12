@@ -1,3 +1,17 @@
+// Copyright © 2018 Milutin Jovanović jovanovic.milutin@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
 import (
@@ -314,5 +328,42 @@ func TestFunctions(t *testing.T) {
 		if !test.value.Equal(a) {
 			t.Errorf("test %d: %s unexpected value %v != %v", i, test.code, a, test.value)
 		}
+	}
+}
+
+func TestFibbonaci(t *testing.T) {
+	code := `
+func fibbonaci(count :int) :int {
+	if count <= 0 {
+		return 0;
+	} else if count == 1 {
+		return 1;
+	} else {
+		n1 := 1;
+		n2 := 1;
+		count = count - 2;
+		loop while count > 0 {
+			count = count - 1;
+			temp := n2 + n1;
+			n2 = n1;
+			n1 = temp;
+		}
+		return n1;
+	}
+}
+a := fibbonaci(50);
+`
+	expected := vm.NewInteger(12586269025)
+
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	a := env.Get("a")
+	if !expected.Equal(a) {
+		t.Errorf("unexpected value %s != %s", a, expected)
 	}
 }

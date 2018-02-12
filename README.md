@@ -1,24 +1,38 @@
 # rune
 
-## backlog
+[![License][License-Image]][License-Url]
+[License-Url]: https://opensource.org/licenses/Apache-2.0
+[License-Image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg?maxAge=2592000
+
+[![Build][Build-Status-Image]][Build-Status-Url]
+[Build-Status-Url]: http://travis-ci.org/mikijov/rune
+[Build-Status-Image]: https://travis-ci.org/mikijov/rune.svg?branch=master
+
+[![ReportCard][ReportCard-Image]][ReportCard-Url]
+[ReportCard-Url]: https://goreportcard.com/report/github.com/mikijov/rune
+[ReportCard-Image]: https://goreportcard.com/badge/github.com/mikijov/rune
+
+Programming language I use to experiment with syntax and programming patterns.
+
+## Backlog
 
 ### v1
 
-- tests
-- arrays and slices
-- error handling
-- break and continue
+- [ ] tests
+- [ ] arrays and slices
+- [ ] error handling
+- [ ] break and continue
 
-### future
+### Future
 
-- structs
-- imports/modules
-- allow passing Environment to user functions
-- implement variadic functions
-- support for variadic user functions
-- maps
+- [ ] structs
+- [ ] imports/modules
+- [ ] allow passing Environment to user functions
+- [ ] implement variadic functions
+- [ ] support for variadic user functions
+- [ ] maps
 
-## syntax
+## Syntax
 
 ```
 console := import("console")
@@ -87,7 +101,6 @@ func someFibNumbers() :int[] {
         fibbonaci(5),
     ]
 }
-
-
 ```
+
 <!-- vim: set expandtab ts=4 sw=4 sts=4 tw=80 : -->

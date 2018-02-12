@@ -1,3 +1,17 @@
+// Copyright © 2018 Milutin Jovanović jovanovic.milutin@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Generated from Rune.g4 by ANTLR 4.7.
 
 package parser // Rune
@@ -11,10 +25,14 @@ import (
 	"github.com/mikijov/rune/vm"
 )
 
+// ErrorListener is the sink for all messages produced by the compiler. The
+// implementation must be provided by the user of this package.
 type ErrorListener interface {
 	Error(line, col int, msg string)
 }
 
+// this function is here purely for early debugging. It should be removed as
+// soon as the parser is relatively stable.
 func trace(ctx antlr.ParserRuleContext) {
 	return
 	pc := make([]uintptr, 10) // at least 1 entry needed
@@ -39,6 +57,8 @@ func trace(ctx antlr.ParserRuleContext) {
 	}
 }
 
+// MyVisitor is implementation of of BaseParseTreeVisitor that parses rune
+// programs.
 type MyVisitor struct {
 	*antlr.BaseParseTreeVisitor
 	errors          ErrorListener
@@ -47,6 +67,8 @@ type MyVisitor struct {
 	currentFunction vm.Type
 }
 
+// NewMyVisitor creates new instance of MyVisitor and initializes it with error
+// listener and externals.
 func NewMyVisitor(errors ErrorListener, ext vm.Externals) *MyVisitor {
 	retVal := &MyVisitor{
 		errors:  errors,
@@ -64,116 +86,116 @@ func NewMyVisitor(errors ErrorListener, ext vm.Externals) *MyVisitor {
 	return retVal
 }
 
+// VisitProgram is the entry point for parsing all rune programs.
 func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 	trace(ctx)
 
 	for _, stmt := range ctx.GetStatements() {
-		this.program.AddStatement(this.VisitStatement(stmt))
+		this.program.AddStatement(this.visitStatement(stmt))
 	}
 
 	return this.program
 }
 
-func (this *MyVisitor) VisitStatement(ctx IStatementContext) vm.Statement {
+func (this *MyVisitor) visitStatement(ctx IStatementContext) vm.Statement {
 	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
 	case *ExpressionContext:
-		return vm.NewExpressionStatement(this.VisitExpression(child))
+		return vm.NewExpressionStatement(this.visitExpression(child))
 	case *DeclarationContext:
-		return this.VisitDeclaration(child)
+		return this.visitDeclaration(child)
 	case *LoopContext:
-		return this.VisitLoop(child)
+		return this.visitLoop(child)
 	case *FunctionContext:
-		return this.VisitFunction(child)
+		return this.visitFunction(child)
 	case *ReturnStatementContext:
-		return this.VisitReturnStatement(child)
+		return this.visitReturnStatement(child)
 	case *IfStatementContext:
-		return this.VisitIfStatement(child)
+		return this.visitIfStatement(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
 }
 
-func (this *MyVisitor) VisitExpression(ctx interface{}) vm.Expression {
+func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 	switch ctx := ctx.(type) {
 	case *ExpressionContext:
-		return this.VisitExpression(ctx.GetChild(0))
+		return this.visitExpression(ctx.GetChild(0))
 	case *ExpressionPassthroughContext:
-		return this.VisitExpression(ctx.GetChild(1)) // skip parenthesis
+		return this.visitExpression(ctx.GetChild(1)) // skip parenthesis
 	case *BinaryExpressionContext:
-		return this.VisitBinaryExpression(ctx)
+		return this.visitBinaryExpression(ctx)
 	// case *UnaryExpressionContext:
 	// 	return this.VisitUnaryExpression(ctx)
 	case *AssignmentContext:
-		return this.VisitAssignment(ctx)
+		return this.visitAssignment(ctx)
 	case *LiteralPassthroughContext:
-		return this.VisitLiteralPassthrough(ctx)
+		return this.visitLiteralPassthrough(ctx)
 	case *RealLiteralContext:
-		return this.VisitRealLiteral(ctx)
+		return this.visitRealLiteral(ctx)
 	case *IntegerLiteralContext:
-		return this.VisitIntegerLiteral(ctx)
+		return this.visitIntegerLiteral(ctx)
 	case *BooleanLiteralContext:
-		return this.VisitBooleanLiteral(ctx)
+		return this.visitBooleanLiteral(ctx)
 	case *VariableExpressionContext:
-		return this.VisitVariableExpression(ctx)
+		return this.visitVariableExpression(ctx)
 	case *FunctionCallContext:
-		return this.VisitFunctionCall(ctx)
+		return this.visitFunctionCall(ctx)
 	case *LambdaContext:
-		return this.VisitLambda(ctx)
+		return this.visitLambda(ctx)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx))
 	}
 }
 
-func (this *MyVisitor) VisitDeclaration(ctx *DeclarationContext) vm.Statement {
+func (this *MyVisitor) visitDeclaration(ctx *DeclarationContext) vm.Statement {
 	trace(ctx)
 
-	var type_ vm.Type
+	var typ vm.Type
 	if ctx.GetType_() != nil {
-		type_ = this.VisitTypeName(ctx.GetType_())
+		typ = this.visitTypeName(ctx.GetType_())
 	}
 
 	var value vm.Expression
 	if ctx.GetValue() != nil {
-		value = this.VisitExpression(ctx.GetValue())
+		value = this.visitExpression(ctx.GetValue())
 	}
 
-	if type_ != nil && value != nil {
-		if !type_.Equal(value.Type()) {
+	if typ != nil && value != nil {
+		if !typ.Equal(value.Type()) {
 			panic("type mismatch")
 		}
-	} else if type_ != nil {
+	} else if typ != nil {
 		// already have type, nothing to do
 	} else if value != nil {
-		type_ = value.Type()
+		typ = value.Type()
 	} else {
 		panic("variable type not provided") // grammar should not allow this
 	}
 
 	name := ctx.GetIdentifier().GetText()
-	if !this.scope.Declare(name, type_) {
+	if !this.scope.Declare(name, typ) {
 		panic("variable redeclared")
 	}
 
 	if value != nil {
 		return vm.NewDeclarationStatement(name, value)
-	} else {
-		return vm.NewDeclarationStatement(name, vm.NewLiteral(type_.GetZero()))
 	}
+	return vm.NewDeclarationStatement(name, vm.NewLiteral(typ.GetZero()))
 }
 
-func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
+func (this *MyVisitor) visitFunction(ctx *FunctionContext) vm.Statement {
 	trace(ctx)
 
 	name := ctx.GetIdentifier().GetText()
 
-	paramNames, paramTypes := this.VisitParams(ctx.GetParams())
+	paramNames, paramTypes := this.visitParams(ctx.GetParams())
 	// len(paramNames) == len(paramTypes)
 
 	var returnType vm.Type
 	if ctx.GetReturnType() != nil {
-		returnType = this.VisitTypeName(ctx.GetReturnType())
+		returnType = this.visitTypeName(ctx.GetReturnType())
 	} else {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
@@ -199,7 +221,7 @@ func (this *MyVisitor) VisitFunction(ctx *FunctionContext) vm.Statement {
 
 	return vm.NewDeclarationStatement(
 		name, vm.NewLiteral(
-			vm.NewFunction(typ, paramNames, this.VisitScope(ctx.GetBody())),
+			vm.NewFunction(typ, paramNames, this.visitScope(ctx.GetBody())),
 		),
 	)
 }
@@ -209,14 +231,14 @@ type param struct {
 	typ  vm.Type
 }
 
-func (this *MyVisitor) VisitParams(ctx IParamDeclContext) (paramNames []string, paramTypes []vm.Type) {
+func (this *MyVisitor) visitParams(ctx IParamDeclContext) (paramNames []string, paramTypes []vm.Type) {
 	trace(ctx)
 
 	names := make([]string, 0, 10)
 	types := make([]vm.Type, 0, 10)
 
 	for _, child := range ctx.GetParamGroup() {
-		newNames, newTypes := this.VisitCombinedParam(child)
+		newNames, newTypes := this.visitCombinedParam(child)
 		for _, name := range newNames {
 			names = append(names, name)
 		}
@@ -228,10 +250,10 @@ func (this *MyVisitor) VisitParams(ctx IParamDeclContext) (paramNames []string, 
 	return names, types
 }
 
-func (this *MyVisitor) VisitCombinedParam(ctx ICombinedParamContext) (names []string, types []vm.Type) {
+func (this *MyVisitor) visitCombinedParam(ctx ICombinedParamContext) (names []string, types []vm.Type) {
 	trace(ctx)
 
-	returnType := this.VisitTypeName(ctx.GetParamType())
+	returnType := this.visitTypeName(ctx.GetParamType())
 
 	names = make([]string, 0, 3)
 	types = make([]vm.Type, 0, 3)
@@ -243,20 +265,20 @@ func (this *MyVisitor) VisitCombinedParam(ctx ICombinedParamContext) (names []st
 	return names, types
 }
 
-func (this *MyVisitor) VisitTypeName(ctx interface{}) vm.Type {
+func (this *MyVisitor) visitTypeName(ctx interface{}) vm.Type {
 	switch ctx := ctx.(type) {
 	case *TypeNameContext:
-		return this.VisitTypeName(ctx.GetChild(0))
+		return this.visitTypeName(ctx.GetChild(0))
 	case *SimpleTypeContext:
-		return this.VisitSimpleType(ctx)
+		return this.visitSimpleType(ctx)
 	case *FunctionTypeContext:
-		return this.VisitFunctionType(ctx)
+		return this.visitFunctionType(ctx)
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
 }
 
-func (this *MyVisitor) VisitSimpleType(ctx *SimpleTypeContext) vm.Type {
+func (this *MyVisitor) visitSimpleType(ctx *SimpleTypeContext) vm.Type {
 	trace(ctx)
 
 	switch ctx.GetText() {
@@ -273,17 +295,17 @@ func (this *MyVisitor) VisitSimpleType(ctx *SimpleTypeContext) vm.Type {
 	}
 }
 
-func (this *MyVisitor) VisitFunctionType(ctx *FunctionTypeContext) vm.Type {
+func (this *MyVisitor) visitFunctionType(ctx *FunctionTypeContext) vm.Type {
 	trace(ctx)
 
 	paramTypes := make([]vm.Type, 0, 10)
 	for _, param := range ctx.GetParamTypes() {
-		paramTypes = append(paramTypes, this.VisitTypeName(param))
+		paramTypes = append(paramTypes, this.visitTypeName(param))
 	}
 
 	var returnType vm.Type
 	if ctx.GetReturnType() != nil {
-		returnType = this.VisitTypeName(ctx.GetReturnType())
+		returnType = this.visitTypeName(ctx.GetReturnType())
 	} else {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
@@ -291,24 +313,24 @@ func (this *MyVisitor) VisitFunctionType(ctx *FunctionTypeContext) vm.Type {
 	return vm.NewFunctionType(paramTypes, returnType)
 }
 
-func (this *MyVisitor) VisitScope(ctx IScopeContext) vm.ScopeStatement {
+func (this *MyVisitor) visitScope(ctx IScopeContext) vm.ScopeStatement {
 	trace(ctx)
 
 	scope := vm.NewScopeStatement()
 	for _, stmt := range ctx.GetStatements() {
-		scope.AddStatement(this.VisitStatement(stmt))
+		scope.AddStatement(this.visitStatement(stmt))
 	}
 
 	return scope
 }
 
-func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Statement {
+func (this *MyVisitor) visitReturnStatement(ctx *ReturnStatementContext) vm.Statement {
 	trace(ctx)
 
 	var retVal vm.Expression
 	var retType vm.Type
 	if ctx.GetRetVal() != nil {
-		retVal = this.VisitExpression(ctx.GetRetVal())
+		retVal = this.visitExpression(ctx.GetRetVal())
 		retType = retVal.Type()
 	} else {
 		retType = vm.NewSimpleType(vm.VOID)
@@ -342,7 +364,7 @@ func (this *MyVisitor) VisitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 	return vm.NewReturnStatement(retVal)
 }
 
-func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
+func (this *MyVisitor) visitIfStatement(ctx IIfStatementContext) vm.Statement {
 	trace(ctx)
 
 	conditions := ctx.GetConditions()
@@ -352,14 +374,14 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 	var previousIf vm.IfStatement // current if used to chain ifs
 
 	for i, condCtx := range conditions {
-		condition := this.VisitExpression(condCtx)
+		condition := this.visitExpression(condCtx)
 		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := condCtx.GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
 				"'if' condition must be a boolean expression, but it is "+condition.Type().String())
 		}
 
-		effect := this.VisitScope(effects[i])
+		effect := this.visitScope(effects[i])
 
 		if retVal == nil {
 			retVal = vm.NewIfStatement(condition, effect, nil)
@@ -373,13 +395,13 @@ func (this *MyVisitor) VisitIfStatement(ctx IIfStatementContext) vm.Statement {
 	}
 
 	if ctx.GetAlternative() != nil {
-		previousIf.SetAlternative(this.VisitScope(ctx.GetAlternative()))
+		previousIf.SetAlternative(this.visitScope(ctx.GetAlternative()))
 	}
 
 	return retVal
 }
 
-func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
+func (this *MyVisitor) visitLoop(ctx *LoopContext) vm.Statement {
 	trace(ctx)
 
 	var label string
@@ -392,7 +414,7 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 	if ctx.GetCondition() != nil {
 		// isWhile = ctx.GetKind().GetText() == "while"
 		//
-		condition = this.VisitExpression(ctx.GetCondition())
+		condition = this.visitExpression(ctx.GetCondition())
 		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := ctx.GetCondition().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
@@ -400,7 +422,7 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 		}
 	}
 
-	body := this.VisitScope(ctx.GetBody())
+	body := this.visitScope(ctx.GetBody())
 
 	if condition == nil {
 		return vm.NewLoopStatement(label, body)
@@ -414,25 +436,25 @@ func (this *MyVisitor) VisitLoop(ctx *LoopContext) vm.Statement {
 	// }
 }
 
-func (this *MyVisitor) VisitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
+func (this *MyVisitor) visitLiteralPassthrough(ctx *LiteralPassthroughContext) vm.Expression {
 	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
 	case *RealLiteralContext:
-		return this.VisitRealLiteral(child)
+		return this.visitRealLiteral(child)
 	case *IntegerLiteralContext:
-		return this.VisitIntegerLiteral(child)
+		return this.visitIntegerLiteral(child)
 	case *BooleanLiteralContext:
-		return this.VisitBooleanLiteral(child)
+		return this.visitBooleanLiteral(child)
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx.GetChild(0)))
 	}
 }
 
-func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
+func (this *MyVisitor) visitAssignment(ctx *AssignmentContext) vm.Expression {
 	trace(ctx)
 
-	right := this.VisitExpression(ctx.GetRight())
+	right := this.visitExpression(ctx.GetRight())
 
 	name := ctx.GetLeft().GetText()
 	typ := this.scope.Get(name)
@@ -477,34 +499,34 @@ func (this *MyVisitor) VisitAssignment(ctx *AssignmentContext) vm.Expression {
 	}
 }
 
-func (this *MyVisitor) VisitBinaryExpression(ctx *BinaryExpressionContext) vm.Expression {
+func (this *MyVisitor) visitBinaryExpression(ctx *BinaryExpressionContext) vm.Expression {
 	trace(ctx)
 
-	left := this.VisitExpression(ctx.left)
-	right := this.VisitExpression(ctx.right)
+	left := this.visitExpression(ctx.left)
+	right := this.visitExpression(ctx.right)
 
 	return vm.NewBinaryExpression(left, ctx.op.GetText(), right)
 }
 
-func (this *MyVisitor) VisitRealLiteral(ctx *RealLiteralContext) vm.Expression {
+func (this *MyVisitor) visitRealLiteral(ctx *RealLiteralContext) vm.Expression {
 	trace(ctx)
 
 	return vm.NewRealLiteral(ctx.GetText())
 }
 
-func (this *MyVisitor) VisitIntegerLiteral(ctx *IntegerLiteralContext) vm.Expression {
+func (this *MyVisitor) visitIntegerLiteral(ctx *IntegerLiteralContext) vm.Expression {
 	trace(ctx)
 
 	return vm.NewIntegerLiteral(ctx.GetText())
 }
 
-func (this *MyVisitor) VisitBooleanLiteral(ctx *BooleanLiteralContext) vm.Expression {
+func (this *MyVisitor) visitBooleanLiteral(ctx *BooleanLiteralContext) vm.Expression {
 	trace(ctx)
 
 	return vm.NewBooleanLiteral(ctx.GetText())
 }
 
-func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) vm.Expression {
+func (this *MyVisitor) visitVariableExpression(ctx *VariableExpressionContext) vm.Expression {
 	trace(ctx)
 
 	token := ctx.GetName()
@@ -518,7 +540,7 @@ func (this *MyVisitor) VisitVariableExpression(ctx *VariableExpressionContext) v
 	}
 }
 
-func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression {
+func (this *MyVisitor) visitFunctionCall(ctx *FunctionCallContext) vm.Expression {
 	trace(ctx)
 
 	token := ctx.GetName()
@@ -535,7 +557,7 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 	params := make([]vm.Expression, 0, len(ctx.GetParams()))
 	paramTypes := make([]vm.Type, 0, len(ctx.GetParams()))
 	for _, ectx := range ctx.GetParams() {
-		expression := this.VisitExpression(ectx)
+		expression := this.visitExpression(ectx)
 		params = append(params, expression)
 		paramTypes = append(paramTypes, expression.Type())
 	}
@@ -551,15 +573,15 @@ func (this *MyVisitor) VisitFunctionCall(ctx *FunctionCallContext) vm.Expression
 	return vm.NewFunctionCall(name, params, returnType)
 }
 
-func (this *MyVisitor) VisitLambda(ctx *LambdaContext) vm.Expression {
+func (this *MyVisitor) visitLambda(ctx *LambdaContext) vm.Expression {
 	trace(ctx)
 
-	paramNames, paramTypes := this.VisitParams(ctx.GetParams())
+	paramNames, paramTypes := this.visitParams(ctx.GetParams())
 	// len(paramNames) == len(paramTypes)
 
 	var returnType vm.Type
 	if ctx.GetReturnType() != nil {
-		returnType = this.VisitTypeName(ctx.GetReturnType())
+		returnType = this.visitTypeName(ctx.GetReturnType())
 	} else {
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
@@ -582,6 +604,6 @@ func (this *MyVisitor) VisitLambda(ctx *LambdaContext) vm.Expression {
 	}
 
 	return vm.NewLiteral(
-		vm.NewFunction(typ, paramNames, this.VisitScope(ctx.GetBody())),
+		vm.NewFunction(typ, paramNames, this.visitScope(ctx.GetBody())),
 	)
 }

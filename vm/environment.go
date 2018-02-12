@@ -1,3 +1,17 @@
+// Copyright © 2018 Milutin Jovanović jovanovic.milutin@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package vm
 
 import (
@@ -6,6 +20,8 @@ import (
 	"reflect"
 )
 
+// Environment interface represents the current state of the running program,
+// its variables and functions.
 type Environment interface {
 	Import(ext Externals)
 
@@ -36,6 +52,11 @@ type environment struct {
 	functionContext *functionContext
 }
 
+// NewEnvironment creates new environment tied to a scope. These environments
+// are used for any block of code surrounded by {} like in loops, if statements
+// etc. This excludes function scope. This means that each nested scope can have
+// its own variables, but shares the return value with parent scopes all the way
+// to the function scope.
 func NewEnvironment(outer Environment) Environment {
 	var fc *functionContext
 	if outer != nil {
@@ -53,6 +74,9 @@ func NewEnvironment(outer Environment) Environment {
 	}
 }
 
+// NewFunctionEnvironment creates new environment tied to a function scope. It
+// is very similar to environments created by NewEnvironment() with the exception
+// that NewFunctionEnvironment creates it's own return variable.
 func NewFunctionEnvironment(outer Environment, returnType Type) Environment {
 	return &environment{
 		outer: outer,
