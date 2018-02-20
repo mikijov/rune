@@ -1,24 +1,18 @@
 # rune
 
 [![License][License-Image]][License-Url]
-[License-Url]: https://opensource.org/licenses/Apache-2.0
-[License-Image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg?maxAge=2592000
-
 [![Build][Build-Status-Image]][Build-Status-Url]
-[Build-Status-Url]: http://travis-ci.org/mikijov/rune
-[Build-Status-Image]: https://travis-ci.org/mikijov/rune.svg?branch=master
-
 [![ReportCard][ReportCard-Image]][ReportCard-Url]
-[ReportCard-Url]: https://goreportcard.com/report/github.com/mikijov/rune
-[ReportCard-Image]: https://goreportcard.com/badge/github.com/mikijov/rune
 
 Programming language I use to experiment with syntax and programming patterns.
+Still very much in early stages. However if you find any of it interesting I
+welcome you stopping by and asking a question (make an issue for now)...
 
 ## Backlog
 
 ### v1
 
-- [ ] tests
+- [x] tests
 - [ ] arrays and slices
 - [ ] error handling
 - [ ] break and continue
@@ -103,4 +97,10 @@ func someFibNumbers() :int[] {
 }
 ```
 
+[License-Url]: https://opensource.org/licenses/Apache-2.0
+[License-Image]: https://img.shields.io/badge/license-Apache%202.0-blue.svg?maxAge=2592000
+[Build-Status-Url]: http://travis-ci.org/mikijov/rune
+[Build-Status-Image]: https://travis-ci.org/mikijov/rune.svg?branch=master
+[ReportCard-Url]: https://goreportcard.com/report/github.com/mikijov/rune
+[ReportCard-Image]: https://goreportcard.com/badge/github.com/mikijov/rune
 <!-- vim: set expandtab ts=4 sw=4 sts=4 tw=80 : -->
