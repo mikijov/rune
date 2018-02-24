@@ -18,7 +18,7 @@ package parser // Rune
 
 import (
 	"fmt"
-	"runtime"
+	// "runtime"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 
@@ -34,27 +34,27 @@ type ErrorListener interface {
 // this function is here purely for early debugging. It should be removed as
 // soon as the parser is relatively stable.
 func trace(ctx antlr.ParserRuleContext) {
-	// return
-	pc := make([]uintptr, 10) // at least 1 entry needed
-	runtime.Callers(2, pc)
-	f := runtime.FuncForPC(pc[0])
-	// file, line := f.FileLine(pc[0])
-	// fmt.Printf("%s:%d %s\n", file, line, f.Name())
-	fmt.Printf("%s(%s)\n", f.Name(), ctx.GetText())
-	if ctx != nil {
-		fmt.Printf("%T\n", ctx)
-		return
-		for i, child := range ctx.GetChildren() {
-			switch child := child.(type) {
-			case antlr.ParserRuleContext:
-				fmt.Printf("%d:%s\n", i, child.GetText())
-			case *antlr.TerminalNodeImpl:
-				fmt.Printf("%d:%s\n", i, child.GetText())
-			default:
-				fmt.Printf("Unknown\n")
-			}
-		}
-	}
+	// // return
+	// pc := make([]uintptr, 10) // at least 1 entry needed
+	// runtime.Callers(2, pc)
+	// f := runtime.FuncForPC(pc[0])
+	// // file, line := f.FileLine(pc[0])
+	// // fmt.Printf("%s:%d %s\n", file, line, f.Name())
+	// fmt.Printf("%s(%s)\n", f.Name(), ctx.GetText())
+	// if ctx != nil {
+	// 	fmt.Printf("%T\n", ctx)
+	// 	return
+	// 	for i, child := range ctx.GetChildren() {
+	// 		switch child := child.(type) {
+	// 		case antlr.ParserRuleContext:
+	// 			fmt.Printf("%d:%s\n", i, child.GetText())
+	// 		case *antlr.TerminalNodeImpl:
+	// 			fmt.Printf("%d:%s\n", i, child.GetText())
+	// 		default:
+	// 			fmt.Printf("Unknown\n")
+	// 		}
+	// 	}
+	// }
 }
 
 // MyVisitor is implementation of of BaseParseTreeVisitor that parses rune
