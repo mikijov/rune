@@ -22,18 +22,13 @@ const (
 	BOOLEAN       = "bool"
 	STRING        = "string"
 	FUNCTION      = "func"
+	STRUCT        = "struct"
 )
 
 // Kind is a higher level of grouping of data types in rune. E.g. all functions
 // belong to a FUNCTION kind even though each different function signature is a
 // separate type.
 type Kind string
-
-// VmInteger determines the underlying type rune uses to represent integers.
-type VmInteger int64
-
-// VmReal determines the underlying type rune uses to represent real numbers.
-type VmReal float64
 
 // Type interface describes every type in rune.
 type Type interface {
@@ -44,6 +39,10 @@ type Type interface {
 	GetParam(i int) Type
 	GetResultType() Type
 	GetZero() Object
+	GetFieldCount() int
+	GetFieldName(i int) string
+	GetFieldType(i int) Type
+	GetFieldIndex(name string) int
 }
 
 type simpleType struct {
@@ -89,9 +88,9 @@ func (this *simpleType) GetResultType() Type {
 func (this *simpleType) GetZero() Object {
 	switch this.kind {
 	case INTEGER:
-		return &integer{value: VmInteger(0)}
+		return &integer{value: 0}
 	case REAL:
-		return &real{value: VmReal(0.0)}
+		return &real{value: 0.0}
 	case STRING:
 		return &strng{value: ""}
 	case BOOLEAN:
@@ -103,6 +102,22 @@ func (this *simpleType) GetZero() Object {
 	default:
 		panic("invalid type")
 	}
+}
+
+func (this *simpleType) GetFieldCount() int {
+	panic("not a struct")
+}
+
+func (this *simpleType) GetFieldName(i int) string {
+	panic("not a struct")
+}
+
+func (this *simpleType) GetFieldType(i int) Type {
+	panic("not a struct")
+}
+
+func (this *simpleType) GetFieldIndex(name string) int {
+	panic("not a struct")
 }
 
 type functionType struct {
@@ -174,4 +189,105 @@ func (this *functionType) GetResultType() Type {
 
 func (this *functionType) GetZero() Object {
 	return NewZeroFunction(this)
+}
+
+func (this *functionType) GetFieldCount() int {
+	panic("not a struct")
+}
+
+func (this *functionType) GetFieldName(i int) string {
+	panic("not a struct")
+}
+
+func (this *functionType) GetFieldType(i int) Type {
+	panic("not a struct")
+}
+
+func (this *functionType) GetFieldIndex(name string) int {
+	panic("not a struct")
+}
+
+type structType struct {
+	fieldNames []string
+	fieldTypes []Type
+}
+
+// NewStructType creates Type that represents structs.
+func NewStructType(fieldNames []string, fieldTypes []Type) Type {
+	return &structType{
+		fieldNames: fieldNames,
+		fieldTypes: fieldTypes,
+	}
+}
+
+func (this *structType) GetKind() Kind {
+	return STRUCT
+}
+
+func (this *structType) String() string {
+	retVal := "struct {"
+
+	for i := 0; i < len(this.fieldNames); i++ {
+		retVal += this.fieldNames[i] + ":" + this.fieldTypes[i].String() + ";"
+	}
+
+	retVal += "}"
+
+	return retVal
+}
+
+func (this *structType) Equal(other Type) bool {
+	if o, ok := other.(*structType); !ok {
+		return false
+	} else {
+		if len(this.fieldNames) != len(o.fieldNames) {
+			return false
+		}
+		for i := 0; i < len(this.fieldNames); i++ {
+			if this.fieldNames[i] != o.fieldNames[i] {
+				return false
+			}
+			if !this.fieldTypes[i].Equal(o.fieldTypes[i]) {
+				return false
+			}
+		}
+		return true
+	}
+}
+
+func (this *structType) GetParamCount() int {
+	panic("not a struct")
+}
+
+func (this *structType) GetParam(i int) Type {
+	panic("not a struct")
+}
+
+func (this *structType) GetResultType() Type {
+	return this
+}
+
+func (this *structType) GetZero() Object {
+	return NewStruct(this)
+}
+
+func (this *structType) GetFieldCount() int {
+	return len(this.fieldNames)
+}
+
+func (this *structType) GetFieldName(i int) string {
+	return this.fieldNames[i]
+}
+
+func (this *structType) GetFieldType(i int) Type {
+	return this.fieldTypes[i]
+}
+
+func (this *structType) GetFieldIndex(name string) int {
+	for i, field := range this.fieldNames {
+		if field == name {
+			return i
+		}
+	}
+	return -1
 }

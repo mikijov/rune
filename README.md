@@ -13,13 +13,15 @@ welcome you stopping by and asking a question (make an issue for now)...
 ### v1
 
 - [x] tests
+- [ ] structs
+- [ ] interfaces
 - [ ] arrays and slices
 - [ ] error handling
 - [ ] break and continue
+- [ ] string type
 
 ### Future
 
-- [ ] structs
 - [ ] imports/modules
 - [ ] allow passing Environment to user functions
 - [ ] implement variadic functions
@@ -27,6 +29,15 @@ welcome you stopping by and asking a question (make an issue for now)...
 - [ ] maps
 
 ## Syntax
+```
+type Integer int;
+
+type DemoStruct struct {
+    field1 :int,
+    field2 :real,
+    field3 :bool,
+}
+```
 
 ```
 console := import("console")

@@ -32,6 +32,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#FunctionType.
 	VisitFunctionType(ctx *FunctionTypeContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#StructType.
+	VisitStructType(ctx *StructTypeContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#function.
 	VisitFunction(ctx *FunctionContext) interface{}
 
@@ -40,6 +43,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#combinedParam.
 	VisitCombinedParam(ctx *CombinedParamContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#combinedField.
+	VisitCombinedField(ctx *CombinedFieldContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#scope.
 	VisitScope(ctx *ScopeContext) interface{}
@@ -56,11 +62,11 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#expression.
 	VisitExpression(ctx *ExpressionContext) interface{}
 
-	// Visit a parse tree produced by RuneParser#Assignment.
-	VisitAssignment(ctx *AssignmentContext) interface{}
-
 	// Visit a parse tree produced by RuneParser#LiteralPassthrough.
 	VisitLiteralPassthrough(ctx *LiteralPassthroughContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#Assignment.
+	VisitAssignment(ctx *AssignmentContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#BinaryExpression.
 	VisitBinaryExpression(ctx *BinaryExpressionContext) interface{}
@@ -76,6 +82,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#FunctionCall.
 	VisitFunctionCall(ctx *FunctionCallContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#FieldSelector.
+	VisitFieldSelector(ctx *FieldSelectorContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#Lambda.
 	VisitLambda(ctx *LambdaContext) interface{}

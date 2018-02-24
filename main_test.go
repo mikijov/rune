@@ -331,6 +331,31 @@ func TestFunctions(t *testing.T) {
 	}
 }
 
+func TestStruct(t *testing.T) {
+	code := `
+s1 :struct {
+	b1 :bool;
+	i1, i2 :int;
+	r1, r2 :real;
+};
+`
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	s1 := env.Get("s1")
+	if s1.Type().GetKind() != vm.STRUCT {
+		t.Fatalf("expected struct but got %s", s1.Type().GetKind())
+	}
+	typ := s1.Type()
+	if typ.GetFieldCount() != 5 {
+		t.Fatalf("invalid number of fields (%d)", typ.GetFieldCount())
+	}
+}
+
 func TestFibbonaci(t *testing.T) {
 	code := `
 func fibbonaci(count :int) :int {

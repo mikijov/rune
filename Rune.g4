@@ -3,7 +3,7 @@ grammar Rune;
 // put imports here
 @header {
 import (
-    "mikijov/rune/vm"
+    "github.com/mikijov/rune/vm"
 )
 
 var _ vm.Type // inhibit unused import error
@@ -39,6 +39,7 @@ typeName2
     | 'string' # SimpleType
     | 'bool' # SimpleType
     | 'func' '(' (paramTypes+=typeName2 (',' paramTypes+=typeName2)*)? ')' (':' returnType=typeName2)? # FunctionType
+    | 'struct' '{' combinedField* '}' # StructType
     // | 'list' | 'map'
     ;
 
@@ -50,6 +51,9 @@ paramDecl
     ;
 combinedParam
     : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName
+    ;
+combinedField
+    : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName ';'
     ;
 scope
     : '{' statements+=statement* '}'
@@ -73,6 +77,7 @@ expression: expression2;
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # FunctionCall
+    | base=expression2 '.' field=IDENTIFIER # FieldSelector
     | op=unaryOp value=expression2 # UnaryExpression
     | left=expression2 op=('*'|'/'|'%'|'&') right=expression2 # BinaryExpression
     | left=expression2 op=('+'|'-'|'|'|'^') right=expression2 # BinaryExpression
@@ -80,7 +85,7 @@ expression2
     | left=expression2 op=('<'|'>'|'=='|'>='|'<='|'!=') right=expression2 # BinaryExpression
     | left=expression2 op='and' right=expression2 # BinaryExpression
     | left=expression2 op='or' right=expression2 # BinaryExpression
-    | left=IDENTIFIER op=assignmentOp right=expression2 # Assignment
+    | left=expression2 op=assignmentOp right=expression2 # Assignment
     | value=literal # LiteralPassthrough
     | 'func' params=paramDecl (':' returnType=typeName)? body=scope # Lambda
     | name=IDENTIFIER # VariableExpression

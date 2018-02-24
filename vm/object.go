@@ -24,6 +24,7 @@ import (
 type Object interface {
 	Type() Type
 	String() string
+	// Value is used for passing values to external functions.
 	Value() reflect.Value
 	Equal(other Object) bool
 }
@@ -33,9 +34,9 @@ type Object interface {
 func ObjectFromValue(typ Type, val reflect.Value) Object {
 	switch typ.GetKind() {
 	case INTEGER:
-		return &integer{value: VmInteger(val.Int())}
+		return &integer{value: val.Int()}
 	case REAL:
-		return &real{value: VmReal(val.Float())}
+		return &real{value: val.Float()}
 	case STRING:
 		return &strng{value: val.String()}
 	case BOOLEAN:
@@ -66,19 +67,19 @@ func (this *void) Equal(other Object) bool {
 // Integer is specialization of Object for integer values.
 type Integer interface {
 	Object
-	GetValue() VmInteger
+	GetValue() int64
 }
 
 type integer struct {
-	value VmInteger
+	value int64
 }
 
 // NewInteger creates Integer object with specified value.
-func NewInteger(val VmInteger) Integer     { return &integer{val} }
+func NewInteger(val int64) Integer         { return &integer{val} }
 func (this *integer) Type() Type           { return NewSimpleType(INTEGER) }
 func (this *integer) String() string       { return fmt.Sprintf("%d", this.value) }
 func (this *integer) Value() reflect.Value { return reflect.ValueOf(int64(this.value)) }
-func (this *integer) GetValue() VmInteger  { return this.value }
+func (this *integer) GetValue() int64      { return this.value }
 
 func (this *integer) Equal(other Object) bool {
 	o, ok := other.(*integer)
@@ -91,19 +92,19 @@ func (this *integer) Equal(other Object) bool {
 // Real is specialization of Object for real values.
 type Real interface {
 	Object
-	GetValue() VmReal
+	GetValue() float64
 }
 
 type real struct {
-	value VmReal
+	value float64
 }
 
 // NewReal creates Real object with specified value.
-func NewReal(val VmReal) Real           { return &real{val} }
+func NewReal(val float64) Real          { return &real{val} }
 func (this *real) Type() Type           { return NewSimpleType(REAL) }
 func (this *real) String() string       { return fmt.Sprintf("%f", this.value) }
-func (this *real) Value() reflect.Value { return reflect.ValueOf(float64(this.value)) }
-func (this *real) GetValue() VmReal     { return this.value }
+func (this *real) Value() reflect.Value { return reflect.ValueOf(this.value) }
+func (this *real) GetValue() float64    { return this.value }
 
 func (this *real) Equal(other Object) bool {
 	o, ok := other.(*real)
@@ -112,7 +113,7 @@ func (this *real) Equal(other Object) bool {
 	}
 	// compares floats while ignoring last bit
 	// fmt.Printf("%f: %d . %d\n", this.value, math.Float64bits(float64(this.value)), math.Float64bits(float64(o.value)))
-	return math.Nextafter(float64(this.value), float64(o.value)) == float64(o.value)
+	return math.Nextafter(this.value, o.value) == o.value
 }
 
 // Boolean is specialization of Object for boolean values.
@@ -283,11 +284,59 @@ func (this *userFunction) Call(env Environment, params []Expression) Object {
 }
 
 func (this *userFunction) Equal(other Object) bool {
-	// TODO: return simply DeepEqual; no need to cast
+	if !this.typ.Equal(other.Type()) {
+		return false
+	}
 	o, ok := other.(*userFunction)
 	if !ok {
 		return false
 	} else {
 		return reflect.DeepEqual(this.value, o.value)
+	}
+}
+
+type struc struct {
+	typ    Type
+	fields []Object
+}
+
+// Struct represent rune structs and allow access to individual fields.
+type Struct interface {
+	Object
+	Get(index int) Object
+	Set(index int, value Object)
+}
+
+// NewStruct creates new struct value and initializes all fields to zero.
+func NewStruct(typ Type) Object {
+	retVal := &struc{
+		typ:    typ,
+		fields: make([]Object, typ.GetFieldCount()),
+	}
+	for i := 0; i < typ.GetFieldCount(); i++ {
+		retVal.fields[i] = typ.GetFieldType(i).GetZero()
+	}
+	return retVal
+}
+func (this *struc) Type() Type           { return this.typ }
+func (this *struc) String() string       { return string(VOID) }
+func (this *struc) Value() reflect.Value { return reflect.ValueOf(Struct(this)) }
+func (this *struc) Get(index int) Object { return this.fields[index] }
+func (this *struc) Set(index int, value Object) {
+	if !this.fields[index].Type().Equal(value.Type()) {
+		panic(fmt.Sprintf("type mismatch assigning: %s. %v != %v", this.typ.GetFieldName(index), this.fields[index].Type(), value.Type()))
+	}
+	this.fields[index] = value
+}
+
+func (this *struc) Equal(other Object) bool {
+	if !this.typ.Equal(other.Type()) {
+		return false
+	}
+	o, ok := other.(*struc)
+	if !ok {
+		return false
+	} else {
+		return reflect.DeepEqual(this.fields, o.fields)
 	}
 }

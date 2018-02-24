@@ -35,6 +35,7 @@ type Statement interface {
 // Expression is a construct that has a value that can be assigned.
 type Expression interface {
 	Execute(env Environment) Object
+	Set(env Environment, value Object)
 	Type() Type
 	String() string
 }
@@ -388,6 +389,10 @@ func (this *variableReference) Execute(env Environment) Object {
 	return env.Get(this.name)
 }
 
+func (this *variableReference) Set(env Environment, value Object) {
+	env.Set(this.name, value)
+}
+
 func (this *variableReference) String() string {
 	return this.name
 }
@@ -398,6 +403,36 @@ func NewVariableReference(name string, typ Type) Expression {
 	return &variableReference{
 		name: name,
 		typ:  typ,
+	}
+}
+
+type fieldSelector struct {
+	base  Expression
+	index int
+}
+
+func (this *fieldSelector) Type() Type {
+	return this.base.Type().GetFieldType(this.index)
+}
+
+func (this *fieldSelector) Execute(env Environment) Object {
+	return this.base.Execute(env).(Struct).Get(this.index)
+}
+
+func (this *fieldSelector) Set(env Environment, value Object) {
+	this.base.Execute(env).(Struct).Set(this.index, value)
+}
+
+func (this *fieldSelector) String() string {
+	return this.base.String() + "." + this.base.Type().GetFieldType(this.index).String()
+}
+
+// NewFieldSelector creates expression which evaluates to the value of specified
+// field of the base struct.
+func NewFieldSelector(base Expression, index int) Expression {
+	return &fieldSelector{
+		base:  base,
+		index: index,
 	}
 }
 
@@ -479,6 +514,10 @@ func (this *voidLiteral) Execute(env Environment) Object {
 	panic("cannot execute void literal")
 }
 
+func (this *voidLiteral) Set(env Environment, value Object) {
+	panic("cannot assign to voidLiteral")
+}
+
 func (this *voidLiteral) String() string {
 	return string(VOID)
 }
@@ -500,6 +539,10 @@ func (this *integerLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
+func (this *integerLiteral) Set(env Environment, value Object) {
+	panic("cannot assign to integerLiteral")
+}
+
 func (this *integerLiteral) String() string {
 	return this.value.String()
 }
@@ -510,7 +553,7 @@ func NewIntegerLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	return &integerLiteral{value: &integer{value: VmInteger(val)}}
+	return &integerLiteral{value: &integer{value: val}}
 }
 
 type realLiteral struct {
@@ -525,6 +568,10 @@ func (this *realLiteral) Execute(env Environment) Object {
 	return this.value
 }
 
+func (this *realLiteral) Set(env Environment, value Object) {
+	panic("cannot assign to realLiteral")
+}
+
 func (this *realLiteral) String() string {
 	return this.value.String()
 }
@@ -535,7 +582,7 @@ func NewRealLiteral(s string) Expression {
 	if err != nil {
 		panic(err)
 	}
-	return &realLiteral{value: &real{value: VmReal(val)}}
+	return &realLiteral{value: &real{value: val}}
 }
 
 type booleanLiteral struct {
@@ -548,6 +595,10 @@ func (this *booleanLiteral) Type() Type {
 
 func (this *booleanLiteral) Execute(env Environment) Object {
 	return this.value
+}
+
+func (this *booleanLiteral) Set(env Environment, value Object) {
+	panic("cannot assign to realLiteral")
 }
 
 func (this *booleanLiteral) String() string {
@@ -585,6 +636,10 @@ func (this *integerAddition) Execute(env Environment) Object {
 	return &integer{left.GetValue() + right.GetValue()}
 }
 
+func (this *integerAddition) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerAddition) Left() Expression {
 	return this.left
 }
@@ -612,6 +667,10 @@ func (this *realAddition) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real)
 	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() + right.GetValue()}
+}
+
+func (this *realAddition) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realAddition) Left() Expression {
@@ -643,6 +702,10 @@ func (this *integerSubstraction) Execute(env Environment) Object {
 	return &integer{left.GetValue() - right.GetValue()}
 }
 
+func (this *integerSubstraction) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerSubstraction) Left() Expression {
 	return this.left
 }
@@ -670,6 +733,10 @@ func (this *realSubstraction) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real)
 	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() - right.GetValue()}
+}
+
+func (this *realSubstraction) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realSubstraction) Left() Expression {
@@ -701,6 +768,10 @@ func (this *integerMultiplication) Execute(env Environment) Object {
 	return &integer{left.GetValue() * right.GetValue()}
 }
 
+func (this *integerMultiplication) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerMultiplication) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), "*", this.right.String())
 }
@@ -720,6 +791,10 @@ func (this *realMultiplication) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real)
 	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() * right.GetValue()}
+}
+
+func (this *realMultiplication) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realMultiplication) String() string {
@@ -743,6 +818,10 @@ func (this *integerDivision) Execute(env Environment) Object {
 	return &integer{left.GetValue() / right.GetValue()}
 }
 
+func (this *integerDivision) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerDivision) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), "/", this.right.String())
 }
@@ -762,6 +841,10 @@ func (this *realDivision) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real)
 	right := this.right.Execute(env).(Real)
 	return &real{left.GetValue() / right.GetValue()}
+}
+
+func (this *realDivision) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realDivision) String() string {
@@ -785,6 +868,10 @@ func (this *integerModulo) Execute(env Environment) Object {
 	return &integer{left.GetValue() % right.GetValue()}
 }
 
+func (this *integerModulo) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerModulo) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), "%", this.right.String())
 }
@@ -804,6 +891,10 @@ func (this *integerOr) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Integer)
 	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() | right.GetValue()}
+}
+
+func (this *integerOr) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *integerOr) String() string {
@@ -827,6 +918,10 @@ func (this *integerXor) Execute(env Environment) Object {
 	return &integer{left.GetValue() ^ right.GetValue()}
 }
 
+func (this *integerXor) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerXor) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), "^", this.right.String())
 }
@@ -846,6 +941,10 @@ func (this *integerAnd) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Integer)
 	right := this.right.Execute(env).(Integer)
 	return &integer{left.GetValue() & right.GetValue()}
+}
+
+func (this *integerAnd) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *integerAnd) String() string {
@@ -872,6 +971,10 @@ func (this *booleanOr) Execute(env Environment) Object {
 	return &boolean{right}
 }
 
+func (this *booleanOr) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *booleanOr) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " or ", this.right.String())
 }
@@ -896,6 +999,10 @@ func (this *booleanAnd) Execute(env Environment) Object {
 	return &boolean{right}
 }
 
+func (this *booleanAnd) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *booleanAnd) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " and ", this.right.String())
 }
@@ -917,6 +1024,10 @@ func (this *integerEqual) Execute(env Environment) Object {
 	return &boolean{left.Equal(right)}
 }
 
+func (this *integerEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
@@ -934,6 +1045,10 @@ func (this *realEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env)
 	right := this.right.Execute(env)
 	return &boolean{left.Equal(right)}
+}
+
+func (this *realEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realEqual) String() string {
@@ -955,6 +1070,10 @@ func (this *booleanEqual) Execute(env Environment) Object {
 	return &boolean{left.Equal(right)}
 }
 
+func (this *booleanEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *booleanEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " == ", this.right.String())
 }
@@ -972,6 +1091,10 @@ func (this *funcEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env)
 	right := this.right.Execute(env)
 	return &boolean{left.Equal(right)}
+}
+
+func (this *funcEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *funcEqual) String() string {
@@ -995,6 +1118,10 @@ func (this *integerNotEqual) Execute(env Environment) Object {
 	return &boolean{!left.Equal(right)}
 }
 
+func (this *integerNotEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerNotEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
@@ -1012,6 +1139,10 @@ func (this *realNotEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env)
 	right := this.right.Execute(env)
 	return &boolean{!left.Equal(right)}
+}
+
+func (this *realNotEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realNotEqual) String() string {
@@ -1033,6 +1164,10 @@ func (this *booleanNotEqual) Execute(env Environment) Object {
 	return &boolean{!left.Equal(right)}
 }
 
+func (this *booleanNotEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *booleanNotEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " != ", this.right.String())
 }
@@ -1050,6 +1185,10 @@ func (this *funcNotEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env)
 	right := this.right.Execute(env)
 	return &boolean{!left.Equal(right)}
+}
+
+func (this *funcNotEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *funcNotEqual) String() string {
@@ -1073,6 +1212,10 @@ func (this *integerLessThan) Execute(env Environment) Object {
 	return &boolean{left < right}
 }
 
+func (this *integerLessThan) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerLessThan) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " < ", this.right.String())
 }
@@ -1090,6 +1233,10 @@ func (this *realLessThan) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real).GetValue()
 	right := this.right.Execute(env).(Real).GetValue()
 	return &boolean{left < right}
+}
+
+func (this *realLessThan) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realLessThan) String() string {
@@ -1113,6 +1260,10 @@ func (this *integerGreaterThan) Execute(env Environment) Object {
 	return &boolean{left > right}
 }
 
+func (this *integerGreaterThan) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerGreaterThan) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " > ", this.right.String())
 }
@@ -1130,6 +1281,10 @@ func (this *realGreaterThan) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real).GetValue()
 	right := this.right.Execute(env).(Real).GetValue()
 	return &boolean{left > right}
+}
+
+func (this *realGreaterThan) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realGreaterThan) String() string {
@@ -1153,6 +1308,10 @@ func (this *integerLessOrEqual) Execute(env Environment) Object {
 	return &boolean{left <= right}
 }
 
+func (this *integerLessOrEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerLessOrEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " <= ", this.right.String())
 }
@@ -1170,6 +1329,10 @@ func (this *realLessOrEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real).GetValue()
 	right := this.right.Execute(env).(Real).GetValue()
 	return &boolean{left <= right}
+}
+
+func (this *realLessOrEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realLessOrEqual) String() string {
@@ -1193,6 +1356,10 @@ func (this *integerGreaterOrEqual) Execute(env Environment) Object {
 	return &boolean{left >= right}
 }
 
+func (this *integerGreaterOrEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
+}
+
 func (this *integerGreaterOrEqual) String() string {
 	return fmt.Sprintf("(%s%s%s)", this.left.String(), " >= ", this.right.String())
 }
@@ -1210,6 +1377,10 @@ func (this *realGreaterOrEqual) Execute(env Environment) Object {
 	left := this.left.Execute(env).(Real).GetValue()
 	right := this.right.Execute(env).(Real).GetValue()
 	return &boolean{left >= right}
+}
+
+func (this *realGreaterOrEqual) Set(env Environment, value Object) {
+	panic("cannot assign to binary expression")
 }
 
 func (this *realGreaterOrEqual) String() string {
@@ -1363,32 +1534,33 @@ func NewBinaryExpression(left Expression, op string, right Expression) Expressio
 }
 
 type assignment struct {
-	name       string
-	expression Expression
+	dest  Expression
+	value Expression
 }
 
 // NewAssignment creates new expression which assign a value to a variable and
 // the same value being the value for the whole expression.
-func NewAssignment(name string, value Expression) Expression {
+func NewAssignment(dest Expression, value Expression) Expression {
 	return &assignment{
-		name:       name,
-		expression: value,
+		dest:  dest,
+		value: value,
 	}
 }
 
 func (this *assignment) Type() Type {
-	return this.expression.Type()
+	return this.value.Type()
 }
 
 func (this *assignment) Execute(env Environment) Object {
-	value := this.expression.Execute(env)
-	env.Set(this.name, value)
+	value := this.value.Execute(env)
+	this.dest.Set(env, value)
 	return value
 }
 
+func (this *assignment) Set(env Environment, value Object) {
+	panic("cannot assign to assignment")
+}
+
 func (this *assignment) String() string {
-	return fmt.Sprintf("%s = %s",
-		this.name,
-		this.expression.String(),
-	)
+	return fmt.Sprintf("(%s%s%s)", this.dest.String(), "=", this.value.String())
 }

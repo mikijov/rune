@@ -34,7 +34,7 @@ type ErrorListener interface {
 // this function is here purely for early debugging. It should be removed as
 // soon as the parser is relatively stable.
 func trace(ctx antlr.ParserRuleContext) {
-	return
+	// return
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
 	f := runtime.FuncForPC(pc[0])
@@ -142,6 +142,8 @@ func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 		return this.visitVariableExpression(ctx)
 	case *FunctionCallContext:
 		return this.visitFunctionCall(ctx)
+	case *FieldSelectorContext:
+		return this.visitFieldSelector(ctx)
 	case *LambdaContext:
 		return this.visitLambda(ctx)
 	default:
@@ -234,15 +236,26 @@ type param struct {
 func (this *MyVisitor) visitParams(ctx IParamDeclContext) (paramNames []string, paramTypes []vm.Type) {
 	trace(ctx)
 
-	names := make([]string, 0, 10)
-	types := make([]vm.Type, 0, 10)
+	groups := ctx.GetParamGroup()
+	names := make([]string, 0, len(groups))
+	types := make([]vm.Type, 0, len(groups))
 
-	for _, child := range ctx.GetParamGroup() {
+	for _, child := range groups {
 		newNames, newTypes := this.visitCombinedParam(child)
 		for _, name := range newNames {
+			if len(names) >= cap(names) {
+				temp := make([]string, len(names), cap(names)+1)
+				copy(temp, names)
+				names = temp
+			}
 			names = append(names, name)
 		}
 		for _, typ := range newTypes {
+			if len(types) >= cap(types) {
+				temp := make([]vm.Type, len(types), cap(types)+1)
+				copy(temp, types)
+				types = temp
+			}
 			types = append(types, typ)
 		}
 	}
@@ -255,8 +268,8 @@ func (this *MyVisitor) visitCombinedParam(ctx ICombinedParamContext) (names []st
 
 	returnType := this.visitTypeName(ctx.GetParamType())
 
-	names = make([]string, 0, 3)
-	types = make([]vm.Type, 0, 3)
+	names = make([]string, 0, len(ctx.GetNames()))
+	types = make([]vm.Type, 0, len(ctx.GetNames()))
 	for _, name := range ctx.GetNames() {
 		names = append(names, name.GetText())
 		types = append(types, returnType)
@@ -273,6 +286,8 @@ func (this *MyVisitor) visitTypeName(ctx interface{}) vm.Type {
 		return this.visitSimpleType(ctx)
 	case *FunctionTypeContext:
 		return this.visitFunctionType(ctx)
+	case *StructTypeContext:
+		return this.visitStructType(ctx)
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
@@ -298,7 +313,7 @@ func (this *MyVisitor) visitSimpleType(ctx *SimpleTypeContext) vm.Type {
 func (this *MyVisitor) visitFunctionType(ctx *FunctionTypeContext) vm.Type {
 	trace(ctx)
 
-	paramTypes := make([]vm.Type, 0, 10)
+	paramTypes := make([]vm.Type, 0, len(ctx.GetParamTypes()))
 	for _, param := range ctx.GetParamTypes() {
 		paramTypes = append(paramTypes, this.visitTypeName(param))
 	}
@@ -311,6 +326,51 @@ func (this *MyVisitor) visitFunctionType(ctx *FunctionTypeContext) vm.Type {
 	}
 
 	return vm.NewFunctionType(paramTypes, returnType)
+}
+
+func (this *MyVisitor) visitStructType(ctx *StructTypeContext) vm.Type {
+	trace(ctx)
+
+	fields := ctx.AllCombinedField()
+	names := make([]string, 0, len(fields))
+	types := make([]vm.Type, 0, len(fields))
+
+	for _, child := range fields {
+		newNames, newTypes := this.visitCombinedField(child)
+		for _, name := range newNames {
+			if len(names) >= cap(names) {
+				temp := make([]string, len(names), cap(names)+1)
+				copy(temp, names)
+				names = temp
+			}
+			names = append(names, name)
+		}
+		for _, typ := range newTypes {
+			if len(types) >= cap(types) {
+				temp := make([]vm.Type, len(types), cap(types)+1)
+				copy(temp, types)
+				types = temp
+			}
+			types = append(types, typ)
+		}
+	}
+
+	return vm.NewStructType(names, types)
+}
+
+func (this *MyVisitor) visitCombinedField(ctx ICombinedFieldContext) (names []string, types []vm.Type) {
+	trace(ctx)
+
+	returnType := this.visitTypeName(ctx.GetParamType())
+
+	names = make([]string, 0, len(ctx.GetNames()))
+	types = make([]vm.Type, 0, len(ctx.GetNames()))
+	for _, name := range ctx.GetNames() {
+		names = append(names, name.GetText())
+		types = append(types, returnType)
+	}
+
+	return names, types
 }
 
 func (this *MyVisitor) visitScope(ctx IScopeContext) vm.ScopeStatement {
@@ -454,46 +514,34 @@ func (this *MyVisitor) visitLiteralPassthrough(ctx *LiteralPassthroughContext) v
 func (this *MyVisitor) visitAssignment(ctx *AssignmentContext) vm.Expression {
 	trace(ctx)
 
+	left := this.visitExpression(ctx.GetLeft())
 	right := this.visitExpression(ctx.GetRight())
 
-	name := ctx.GetLeft().GetText()
-	typ := this.scope.Get(name)
-	if typ == nil {
-		token := ctx.GetLeft()
-		this.errors.Error(token.GetLine(), token.GetColumn(), name+": undeclared variable")
-	} else if !typ.Equal(right.Type()) {
-		token := ctx.GetStart()
+	if !left.Type().Equal(right.Type()) {
+		token := ctx.GetRight().GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", typ, right.Type()))
+			fmt.Sprintf("type mismatch\n Left: %s\nRight: %s", left.Type(), right.Type()))
 	}
 
 	switch ctx.GetOp().GetText() {
 	case "=":
-		return vm.NewAssignment(name, right)
+		return vm.NewAssignment(left, right)
 	case "+=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "+", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "+", right))
 	case "-=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "-", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "-", right))
 	case "*=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "*", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "*", right))
 	case "/=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "/", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "/", right))
 	case "%=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "%", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "%", right))
 	case "&=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "&", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "&", right))
 	case "|=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "|", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "|", right))
 	case "^=":
-		return vm.NewAssignment(name,
-			vm.NewBinaryExpression(vm.NewVariableReference(name, typ), "^", right))
+		return vm.NewAssignment(left, vm.NewBinaryExpression(left, "^", right))
 	default:
 		panic("unknown operation")
 	}
@@ -571,6 +619,18 @@ func (this *MyVisitor) visitFunctionCall(ctx *FunctionCallContext) vm.Expression
 	}
 
 	return vm.NewFunctionCall(name, params, returnType)
+}
+
+func (this *MyVisitor) visitFieldSelector(ctx *FieldSelectorContext) vm.Expression {
+	trace(ctx)
+
+	base := this.visitExpression(ctx.GetBase())
+	baseType := base.Type()
+
+	field := ctx.GetField().GetText()
+	index := baseType.GetFieldIndex(field)
+
+	return vm.NewFieldSelector(base, index)
 }
 
 func (this *MyVisitor) visitLambda(ctx *LambdaContext) vm.Expression {
