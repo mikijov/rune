@@ -20,6 +20,10 @@ func (v *BaseRuneVisitor) VisitDeclaration(ctx *DeclarationContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitTypeDeclaration(ctx *TypeDeclarationContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitTypeName(ctx *TypeNameContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -33,6 +37,10 @@ func (v *BaseRuneVisitor) VisitFunctionType(ctx *FunctionTypeContext) interface{
 }
 
 func (v *BaseRuneVisitor) VisitStructType(ctx *StructTypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseRuneVisitor) VisitCustomType(ctx *CustomTypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

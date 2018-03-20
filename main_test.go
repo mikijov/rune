@@ -25,9 +25,9 @@ func TestDeclarations(t *testing.T) {
 		code string
 		typ  vm.Type
 	}{
-		{"a :int;", vm.NewSimpleType(vm.INTEGER)},
-		{"a :real;", vm.NewSimpleType(vm.REAL)},
-		{"a :bool;", vm.NewSimpleType(vm.BOOLEAN)},
+		{"a :int", vm.NewSimpleType(vm.INTEGER)},
+		{"a :real", vm.NewSimpleType(vm.REAL)},
+		{"a :bool", vm.NewSimpleType(vm.BOOLEAN)},
 		// TODO: test functions
 	}
 
@@ -355,10 +355,10 @@ func testField(t *testing.T, s vm.Object, field string, expected vm.Object) {
 func TestStructZero(t *testing.T) {
 	code := `
 s1 :struct {
-	b1 :bool;
-	i1, i2 :int;
-	r1, r2 :real;
-};
+	b1 :bool
+	i1, i2 :int
+	r1, r2 :real
+}
 `
 	program, errors := Compile(code, nil)
 	if len(errors.GetErrors()) > 0 {
@@ -385,10 +385,85 @@ s1 :struct {
 func TestStructFields(t *testing.T) {
 	code := `
 s1 :struct {
-	b1 :bool;
-	i1, i2 :int;
-	r1, r2 :real;
-};
+	b1 :bool
+	i1, i2 :int
+	r1, r2 :real
+}
+s1.b1 = true;
+s1.i1 = 1;
+s1.i2 = 2;
+s1.r1 = 1.1;
+s1.r2 = 2.2;
+
+b := s1.b1;
+i := s1.i1;
+r := s1.r1;
+`
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	s1 := env.Get("s1")
+	if s1.Type().GetKind() != vm.STRUCT {
+		t.Fatalf("expected struct but got %s", s1.Type().GetKind())
+	}
+	typ := s1.Type()
+	if typ.GetFieldCount() != 5 {
+		t.Fatalf("invalid number of fields (%d)", typ.GetFieldCount())
+	}
+	testField(t, s1, "b1", vm.NewBoolean(true))
+	testField(t, s1, "i1", vm.NewInteger(1))
+	testField(t, s1, "i2", vm.NewInteger(2))
+	testField(t, s1, "r1", vm.NewReal(1.1))
+	testField(t, s1, "r2", vm.NewReal(2.2))
+
+	testVariable(t, env, "b", vm.NewBoolean(true))
+	testVariable(t, env, "i", vm.NewInteger(1))
+	testVariable(t, env, "r", vm.NewReal(1.1))
+}
+
+func TestTypeDeclarationZero(t *testing.T) {
+	code := `
+type t1 :struct {
+	b1 :bool
+	i1, i2 :int
+	r1, r2 :real
+}
+s1 :t1
+`
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	s1 := env.Get("s1")
+	if s1.Type().GetKind() != vm.STRUCT {
+		t.Fatalf("expected struct but got %s", s1.Type().GetKind())
+	}
+	typ := s1.Type()
+	if typ.GetFieldCount() != 5 {
+		t.Fatalf("invalid number of fields (%d)", typ.GetFieldCount())
+	}
+	testField(t, s1, "b1", vm.NewSimpleType(vm.BOOLEAN).GetZero())
+	testField(t, s1, "i1", vm.NewSimpleType(vm.INTEGER).GetZero())
+	testField(t, s1, "i2", vm.NewSimpleType(vm.INTEGER).GetZero())
+	testField(t, s1, "r1", vm.NewSimpleType(vm.REAL).GetZero())
+	testField(t, s1, "r2", vm.NewSimpleType(vm.REAL).GetZero())
+}
+
+func TestTypeDeclarationStructFields(t *testing.T) {
+	code := `
+type t1 :struct {
+	b1 :bool
+	i1, i2 :int
+	r1, r2 :real
+}
+s1 :t1
 s1.b1 = true;
 s1.i1 = 1;
 s1.i2 = 2;

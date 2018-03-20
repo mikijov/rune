@@ -19,18 +19,27 @@ program
     : statements+=statement* EOF
     ;
 
+//programStatement
+//: declaration
+//| typeDeclaration
+//| function
+//;
 statement
-    : declaration ';'
-    | returnStatement ';'
-    | expression ';'
+    : declaration
+    | typeDeclaration
     | function
+    | returnStatement
+    | expression ';'
     | ifStatement
     | loop
     ;
 
 declaration
-    : identifier=IDENTIFIER ':=' value=expression
-    | identifier=IDENTIFIER ':' type_=typeName ('=' value=expression)?
+    : identifier=IDENTIFIER ':=' value=expression ';'
+    | identifier=IDENTIFIER ':' type_=typeName ('=' value=expression ';')?
+    ;
+typeDeclaration
+    : 'type' identifier=IDENTIFIER ':' type_=typeName
     ;
 typeName: typeName2;
 typeName2
@@ -40,6 +49,7 @@ typeName2
     | 'bool' # SimpleType
     | 'func' '(' (paramTypes+=typeName2 (',' paramTypes+=typeName2)*)? ')' (':' returnType=typeName2)? # FunctionType
     | 'struct' '{' combinedField* '}' # StructType
+    | name=IDENTIFIER # CustomType
     // | 'list' | 'map'
     ;
 
@@ -53,14 +63,14 @@ combinedParam
     : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName
     ;
 combinedField
-    : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName ';'
+    : names+=IDENTIFIER (',' names+=IDENTIFIER)* ':' paramType=typeName
     ;
 scope
     : '{' statements+=statement* '}'
     ;
 
 returnStatement
-    : 'return' (retVal=expression)?
+    : 'return' (retVal=expression ';')?
     ;
 
 ifStatement

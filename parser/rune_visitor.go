@@ -23,6 +23,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#declaration.
 	VisitDeclaration(ctx *DeclarationContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#typeDeclaration.
+	VisitTypeDeclaration(ctx *TypeDeclarationContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#typeName.
 	VisitTypeName(ctx *TypeNameContext) interface{}
 
@@ -34,6 +37,9 @@ type RuneVisitor interface {
 
 	// Visit a parse tree produced by RuneParser#StructType.
 	VisitStructType(ctx *StructTypeContext) interface{}
+
+	// Visit a parse tree produced by RuneParser#CustomType.
+	VisitCustomType(ctx *CustomTypeContext) interface{}
 
 	// Visit a parse tree produced by RuneParser#function.
 	VisitFunction(ctx *FunctionContext) interface{}

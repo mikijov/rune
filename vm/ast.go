@@ -121,6 +121,32 @@ func (this *declarationStatement) String() string {
 	)
 }
 
+type typeDeclarationStatement struct {
+	name string
+	typ  Type
+}
+
+// NewTypeDeclarationStatement creates new declaration Statement. When executed
+// it will declare new variable in the current scope and then assign initial
+// value to it.
+func NewTypeDeclarationStatement(name string, typ Type) Statement {
+	return &typeDeclarationStatement{
+		name: name,
+		typ:  typ,
+	}
+}
+
+func (this *typeDeclarationStatement) Execute(env Environment) {
+	// nop
+}
+
+func (this *typeDeclarationStatement) String() string {
+	return fmt.Sprintf("type %s :%v",
+		this.name,
+		this.typ,
+	)
+}
+
 // ScopeStatement is a statement representing a list of statements all enclosed
 // within a scope that determines variable lifetime.
 type ScopeStatement interface {

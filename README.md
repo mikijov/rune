@@ -13,7 +13,7 @@ welcome you stopping by and asking a question (make an issue for now)...
 ### v1
 
 - [x] tests
-- [ ] structs
+- [x] structs
 - [ ] interfaces
 - [ ] arrays and slices
 - [ ] error handling
@@ -22,6 +22,7 @@ welcome you stopping by and asking a question (make an issue for now)...
 
 ### Future
 
+- [ ] struct literals
 - [ ] imports/modules
 - [ ] allow passing Environment to user functions
 - [ ] implement variadic functions
@@ -30,12 +31,12 @@ welcome you stopping by and asking a question (make an issue for now)...
 
 ## Syntax
 ```
-type Integer int;
+type Integer :int
 
-type DemoStruct struct {
-    field1 :int,
-    field2 :real,
-    field3 :bool,
+type DemoStruct :struct {
+    field1 :int
+    field2 :real
+    field3 :bool
 }
 ```
 

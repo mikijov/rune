@@ -105,6 +105,8 @@ func (this *MyVisitor) visitStatement(ctx IStatementContext) vm.Statement {
 		return vm.NewExpressionStatement(this.visitExpression(child))
 	case *DeclarationContext:
 		return this.visitDeclaration(child)
+	case *TypeDeclarationContext:
+		return this.visitTypeDeclaration(child)
 	case *LoopContext:
 		return this.visitLoop(child)
 	case *FunctionContext:
@@ -149,6 +151,22 @@ func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 	default:
 		panic(fmt.Sprintf("unknown type: %T\n", ctx))
 	}
+}
+
+func (this *MyVisitor) visitTypeDeclaration(ctx *TypeDeclarationContext) vm.Statement {
+	trace(ctx)
+
+	var typ vm.Type
+	if ctx.GetType_() != nil {
+		typ = this.visitTypeName(ctx.GetType_())
+	}
+
+	name := ctx.GetIdentifier().GetText()
+	if !this.scope.Declare(name, typ) {
+		panic("variable redeclared")
+	}
+
+	return vm.NewTypeDeclarationStatement(name, typ)
 }
 
 func (this *MyVisitor) visitDeclaration(ctx *DeclarationContext) vm.Statement {
@@ -288,6 +306,8 @@ func (this *MyVisitor) visitTypeName(ctx interface{}) vm.Type {
 		return this.visitFunctionType(ctx)
 	case *StructTypeContext:
 		return this.visitStructType(ctx)
+	case *CustomTypeContext:
+		return this.visitCustomType(ctx)
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
@@ -308,6 +328,20 @@ func (this *MyVisitor) visitSimpleType(ctx *SimpleTypeContext) vm.Type {
 	default:
 		panic("unknown type") // grammar should not allow this
 	}
+}
+
+func (this *MyVisitor) visitCustomType(ctx *CustomTypeContext) vm.Type {
+	trace(ctx)
+
+	name := ctx.GetText()
+	typ := this.scope.Get(name)
+	if typ == nil {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("unknown type '%s'", name))
+		return nil
+	}
+	return typ
 }
 
 func (this *MyVisitor) visitFunctionType(ctx *FunctionTypeContext) vm.Type {

@@ -19,7 +19,7 @@ import (
 )
 
 // Scope interface represents a scope which in turn determines lifetime and
-// visibility of variables.
+// visibility of variables and types.
 type Scope interface {
 	Declare(name string, typ vm.Type) bool
 	Get(name string) vm.Type

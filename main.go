@@ -32,6 +32,7 @@ type Messages interface {
 	antlr.ErrorListener
 	parser.ErrorListener
 	GetErrors() []string
+	GetWarrnings() []string
 }
 
 func helloWorld() {
@@ -92,6 +93,9 @@ func main() {
 	program, messages := CompileFile(os.Args[1], externals)
 
 	// check for errors
+	for _, msg := range messages.GetWarrnings() {
+		fmt.Println(msg)
+	}
 	if len(messages.GetErrors()) > 0 {
 		for _, msg := range messages.GetErrors() {
 			fmt.Println(msg)

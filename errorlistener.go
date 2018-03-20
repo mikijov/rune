@@ -22,7 +22,8 @@ import (
 
 type runeErrorListener struct {
 	Messages
-	errors []string
+	errors   []string
+	warnings []string
 }
 
 // NewRuneErrorListener creates instance of ErrorListener which will store all
@@ -40,11 +41,11 @@ func (this *runeErrorListener) SyntaxError(recognizer antlr.Recognizer, offendin
 }
 
 func (this *runeErrorListener) ReportAmbiguity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, exact bool, ambigAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
-	this.errors = append(this.errors, "AMBIGUITY")
+	this.warnings = append(this.errors, "AMBIGUITY")
 }
 
 func (this *runeErrorListener) ReportAttemptingFullContext(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex int, conflictingAlts *antlr.BitSet, configs antlr.ATNConfigSet) {
-	this.errors = append(this.errors, "FULL CONTEXT")
+	this.warnings = append(this.errors, "FULL CONTEXT")
 }
 
 func (this *runeErrorListener) ReportContextSensitivity(recognizer antlr.Parser, dfa *antlr.DFA, startIndex, stopIndex, prediction int, configs antlr.ATNConfigSet) {
@@ -53,4 +54,8 @@ func (this *runeErrorListener) ReportContextSensitivity(recognizer antlr.Parser,
 
 func (this *runeErrorListener) GetErrors() []string {
 	return this.errors
+}
+
+func (this *runeErrorListener) GetWarrnings() []string {
+	return this.warnings
 }

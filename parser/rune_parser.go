@@ -22,144 +22,150 @@ var _ = reflect.Copy
 var _ = strconv.Itoa
 
 var parserATN = []uint16{
-	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 54, 260,
+	3, 24715, 42794, 33075, 47597, 16764, 15335, 30598, 22884, 3, 55, 270,
 	4, 2, 9, 2, 4, 3, 9, 3, 4, 4, 9, 4, 4, 5, 9, 5, 4, 6, 9, 6, 4, 7, 9, 7,
 	4, 8, 9, 8, 4, 9, 9, 9, 4, 10, 9, 10, 4, 11, 9, 11, 4, 12, 9, 12, 4, 13,
 	9, 13, 4, 14, 9, 14, 4, 15, 9, 15, 4, 16, 9, 16, 4, 17, 9, 17, 4, 18, 9,
-	18, 4, 19, 9, 19, 3, 2, 7, 2, 40, 10, 2, 12, 2, 14, 2, 43, 11, 2, 3, 2,
-	3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
-	3, 3, 5, 3, 59, 10, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4,
-	5, 4, 69, 10, 4, 5, 4, 71, 10, 4, 3, 5, 3, 5, 3, 6, 3, 6, 3, 6, 3, 6, 3,
-	6, 3, 6, 3, 6, 3, 6, 3, 6, 7, 6, 84, 10, 6, 12, 6, 14, 6, 87, 11, 6, 5,
-	6, 89, 10, 6, 3, 6, 3, 6, 3, 6, 5, 6, 94, 10, 6, 3, 6, 3, 6, 3, 6, 7, 6,
-	99, 10, 6, 12, 6, 14, 6, 102, 11, 6, 3, 6, 5, 6, 105, 10, 6, 3, 7, 3, 7,
-	3, 7, 3, 7, 3, 7, 5, 7, 112, 10, 7, 3, 7, 3, 7, 3, 8, 3, 8, 3, 8, 3, 8,
-	7, 8, 120, 10, 8, 12, 8, 14, 8, 123, 11, 8, 5, 8, 125, 10, 8, 3, 8, 3,
-	8, 3, 9, 3, 9, 3, 9, 7, 9, 132, 10, 9, 12, 9, 14, 9, 135, 11, 9, 3, 9,
-	3, 9, 3, 9, 3, 10, 3, 10, 3, 10, 7, 10, 143, 10, 10, 12, 10, 14, 10, 146,
-	11, 10, 3, 10, 3, 10, 3, 10, 3, 10, 3, 11, 3, 11, 7, 11, 154, 10, 11, 12,
-	11, 14, 11, 157, 11, 11, 3, 11, 3, 11, 3, 12, 3, 12, 5, 12, 163, 10, 12,
-	3, 13, 3, 13, 3, 13, 3, 13, 3, 13, 3, 13, 3, 13, 3, 13, 7, 13, 173, 10,
-	13, 12, 13, 14, 13, 176, 11, 13, 3, 13, 3, 13, 5, 13, 180, 10, 13, 3, 14,
-	3, 14, 3, 14, 5, 14, 185, 10, 14, 3, 14, 3, 14, 3, 15, 3, 15, 3, 16, 3,
-	16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 7, 16, 201,
-	10, 16, 12, 16, 14, 16, 204, 11, 16, 5, 16, 206, 10, 16, 3, 16, 3, 16,
-	3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 5, 16, 217, 10, 16, 3,
-	16, 3, 16, 3, 16, 5, 16, 222, 10, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16,
-	3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3,
-	16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 3, 16, 7, 16, 246, 10, 16, 12, 16,
-	14, 16, 249, 11, 16, 3, 17, 3, 17, 3, 18, 3, 18, 3, 19, 3, 19, 3, 19, 5,
-	19, 258, 10, 19, 3, 19, 2, 3, 30, 20, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20,
-	22, 24, 26, 28, 30, 32, 34, 36, 2, 6, 3, 2, 24, 27, 3, 2, 28, 31, 3, 2,
-	32, 37, 4, 2, 6, 6, 40, 47, 2, 285, 2, 41, 3, 2, 2, 2, 4, 58, 3, 2, 2,
-	2, 6, 70, 3, 2, 2, 2, 8, 72, 3, 2, 2, 2, 10, 104, 3, 2, 2, 2, 12, 106,
-	3, 2, 2, 2, 14, 115, 3, 2, 2, 2, 16, 128, 3, 2, 2, 2, 18, 139, 3, 2, 2,
-	2, 20, 151, 3, 2, 2, 2, 22, 160, 3, 2, 2, 2, 24, 164, 3, 2, 2, 2, 26, 181,
-	3, 2, 2, 2, 28, 188, 3, 2, 2, 2, 30, 221, 3, 2, 2, 2, 32, 250, 3, 2, 2,
-	2, 34, 252, 3, 2, 2, 2, 36, 257, 3, 2, 2, 2, 38, 40, 5, 4, 3, 2, 39, 38,
-	3, 2, 2, 2, 40, 43, 3, 2, 2, 2, 41, 39, 3, 2, 2, 2, 41, 42, 3, 2, 2, 2,
-	42, 44, 3, 2, 2, 2, 43, 41, 3, 2, 2, 2, 44, 45, 7, 2, 2, 3, 45, 3, 3, 2,
-	2, 2, 46, 47, 5, 6, 4, 2, 47, 48, 7, 3, 2, 2, 48, 59, 3, 2, 2, 2, 49, 50,
-	5, 22, 12, 2, 50, 51, 7, 3, 2, 2, 51, 59, 3, 2, 2, 2, 52, 53, 5, 28, 15,
-	2, 53, 54, 7, 3, 2, 2, 54, 59, 3, 2, 2, 2, 55, 59, 5, 12, 7, 2, 56, 59,
-	5, 24, 13, 2, 57, 59, 5, 26, 14, 2, 58, 46, 3, 2, 2, 2, 58, 49, 3, 2, 2,
-	2, 58, 52, 3, 2, 2, 2, 58, 55, 3, 2, 2, 2, 58, 56, 3, 2, 2, 2, 58, 57,
-	3, 2, 2, 2, 59, 5, 3, 2, 2, 2, 60, 61, 7, 51, 2, 2, 61, 62, 7, 4, 2, 2,
-	62, 71, 5, 28, 15, 2, 63, 64, 7, 51, 2, 2, 64, 65, 7, 5, 2, 2, 65, 68,
-	5, 8, 5, 2, 66, 67, 7, 6, 2, 2, 67, 69, 5, 28, 15, 2, 68, 66, 3, 2, 2,
-	2, 68, 69, 3, 2, 2, 2, 69, 71, 3, 2, 2, 2, 70, 60, 3, 2, 2, 2, 70, 63,
-	3, 2, 2, 2, 71, 7, 3, 2, 2, 2, 72, 73, 5, 10, 6, 2, 73, 9, 3, 2, 2, 2,
-	74, 105, 7, 7, 2, 2, 75, 105, 7, 8, 2, 2, 76, 105, 7, 9, 2, 2, 77, 105,
-	7, 10, 2, 2, 78, 79, 7, 11, 2, 2, 79, 88, 7, 12, 2, 2, 80, 85, 5, 10, 6,
-	2, 81, 82, 7, 13, 2, 2, 82, 84, 5, 10, 6, 2, 83, 81, 3, 2, 2, 2, 84, 87,
-	3, 2, 2, 2, 85, 83, 3, 2, 2, 2, 85, 86, 3, 2, 2, 2, 86, 89, 3, 2, 2, 2,
-	87, 85, 3, 2, 2, 2, 88, 80, 3, 2, 2, 2, 88, 89, 3, 2, 2, 2, 89, 90, 3,
-	2, 2, 2, 90, 93, 7, 14, 2, 2, 91, 92, 7, 5, 2, 2, 92, 94, 5, 10, 6, 2,
-	93, 91, 3, 2, 2, 2, 93, 94, 3, 2, 2, 2, 94, 105, 3, 2, 2, 2, 95, 96, 7,
-	15, 2, 2, 96, 100, 7, 16, 2, 2, 97, 99, 5, 18, 10, 2, 98, 97, 3, 2, 2,
-	2, 99, 102, 3, 2, 2, 2, 100, 98, 3, 2, 2, 2, 100, 101, 3, 2, 2, 2, 101,
-	103, 3, 2, 2, 2, 102, 100, 3, 2, 2, 2, 103, 105, 7, 17, 2, 2, 104, 74,
-	3, 2, 2, 2, 104, 75, 3, 2, 2, 2, 104, 76, 3, 2, 2, 2, 104, 77, 3, 2, 2,
-	2, 104, 78, 3, 2, 2, 2, 104, 95, 3, 2, 2, 2, 105, 11, 3, 2, 2, 2, 106,
-	107, 7, 11, 2, 2, 107, 108, 7, 51, 2, 2, 108, 111, 5, 14, 8, 2, 109, 110,
-	7, 5, 2, 2, 110, 112, 5, 8, 5, 2, 111, 109, 3, 2, 2, 2, 111, 112, 3, 2,
-	2, 2, 112, 113, 3, 2, 2, 2, 113, 114, 5, 20, 11, 2, 114, 13, 3, 2, 2, 2,
-	115, 124, 7, 12, 2, 2, 116, 121, 5, 16, 9, 2, 117, 118, 7, 13, 2, 2, 118,
-	120, 5, 16, 9, 2, 119, 117, 3, 2, 2, 2, 120, 123, 3, 2, 2, 2, 121, 119,
-	3, 2, 2, 2, 121, 122, 3, 2, 2, 2, 122, 125, 3, 2, 2, 2, 123, 121, 3, 2,
-	2, 2, 124, 116, 3, 2, 2, 2, 124, 125, 3, 2, 2, 2, 125, 126, 3, 2, 2, 2,
-	126, 127, 7, 14, 2, 2, 127, 15, 3, 2, 2, 2, 128, 133, 7, 51, 2, 2, 129,
-	130, 7, 13, 2, 2, 130, 132, 7, 51, 2, 2, 131, 129, 3, 2, 2, 2, 132, 135,
-	3, 2, 2, 2, 133, 131, 3, 2, 2, 2, 133, 134, 3, 2, 2, 2, 134, 136, 3, 2,
-	2, 2, 135, 133, 3, 2, 2, 2, 136, 137, 7, 5, 2, 2, 137, 138, 5, 8, 5, 2,
-	138, 17, 3, 2, 2, 2, 139, 144, 7, 51, 2, 2, 140, 141, 7, 13, 2, 2, 141,
-	143, 7, 51, 2, 2, 142, 140, 3, 2, 2, 2, 143, 146, 3, 2, 2, 2, 144, 142,
-	3, 2, 2, 2, 144, 145, 3, 2, 2, 2, 145, 147, 3, 2, 2, 2, 146, 144, 3, 2,
-	2, 2, 147, 148, 7, 5, 2, 2, 148, 149, 5, 8, 5, 2, 149, 150, 7, 3, 2, 2,
-	150, 19, 3, 2, 2, 2, 151, 155, 7, 16, 2, 2, 152, 154, 5, 4, 3, 2, 153,
-	152, 3, 2, 2, 2, 154, 157, 3, 2, 2, 2, 155, 153, 3, 2, 2, 2, 155, 156,
-	3, 2, 2, 2, 156, 158, 3, 2, 2, 2, 157, 155, 3, 2, 2, 2, 158, 159, 7, 17,
-	2, 2, 159, 21, 3, 2, 2, 2, 160, 162, 7, 18, 2, 2, 161, 163, 5, 28, 15,
-	2, 162, 161, 3, 2, 2, 2, 162, 163, 3, 2, 2, 2, 163, 23, 3, 2, 2, 2, 164,
-	165, 7, 19, 2, 2, 165, 166, 5, 28, 15, 2, 166, 174, 5, 20, 11, 2, 167,
-	168, 7, 20, 2, 2, 168, 169, 7, 19, 2, 2, 169, 170, 5, 28, 15, 2, 170, 171,
-	5, 20, 11, 2, 171, 173, 3, 2, 2, 2, 172, 167, 3, 2, 2, 2, 173, 176, 3,
-	2, 2, 2, 174, 172, 3, 2, 2, 2, 174, 175, 3, 2, 2, 2, 175, 179, 3, 2, 2,
-	2, 176, 174, 3, 2, 2, 2, 177, 178, 7, 20, 2, 2, 178, 180, 5, 20, 11, 2,
-	179, 177, 3, 2, 2, 2, 179, 180, 3, 2, 2, 2, 180, 25, 3, 2, 2, 2, 181, 184,
-	7, 21, 2, 2, 182, 183, 7, 22, 2, 2, 183, 185, 5, 28, 15, 2, 184, 182, 3,
-	2, 2, 2, 184, 185, 3, 2, 2, 2, 185, 186, 3, 2, 2, 2, 186, 187, 5, 20, 11,
-	2, 187, 27, 3, 2, 2, 2, 188, 189, 5, 30, 16, 2, 189, 29, 3, 2, 2, 2, 190,
-	191, 8, 16, 1, 2, 191, 192, 7, 12, 2, 2, 192, 193, 5, 30, 16, 2, 193, 194,
-	7, 14, 2, 2, 194, 222, 3, 2, 2, 2, 195, 196, 7, 51, 2, 2, 196, 205, 7,
-	12, 2, 2, 197, 202, 5, 30, 16, 2, 198, 199, 7, 13, 2, 2, 199, 201, 5, 30,
-	16, 2, 200, 198, 3, 2, 2, 2, 201, 204, 3, 2, 2, 2, 202, 200, 3, 2, 2, 2,
-	202, 203, 3, 2, 2, 2, 203, 206, 3, 2, 2, 2, 204, 202, 3, 2, 2, 2, 205,
-	197, 3, 2, 2, 2, 205, 206, 3, 2, 2, 2, 206, 207, 3, 2, 2, 2, 207, 222,
-	7, 14, 2, 2, 208, 209, 5, 32, 17, 2, 209, 210, 5, 30, 16, 12, 210, 222,
-	3, 2, 2, 2, 211, 222, 5, 36, 19, 2, 212, 213, 7, 11, 2, 2, 213, 216, 5,
-	14, 8, 2, 214, 215, 7, 5, 2, 2, 215, 217, 5, 8, 5, 2, 216, 214, 3, 2, 2,
-	2, 216, 217, 3, 2, 2, 2, 217, 218, 3, 2, 2, 2, 218, 219, 5, 20, 11, 2,
-	219, 222, 3, 2, 2, 2, 220, 222, 7, 51, 2, 2, 221, 190, 3, 2, 2, 2, 221,
-	195, 3, 2, 2, 2, 221, 208, 3, 2, 2, 2, 221, 211, 3, 2, 2, 2, 221, 212,
-	3, 2, 2, 2, 221, 220, 3, 2, 2, 2, 222, 247, 3, 2, 2, 2, 223, 224, 12, 11,
-	2, 2, 224, 225, 9, 2, 2, 2, 225, 246, 5, 30, 16, 12, 226, 227, 12, 10,
-	2, 2, 227, 228, 9, 3, 2, 2, 228, 246, 5, 30, 16, 11, 229, 230, 12, 9, 2,
-	2, 230, 231, 9, 4, 2, 2, 231, 246, 5, 30, 16, 10, 232, 233, 12, 8, 2, 2,
-	233, 234, 7, 38, 2, 2, 234, 246, 5, 30, 16, 9, 235, 236, 12, 7, 2, 2, 236,
-	237, 7, 39, 2, 2, 237, 246, 5, 30, 16, 8, 238, 239, 12, 6, 2, 2, 239, 240,
-	5, 34, 18, 2, 240, 241, 5, 30, 16, 7, 241, 246, 3, 2, 2, 2, 242, 243, 12,
-	13, 2, 2, 243, 244, 7, 23, 2, 2, 244, 246, 7, 51, 2, 2, 245, 223, 3, 2,
-	2, 2, 245, 226, 3, 2, 2, 2, 245, 229, 3, 2, 2, 2, 245, 232, 3, 2, 2, 2,
-	245, 235, 3, 2, 2, 2, 245, 238, 3, 2, 2, 2, 245, 242, 3, 2, 2, 2, 246,
-	249, 3, 2, 2, 2, 247, 245, 3, 2, 2, 2, 247, 248, 3, 2, 2, 2, 248, 31, 3,
-	2, 2, 2, 249, 247, 3, 2, 2, 2, 250, 251, 7, 29, 2, 2, 251, 33, 3, 2, 2,
-	2, 252, 253, 9, 5, 2, 2, 253, 35, 3, 2, 2, 2, 254, 258, 7, 49, 2, 2, 255,
-	258, 7, 48, 2, 2, 256, 258, 7, 50, 2, 2, 257, 254, 3, 2, 2, 2, 257, 255,
-	3, 2, 2, 2, 257, 256, 3, 2, 2, 2, 258, 37, 3, 2, 2, 2, 28, 41, 58, 68,
-	70, 85, 88, 93, 100, 104, 111, 121, 124, 133, 144, 155, 162, 174, 179,
-	184, 202, 205, 216, 221, 245, 247, 257,
+	18, 4, 19, 9, 19, 4, 20, 9, 20, 3, 2, 7, 2, 42, 10, 2, 12, 2, 14, 2, 45,
+	11, 2, 3, 2, 3, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3,
+	5, 3, 58, 10, 3, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4,
+	3, 4, 3, 4, 3, 4, 5, 4, 72, 10, 4, 5, 4, 74, 10, 4, 3, 5, 3, 5, 3, 5, 3,
+	5, 3, 5, 3, 6, 3, 6, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3, 7, 3,
+	7, 7, 7, 92, 10, 7, 12, 7, 14, 7, 95, 11, 7, 5, 7, 97, 10, 7, 3, 7, 3,
+	7, 3, 7, 5, 7, 102, 10, 7, 3, 7, 3, 7, 3, 7, 7, 7, 107, 10, 7, 12, 7, 14,
+	7, 110, 11, 7, 3, 7, 3, 7, 5, 7, 114, 10, 7, 3, 8, 3, 8, 3, 8, 3, 8, 3,
+	8, 5, 8, 121, 10, 8, 3, 8, 3, 8, 3, 9, 3, 9, 3, 9, 3, 9, 7, 9, 129, 10,
+	9, 12, 9, 14, 9, 132, 11, 9, 5, 9, 134, 10, 9, 3, 9, 3, 9, 3, 10, 3, 10,
+	3, 10, 7, 10, 141, 10, 10, 12, 10, 14, 10, 144, 11, 10, 3, 10, 3, 10, 3,
+	10, 3, 11, 3, 11, 3, 11, 7, 11, 152, 10, 11, 12, 11, 14, 11, 155, 11, 11,
+	3, 11, 3, 11, 3, 11, 3, 12, 3, 12, 7, 12, 162, 10, 12, 12, 12, 14, 12,
+	165, 11, 12, 3, 12, 3, 12, 3, 13, 3, 13, 3, 13, 3, 13, 5, 13, 173, 10,
+	13, 3, 14, 3, 14, 3, 14, 3, 14, 3, 14, 3, 14, 3, 14, 3, 14, 7, 14, 183,
+	10, 14, 12, 14, 14, 14, 186, 11, 14, 3, 14, 3, 14, 5, 14, 190, 10, 14,
+	3, 15, 3, 15, 3, 15, 5, 15, 195, 10, 15, 3, 15, 3, 15, 3, 16, 3, 16, 3,
+	17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 7, 17,
+	211, 10, 17, 12, 17, 14, 17, 214, 11, 17, 5, 17, 216, 10, 17, 3, 17, 3,
+	17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 5, 17, 227, 10, 17,
+	3, 17, 3, 17, 3, 17, 5, 17, 232, 10, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3,
+	17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17,
+	3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 3, 17, 7, 17, 256, 10, 17, 12,
+	17, 14, 17, 259, 11, 17, 3, 18, 3, 18, 3, 19, 3, 19, 3, 20, 3, 20, 3, 20,
+	5, 20, 268, 10, 20, 3, 20, 2, 3, 32, 21, 2, 4, 6, 8, 10, 12, 14, 16, 18,
+	20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 2, 6, 3, 2, 25, 28, 3, 2, 29, 32,
+	3, 2, 33, 38, 4, 2, 6, 6, 41, 48, 2, 296, 2, 43, 3, 2, 2, 2, 4, 57, 3,
+	2, 2, 2, 6, 73, 3, 2, 2, 2, 8, 75, 3, 2, 2, 2, 10, 80, 3, 2, 2, 2, 12,
+	113, 3, 2, 2, 2, 14, 115, 3, 2, 2, 2, 16, 124, 3, 2, 2, 2, 18, 137, 3,
+	2, 2, 2, 20, 148, 3, 2, 2, 2, 22, 159, 3, 2, 2, 2, 24, 168, 3, 2, 2, 2,
+	26, 174, 3, 2, 2, 2, 28, 191, 3, 2, 2, 2, 30, 198, 3, 2, 2, 2, 32, 231,
+	3, 2, 2, 2, 34, 260, 3, 2, 2, 2, 36, 262, 3, 2, 2, 2, 38, 267, 3, 2, 2,
+	2, 40, 42, 5, 4, 3, 2, 41, 40, 3, 2, 2, 2, 42, 45, 3, 2, 2, 2, 43, 41,
+	3, 2, 2, 2, 43, 44, 3, 2, 2, 2, 44, 46, 3, 2, 2, 2, 45, 43, 3, 2, 2, 2,
+	46, 47, 7, 2, 2, 3, 47, 3, 3, 2, 2, 2, 48, 58, 5, 6, 4, 2, 49, 58, 5, 8,
+	5, 2, 50, 58, 5, 14, 8, 2, 51, 58, 5, 24, 13, 2, 52, 53, 5, 30, 16, 2,
+	53, 54, 7, 3, 2, 2, 54, 58, 3, 2, 2, 2, 55, 58, 5, 26, 14, 2, 56, 58, 5,
+	28, 15, 2, 57, 48, 3, 2, 2, 2, 57, 49, 3, 2, 2, 2, 57, 50, 3, 2, 2, 2,
+	57, 51, 3, 2, 2, 2, 57, 52, 3, 2, 2, 2, 57, 55, 3, 2, 2, 2, 57, 56, 3,
+	2, 2, 2, 58, 5, 3, 2, 2, 2, 59, 60, 7, 52, 2, 2, 60, 61, 7, 4, 2, 2, 61,
+	62, 5, 30, 16, 2, 62, 63, 7, 3, 2, 2, 63, 74, 3, 2, 2, 2, 64, 65, 7, 52,
+	2, 2, 65, 66, 7, 5, 2, 2, 66, 71, 5, 10, 6, 2, 67, 68, 7, 6, 2, 2, 68,
+	69, 5, 30, 16, 2, 69, 70, 7, 3, 2, 2, 70, 72, 3, 2, 2, 2, 71, 67, 3, 2,
+	2, 2, 71, 72, 3, 2, 2, 2, 72, 74, 3, 2, 2, 2, 73, 59, 3, 2, 2, 2, 73, 64,
+	3, 2, 2, 2, 74, 7, 3, 2, 2, 2, 75, 76, 7, 7, 2, 2, 76, 77, 7, 52, 2, 2,
+	77, 78, 7, 5, 2, 2, 78, 79, 5, 10, 6, 2, 79, 9, 3, 2, 2, 2, 80, 81, 5,
+	12, 7, 2, 81, 11, 3, 2, 2, 2, 82, 114, 7, 8, 2, 2, 83, 114, 7, 9, 2, 2,
+	84, 114, 7, 10, 2, 2, 85, 114, 7, 11, 2, 2, 86, 87, 7, 12, 2, 2, 87, 96,
+	7, 13, 2, 2, 88, 93, 5, 12, 7, 2, 89, 90, 7, 14, 2, 2, 90, 92, 5, 12, 7,
+	2, 91, 89, 3, 2, 2, 2, 92, 95, 3, 2, 2, 2, 93, 91, 3, 2, 2, 2, 93, 94,
+	3, 2, 2, 2, 94, 97, 3, 2, 2, 2, 95, 93, 3, 2, 2, 2, 96, 88, 3, 2, 2, 2,
+	96, 97, 3, 2, 2, 2, 97, 98, 3, 2, 2, 2, 98, 101, 7, 15, 2, 2, 99, 100,
+	7, 5, 2, 2, 100, 102, 5, 12, 7, 2, 101, 99, 3, 2, 2, 2, 101, 102, 3, 2,
+	2, 2, 102, 114, 3, 2, 2, 2, 103, 104, 7, 16, 2, 2, 104, 108, 7, 17, 2,
+	2, 105, 107, 5, 20, 11, 2, 106, 105, 3, 2, 2, 2, 107, 110, 3, 2, 2, 2,
+	108, 106, 3, 2, 2, 2, 108, 109, 3, 2, 2, 2, 109, 111, 3, 2, 2, 2, 110,
+	108, 3, 2, 2, 2, 111, 114, 7, 18, 2, 2, 112, 114, 7, 52, 2, 2, 113, 82,
+	3, 2, 2, 2, 113, 83, 3, 2, 2, 2, 113, 84, 3, 2, 2, 2, 113, 85, 3, 2, 2,
+	2, 113, 86, 3, 2, 2, 2, 113, 103, 3, 2, 2, 2, 113, 112, 3, 2, 2, 2, 114,
+	13, 3, 2, 2, 2, 115, 116, 7, 12, 2, 2, 116, 117, 7, 52, 2, 2, 117, 120,
+	5, 16, 9, 2, 118, 119, 7, 5, 2, 2, 119, 121, 5, 10, 6, 2, 120, 118, 3,
+	2, 2, 2, 120, 121, 3, 2, 2, 2, 121, 122, 3, 2, 2, 2, 122, 123, 5, 22, 12,
+	2, 123, 15, 3, 2, 2, 2, 124, 133, 7, 13, 2, 2, 125, 130, 5, 18, 10, 2,
+	126, 127, 7, 14, 2, 2, 127, 129, 5, 18, 10, 2, 128, 126, 3, 2, 2, 2, 129,
+	132, 3, 2, 2, 2, 130, 128, 3, 2, 2, 2, 130, 131, 3, 2, 2, 2, 131, 134,
+	3, 2, 2, 2, 132, 130, 3, 2, 2, 2, 133, 125, 3, 2, 2, 2, 133, 134, 3, 2,
+	2, 2, 134, 135, 3, 2, 2, 2, 135, 136, 7, 15, 2, 2, 136, 17, 3, 2, 2, 2,
+	137, 142, 7, 52, 2, 2, 138, 139, 7, 14, 2, 2, 139, 141, 7, 52, 2, 2, 140,
+	138, 3, 2, 2, 2, 141, 144, 3, 2, 2, 2, 142, 140, 3, 2, 2, 2, 142, 143,
+	3, 2, 2, 2, 143, 145, 3, 2, 2, 2, 144, 142, 3, 2, 2, 2, 145, 146, 7, 5,
+	2, 2, 146, 147, 5, 10, 6, 2, 147, 19, 3, 2, 2, 2, 148, 153, 7, 52, 2, 2,
+	149, 150, 7, 14, 2, 2, 150, 152, 7, 52, 2, 2, 151, 149, 3, 2, 2, 2, 152,
+	155, 3, 2, 2, 2, 153, 151, 3, 2, 2, 2, 153, 154, 3, 2, 2, 2, 154, 156,
+	3, 2, 2, 2, 155, 153, 3, 2, 2, 2, 156, 157, 7, 5, 2, 2, 157, 158, 5, 10,
+	6, 2, 158, 21, 3, 2, 2, 2, 159, 163, 7, 17, 2, 2, 160, 162, 5, 4, 3, 2,
+	161, 160, 3, 2, 2, 2, 162, 165, 3, 2, 2, 2, 163, 161, 3, 2, 2, 2, 163,
+	164, 3, 2, 2, 2, 164, 166, 3, 2, 2, 2, 165, 163, 3, 2, 2, 2, 166, 167,
+	7, 18, 2, 2, 167, 23, 3, 2, 2, 2, 168, 172, 7, 19, 2, 2, 169, 170, 5, 30,
+	16, 2, 170, 171, 7, 3, 2, 2, 171, 173, 3, 2, 2, 2, 172, 169, 3, 2, 2, 2,
+	172, 173, 3, 2, 2, 2, 173, 25, 3, 2, 2, 2, 174, 175, 7, 20, 2, 2, 175,
+	176, 5, 30, 16, 2, 176, 184, 5, 22, 12, 2, 177, 178, 7, 21, 2, 2, 178,
+	179, 7, 20, 2, 2, 179, 180, 5, 30, 16, 2, 180, 181, 5, 22, 12, 2, 181,
+	183, 3, 2, 2, 2, 182, 177, 3, 2, 2, 2, 183, 186, 3, 2, 2, 2, 184, 182,
+	3, 2, 2, 2, 184, 185, 3, 2, 2, 2, 185, 189, 3, 2, 2, 2, 186, 184, 3, 2,
+	2, 2, 187, 188, 7, 21, 2, 2, 188, 190, 5, 22, 12, 2, 189, 187, 3, 2, 2,
+	2, 189, 190, 3, 2, 2, 2, 190, 27, 3, 2, 2, 2, 191, 194, 7, 22, 2, 2, 192,
+	193, 7, 23, 2, 2, 193, 195, 5, 30, 16, 2, 194, 192, 3, 2, 2, 2, 194, 195,
+	3, 2, 2, 2, 195, 196, 3, 2, 2, 2, 196, 197, 5, 22, 12, 2, 197, 29, 3, 2,
+	2, 2, 198, 199, 5, 32, 17, 2, 199, 31, 3, 2, 2, 2, 200, 201, 8, 17, 1,
+	2, 201, 202, 7, 13, 2, 2, 202, 203, 5, 32, 17, 2, 203, 204, 7, 15, 2, 2,
+	204, 232, 3, 2, 2, 2, 205, 206, 7, 52, 2, 2, 206, 215, 7, 13, 2, 2, 207,
+	212, 5, 32, 17, 2, 208, 209, 7, 14, 2, 2, 209, 211, 5, 32, 17, 2, 210,
+	208, 3, 2, 2, 2, 211, 214, 3, 2, 2, 2, 212, 210, 3, 2, 2, 2, 212, 213,
+	3, 2, 2, 2, 213, 216, 3, 2, 2, 2, 214, 212, 3, 2, 2, 2, 215, 207, 3, 2,
+	2, 2, 215, 216, 3, 2, 2, 2, 216, 217, 3, 2, 2, 2, 217, 232, 7, 15, 2, 2,
+	218, 219, 5, 34, 18, 2, 219, 220, 5, 32, 17, 12, 220, 232, 3, 2, 2, 2,
+	221, 232, 5, 38, 20, 2, 222, 223, 7, 12, 2, 2, 223, 226, 5, 16, 9, 2, 224,
+	225, 7, 5, 2, 2, 225, 227, 5, 10, 6, 2, 226, 224, 3, 2, 2, 2, 226, 227,
+	3, 2, 2, 2, 227, 228, 3, 2, 2, 2, 228, 229, 5, 22, 12, 2, 229, 232, 3,
+	2, 2, 2, 230, 232, 7, 52, 2, 2, 231, 200, 3, 2, 2, 2, 231, 205, 3, 2, 2,
+	2, 231, 218, 3, 2, 2, 2, 231, 221, 3, 2, 2, 2, 231, 222, 3, 2, 2, 2, 231,
+	230, 3, 2, 2, 2, 232, 257, 3, 2, 2, 2, 233, 234, 12, 11, 2, 2, 234, 235,
+	9, 2, 2, 2, 235, 256, 5, 32, 17, 12, 236, 237, 12, 10, 2, 2, 237, 238,
+	9, 3, 2, 2, 238, 256, 5, 32, 17, 11, 239, 240, 12, 9, 2, 2, 240, 241, 9,
+	4, 2, 2, 241, 256, 5, 32, 17, 10, 242, 243, 12, 8, 2, 2, 243, 244, 7, 39,
+	2, 2, 244, 256, 5, 32, 17, 9, 245, 246, 12, 7, 2, 2, 246, 247, 7, 40, 2,
+	2, 247, 256, 5, 32, 17, 8, 248, 249, 12, 6, 2, 2, 249, 250, 5, 36, 19,
+	2, 250, 251, 5, 32, 17, 7, 251, 256, 3, 2, 2, 2, 252, 253, 12, 13, 2, 2,
+	253, 254, 7, 24, 2, 2, 254, 256, 7, 52, 2, 2, 255, 233, 3, 2, 2, 2, 255,
+	236, 3, 2, 2, 2, 255, 239, 3, 2, 2, 2, 255, 242, 3, 2, 2, 2, 255, 245,
+	3, 2, 2, 2, 255, 248, 3, 2, 2, 2, 255, 252, 3, 2, 2, 2, 256, 259, 3, 2,
+	2, 2, 257, 255, 3, 2, 2, 2, 257, 258, 3, 2, 2, 2, 258, 33, 3, 2, 2, 2,
+	259, 257, 3, 2, 2, 2, 260, 261, 7, 30, 2, 2, 261, 35, 3, 2, 2, 2, 262,
+	263, 9, 5, 2, 2, 263, 37, 3, 2, 2, 2, 264, 268, 7, 50, 2, 2, 265, 268,
+	7, 49, 2, 2, 266, 268, 7, 51, 2, 2, 267, 264, 3, 2, 2, 2, 267, 265, 3,
+	2, 2, 2, 267, 266, 3, 2, 2, 2, 268, 39, 3, 2, 2, 2, 28, 43, 57, 71, 73,
+	93, 96, 101, 108, 113, 120, 130, 133, 142, 153, 163, 172, 184, 189, 194,
+	212, 215, 226, 231, 255, 257, 267,
 }
 var deserializer = antlr.NewATNDeserializer(nil)
 var deserializedATN = deserializer.DeserializeFromUInt16(parserATN)
 
 var literalNames = []string{
-	"", "';'", "':='", "':'", "'='", "'int'", "'real'", "'string'", "'bool'",
-	"'func'", "'('", "','", "')'", "'struct'", "'{'", "'}'", "'return'", "'if'",
-	"'else'", "'loop'", "'while'", "'.'", "'*'", "'/'", "'%'", "'&'", "'+'",
-	"'-'", "'|'", "'^'", "'<'", "'>'", "'=='", "'>='", "'<='", "'!='", "'and'",
-	"'or'", "'+='", "'-='", "'*='", "'/='", "'%='", "'&='", "'|='", "'^='",
+	"", "';'", "':='", "':'", "'='", "'type'", "'int'", "'real'", "'string'",
+	"'bool'", "'func'", "'('", "','", "')'", "'struct'", "'{'", "'}'", "'return'",
+	"'if'", "'else'", "'loop'", "'while'", "'.'", "'*'", "'/'", "'%'", "'&'",
+	"'+'", "'-'", "'|'", "'^'", "'<'", "'>'", "'=='", "'>='", "'<='", "'!='",
+	"'and'", "'or'", "'+='", "'-='", "'*='", "'/='", "'%='", "'&='", "'|='",
+	"'^='",
 }
 var symbolicNames = []string{
 	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 	"", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
-	"", "", "", "", "", "", "", "", "", "", "INTEGER_LITERAL", "REAL_LITERAL",
+	"", "", "", "", "", "", "", "", "", "", "", "INTEGER_LITERAL", "REAL_LITERAL",
 	"BOOLEAN_LITERAL", "IDENTIFIER", "LINENDING", "WHITESPACE", "COMMENT",
 }
 
 var ruleNames = []string{
-	"program", "statement", "declaration", "typeName", "typeName2", "function",
-	"paramDecl", "combinedParam", "combinedField", "scope", "returnStatement",
+	"program", "statement", "declaration", "typeDeclaration", "typeName", "typeName2",
+	"function", "paramDecl", "combinedParam", "combinedField", "scope", "returnStatement",
 	"ifStatement", "loop", "expression", "expression2", "unaryOp", "assignmentOp",
 	"literal",
 }
@@ -237,13 +243,14 @@ const (
 	RuneParserT__42           = 43
 	RuneParserT__43           = 44
 	RuneParserT__44           = 45
-	RuneParserINTEGER_LITERAL = 46
-	RuneParserREAL_LITERAL    = 47
-	RuneParserBOOLEAN_LITERAL = 48
-	RuneParserIDENTIFIER      = 49
-	RuneParserLINENDING       = 50
-	RuneParserWHITESPACE      = 51
-	RuneParserCOMMENT         = 52
+	RuneParserT__45           = 46
+	RuneParserINTEGER_LITERAL = 47
+	RuneParserREAL_LITERAL    = 48
+	RuneParserBOOLEAN_LITERAL = 49
+	RuneParserIDENTIFIER      = 50
+	RuneParserLINENDING       = 51
+	RuneParserWHITESPACE      = 52
+	RuneParserCOMMENT         = 53
 )
 
 // RuneParser rules.
@@ -251,21 +258,22 @@ const (
 	RuneParserRULE_program         = 0
 	RuneParserRULE_statement       = 1
 	RuneParserRULE_declaration     = 2
-	RuneParserRULE_typeName        = 3
-	RuneParserRULE_typeName2       = 4
-	RuneParserRULE_function        = 5
-	RuneParserRULE_paramDecl       = 6
-	RuneParserRULE_combinedParam   = 7
-	RuneParserRULE_combinedField   = 8
-	RuneParserRULE_scope           = 9
-	RuneParserRULE_returnStatement = 10
-	RuneParserRULE_ifStatement     = 11
-	RuneParserRULE_loop            = 12
-	RuneParserRULE_expression      = 13
-	RuneParserRULE_expression2     = 14
-	RuneParserRULE_unaryOp         = 15
-	RuneParserRULE_assignmentOp    = 16
-	RuneParserRULE_literal         = 17
+	RuneParserRULE_typeDeclaration = 3
+	RuneParserRULE_typeName        = 4
+	RuneParserRULE_typeName2       = 5
+	RuneParserRULE_function        = 6
+	RuneParserRULE_paramDecl       = 7
+	RuneParserRULE_combinedParam   = 8
+	RuneParserRULE_combinedField   = 9
+	RuneParserRULE_scope           = 10
+	RuneParserRULE_returnStatement = 11
+	RuneParserRULE_ifStatement     = 12
+	RuneParserRULE_loop            = 13
+	RuneParserRULE_expression      = 14
+	RuneParserRULE_expression2     = 15
+	RuneParserRULE_unaryOp         = 16
+	RuneParserRULE_assignmentOp    = 17
+	RuneParserRULE_literal         = 18
 )
 
 // IProgramContext is an interface to support dynamic dispatch.
@@ -395,13 +403,13 @@ func (p *RuneParser) Program() (localctx IProgramContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(39)
+	p.SetState(41)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__8)|(1<<RuneParserT__9)|(1<<RuneParserT__15)|(1<<RuneParserT__16)|(1<<RuneParserT__18)|(1<<RuneParserT__26))) != 0) || (((_la-46)&-(0x1f+1)) == 0 && ((1<<uint((_la-46)))&((1<<(RuneParserINTEGER_LITERAL-46))|(1<<(RuneParserREAL_LITERAL-46))|(1<<(RuneParserBOOLEAN_LITERAL-46))|(1<<(RuneParserIDENTIFIER-46)))) != 0) {
+	for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__9)|(1<<RuneParserT__10)|(1<<RuneParserT__16)|(1<<RuneParserT__17)|(1<<RuneParserT__19)|(1<<RuneParserT__27))) != 0) || (((_la-47)&-(0x1f+1)) == 0 && ((1<<uint((_la-47)))&((1<<(RuneParserINTEGER_LITERAL-47))|(1<<(RuneParserREAL_LITERAL-47))|(1<<(RuneParserBOOLEAN_LITERAL-47))|(1<<(RuneParserIDENTIFIER-47)))) != 0) {
 		{
-			p.SetState(36)
+			p.SetState(38)
 
 			var _x = p.Statement()
 
@@ -409,12 +417,12 @@ func (p *RuneParser) Program() (localctx IProgramContext) {
 		}
 		localctx.(*ProgramContext).statements = append(localctx.(*ProgramContext).statements, localctx.(*ProgramContext)._statement)
 
-		p.SetState(41)
+		p.SetState(43)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(42)
+		p.SetState(44)
 		p.Match(RuneParserEOF)
 	}
 
@@ -469,6 +477,26 @@ func (s *StatementContext) Declaration() IDeclarationContext {
 	return t.(IDeclarationContext)
 }
 
+func (s *StatementContext) TypeDeclaration() ITypeDeclarationContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITypeDeclarationContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ITypeDeclarationContext)
+}
+
+func (s *StatementContext) Function() IFunctionContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFunctionContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IFunctionContext)
+}
+
 func (s *StatementContext) ReturnStatement() IReturnStatementContext {
 	var t = s.GetTypedRuleContext(reflect.TypeOf((*IReturnStatementContext)(nil)).Elem(), 0)
 
@@ -487,16 +515,6 @@ func (s *StatementContext) Expression() IExpressionContext {
 	}
 
 	return t.(IExpressionContext)
-}
-
-func (s *StatementContext) Function() IFunctionContext {
-	var t = s.GetTypedRuleContext(reflect.TypeOf((*IFunctionContext)(nil)).Elem(), 0)
-
-	if t == nil {
-		return nil
-	}
-
-	return t.(IFunctionContext)
 }
 
 func (s *StatementContext) IfStatement() IIfStatementContext {
@@ -557,33 +575,39 @@ func (p *RuneParser) Statement() (localctx IStatementContext) {
 		}
 	}()
 
-	p.SetState(56)
+	p.SetState(55)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 1, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(44)
+			p.SetState(46)
 			p.Declaration()
-		}
-		{
-			p.SetState(45)
-			p.Match(RuneParserT__0)
 		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
 			p.SetState(47)
-			p.ReturnStatement()
-		}
-		{
-			p.SetState(48)
-			p.Match(RuneParserT__0)
+			p.TypeDeclaration()
 		}
 
 	case 3:
 		p.EnterOuterAlt(localctx, 3)
+		{
+			p.SetState(48)
+			p.Function()
+		}
+
+	case 4:
+		p.EnterOuterAlt(localctx, 4)
+		{
+			p.SetState(49)
+			p.ReturnStatement()
+		}
+
+	case 5:
+		p.EnterOuterAlt(localctx, 5)
 		{
 			p.SetState(50)
 			p.Expression()
@@ -593,24 +617,17 @@ func (p *RuneParser) Statement() (localctx IStatementContext) {
 			p.Match(RuneParserT__0)
 		}
 
-	case 4:
-		p.EnterOuterAlt(localctx, 4)
-		{
-			p.SetState(53)
-			p.Function()
-		}
-
-	case 5:
-		p.EnterOuterAlt(localctx, 5)
-		{
-			p.SetState(54)
-			p.IfStatement()
-		}
-
 	case 6:
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(55)
+			p.SetState(53)
+			p.IfStatement()
+		}
+
+	case 7:
+		p.EnterOuterAlt(localctx, 7)
+		{
+			p.SetState(54)
 			p.Loop()
 		}
 
@@ -753,69 +770,216 @@ func (p *RuneParser) Declaration() (localctx IDeclarationContext) {
 		}
 	}()
 
-	p.SetState(68)
+	p.SetState(71)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 3, p.GetParserRuleContext()) {
 	case 1:
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(58)
+			p.SetState(57)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
 			localctx.(*DeclarationContext).identifier = _m
 		}
 		{
-			p.SetState(59)
+			p.SetState(58)
 			p.Match(RuneParserT__1)
 		}
 		{
-			p.SetState(60)
+			p.SetState(59)
 
 			var _x = p.Expression()
 
 			localctx.(*DeclarationContext).value = _x
 		}
+		{
+			p.SetState(60)
+			p.Match(RuneParserT__0)
+		}
 
 	case 2:
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(61)
+			p.SetState(62)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
 			localctx.(*DeclarationContext).identifier = _m
 		}
 		{
-			p.SetState(62)
+			p.SetState(63)
 			p.Match(RuneParserT__2)
 		}
 		{
-			p.SetState(63)
+			p.SetState(64)
 
 			var _x = p.TypeName()
 
 			localctx.(*DeclarationContext).type_ = _x
 		}
-		p.SetState(66)
+		p.SetState(69)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if _la == RuneParserT__3 {
 			{
-				p.SetState(64)
+				p.SetState(65)
 				p.Match(RuneParserT__3)
 			}
 			{
-				p.SetState(65)
+				p.SetState(66)
 
 				var _x = p.Expression()
 
 				localctx.(*DeclarationContext).value = _x
 			}
+			{
+				p.SetState(67)
+				p.Match(RuneParserT__0)
+			}
 
 		}
 
+	}
+
+	return localctx
+}
+
+// ITypeDeclarationContext is an interface to support dynamic dispatch.
+type ITypeDeclarationContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// GetIdentifier returns the identifier token.
+	GetIdentifier() antlr.Token
+
+	// SetIdentifier sets the identifier token.
+	SetIdentifier(antlr.Token)
+
+	// GetType_ returns the type_ rule contexts.
+	GetType_() ITypeNameContext
+
+	// SetType_ sets the type_ rule contexts.
+	SetType_(ITypeNameContext)
+
+	// IsTypeDeclarationContext differentiates from other interfaces.
+	IsTypeDeclarationContext()
+}
+
+type TypeDeclarationContext struct {
+	*antlr.BaseParserRuleContext
+	parser     antlr.Parser
+	identifier antlr.Token
+	type_      ITypeNameContext
+}
+
+func NewEmptyTypeDeclarationContext() *TypeDeclarationContext {
+	var p = new(TypeDeclarationContext)
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(nil, -1)
+	p.RuleIndex = RuneParserRULE_typeDeclaration
+	return p
+}
+
+func (*TypeDeclarationContext) IsTypeDeclarationContext() {}
+
+func NewTypeDeclarationContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *TypeDeclarationContext {
+	var p = new(TypeDeclarationContext)
+
+	p.BaseParserRuleContext = antlr.NewBaseParserRuleContext(parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = RuneParserRULE_typeDeclaration
+
+	return p
+}
+
+func (s *TypeDeclarationContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *TypeDeclarationContext) GetIdentifier() antlr.Token { return s.identifier }
+
+func (s *TypeDeclarationContext) SetIdentifier(v antlr.Token) { s.identifier = v }
+
+func (s *TypeDeclarationContext) GetType_() ITypeNameContext { return s.type_ }
+
+func (s *TypeDeclarationContext) SetType_(v ITypeNameContext) { s.type_ = v }
+
+func (s *TypeDeclarationContext) IDENTIFIER() antlr.TerminalNode {
+	return s.GetToken(RuneParserIDENTIFIER, 0)
+}
+
+func (s *TypeDeclarationContext) TypeName() ITypeNameContext {
+	var t = s.GetTypedRuleContext(reflect.TypeOf((*ITypeNameContext)(nil)).Elem(), 0)
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(ITypeNameContext)
+}
+
+func (s *TypeDeclarationContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *TypeDeclarationContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *TypeDeclarationContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitTypeDeclaration(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *RuneParser) TypeDeclaration() (localctx ITypeDeclarationContext) {
+	localctx = NewTypeDeclarationContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 6, RuneParserRULE_typeDeclaration)
+
+	defer func() {
+		p.ExitRule()
+	}()
+
+	defer func() {
+		if err := recover(); err != nil {
+			if v, ok := err.(antlr.RecognitionException); ok {
+				localctx.SetException(v)
+				p.GetErrorHandler().ReportError(p, v)
+				p.GetErrorHandler().Recover(p, v)
+			} else {
+				panic(err)
+			}
+		}
+	}()
+
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(73)
+		p.Match(RuneParserT__4)
+	}
+	{
+		p.SetState(74)
+
+		var _m = p.Match(RuneParserIDENTIFIER)
+
+		localctx.(*TypeDeclarationContext).identifier = _m
+	}
+	{
+		p.SetState(75)
+		p.Match(RuneParserT__2)
+	}
+	{
+		p.SetState(76)
+
+		var _x = p.TypeName()
+
+		localctx.(*TypeDeclarationContext).type_ = _x
 	}
 
 	return localctx
@@ -889,7 +1053,7 @@ func (s *TypeNameContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) TypeName() (localctx ITypeNameContext) {
 	localctx = NewTypeNameContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, RuneParserRULE_typeName)
+	p.EnterRule(localctx, 8, RuneParserRULE_typeName)
 
 	defer func() {
 		p.ExitRule()
@@ -909,7 +1073,7 @@ func (p *RuneParser) TypeName() (localctx ITypeNameContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(70)
+		p.SetState(78)
 		p.TypeName2()
 	}
 
@@ -964,6 +1128,43 @@ func (s *TypeName2Context) GetRuleContext() antlr.RuleContext {
 
 func (s *TypeName2Context) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type CustomTypeContext struct {
+	*TypeName2Context
+	name antlr.Token
+}
+
+func NewCustomTypeContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *CustomTypeContext {
+	var p = new(CustomTypeContext)
+
+	p.TypeName2Context = NewEmptyTypeName2Context()
+	p.parser = parser
+	p.CopyFrom(ctx.(*TypeName2Context))
+
+	return p
+}
+
+func (s *CustomTypeContext) GetName() antlr.Token { return s.name }
+
+func (s *CustomTypeContext) SetName(v antlr.Token) { s.name = v }
+
+func (s *CustomTypeContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *CustomTypeContext) IDENTIFIER() antlr.TerminalNode {
+	return s.GetToken(RuneParserIDENTIFIER, 0)
+}
+
+func (s *CustomTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case RuneVisitor:
+		return t.VisitCustomType(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
 }
 
 type SimpleTypeContext struct {
@@ -1113,7 +1314,7 @@ func (s *FunctionTypeContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (p *RuneParser) TypeName2() (localctx ITypeName2Context) {
 	localctx = NewTypeName2Context(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, RuneParserRULE_typeName2)
+	p.EnterRule(localctx, 10, RuneParserRULE_typeName2)
 	var _la int
 
 	defer func() {
@@ -1132,77 +1333,77 @@ func (p *RuneParser) TypeName2() (localctx ITypeName2Context) {
 		}
 	}()
 
-	p.SetState(102)
+	p.SetState(111)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
-	case RuneParserT__4:
+	case RuneParserT__5:
 		localctx = NewSimpleTypeContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(72)
-			p.Match(RuneParserT__4)
-		}
-
-	case RuneParserT__5:
-		localctx = NewSimpleTypeContext(p, localctx)
-		p.EnterOuterAlt(localctx, 2)
-		{
-			p.SetState(73)
+			p.SetState(80)
 			p.Match(RuneParserT__5)
 		}
 
 	case RuneParserT__6:
 		localctx = NewSimpleTypeContext(p, localctx)
-		p.EnterOuterAlt(localctx, 3)
+		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(74)
+			p.SetState(81)
 			p.Match(RuneParserT__6)
 		}
 
 	case RuneParserT__7:
 		localctx = NewSimpleTypeContext(p, localctx)
-		p.EnterOuterAlt(localctx, 4)
+		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(75)
+			p.SetState(82)
 			p.Match(RuneParserT__7)
 		}
 
 	case RuneParserT__8:
+		localctx = NewSimpleTypeContext(p, localctx)
+		p.EnterOuterAlt(localctx, 4)
+		{
+			p.SetState(83)
+			p.Match(RuneParserT__8)
+		}
+
+	case RuneParserT__9:
 		localctx = NewFunctionTypeContext(p, localctx)
 		p.EnterOuterAlt(localctx, 5)
 		{
-			p.SetState(76)
-			p.Match(RuneParserT__8)
-		}
-		{
-			p.SetState(77)
+			p.SetState(84)
 			p.Match(RuneParserT__9)
 		}
-		p.SetState(86)
+		{
+			p.SetState(85)
+			p.Match(RuneParserT__10)
+		}
+		p.SetState(94)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		if ((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__5)|(1<<RuneParserT__6)|(1<<RuneParserT__7)|(1<<RuneParserT__8)|(1<<RuneParserT__12))) != 0 {
+		if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__5)|(1<<RuneParserT__6)|(1<<RuneParserT__7)|(1<<RuneParserT__8)|(1<<RuneParserT__9)|(1<<RuneParserT__13))) != 0) || _la == RuneParserIDENTIFIER {
 			{
-				p.SetState(78)
+				p.SetState(86)
 
 				var _x = p.TypeName2()
 
 				localctx.(*FunctionTypeContext)._typeName2 = _x
 			}
 			localctx.(*FunctionTypeContext).paramTypes = append(localctx.(*FunctionTypeContext).paramTypes, localctx.(*FunctionTypeContext)._typeName2)
-			p.SetState(83)
+			p.SetState(91)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 
-			for _la == RuneParserT__10 {
+			for _la == RuneParserT__11 {
 				{
-					p.SetState(79)
-					p.Match(RuneParserT__10)
+					p.SetState(87)
+					p.Match(RuneParserT__11)
 				}
 				{
-					p.SetState(80)
+					p.SetState(88)
 
 					var _x = p.TypeName2()
 
@@ -1210,27 +1411,27 @@ func (p *RuneParser) TypeName2() (localctx ITypeName2Context) {
 				}
 				localctx.(*FunctionTypeContext).paramTypes = append(localctx.(*FunctionTypeContext).paramTypes, localctx.(*FunctionTypeContext)._typeName2)
 
-				p.SetState(85)
+				p.SetState(93)
 				p.GetErrorHandler().Sync(p)
 				_la = p.GetTokenStream().LA(1)
 			}
 
 		}
 		{
-			p.SetState(88)
-			p.Match(RuneParserT__11)
+			p.SetState(96)
+			p.Match(RuneParserT__12)
 		}
-		p.SetState(91)
+		p.SetState(99)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if _la == RuneParserT__2 {
 			{
-				p.SetState(89)
+				p.SetState(97)
 				p.Match(RuneParserT__2)
 			}
 			{
-				p.SetState(90)
+				p.SetState(98)
 
 				var _x = p.TypeName2()
 
@@ -1239,34 +1440,45 @@ func (p *RuneParser) TypeName2() (localctx ITypeName2Context) {
 
 		}
 
-	case RuneParserT__12:
+	case RuneParserT__13:
 		localctx = NewStructTypeContext(p, localctx)
 		p.EnterOuterAlt(localctx, 6)
 		{
-			p.SetState(93)
-			p.Match(RuneParserT__12)
-		}
-		{
-			p.SetState(94)
+			p.SetState(101)
 			p.Match(RuneParserT__13)
 		}
-		p.SetState(98)
+		{
+			p.SetState(102)
+			p.Match(RuneParserT__14)
+		}
+		p.SetState(106)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		for _la == RuneParserIDENTIFIER {
 			{
-				p.SetState(95)
+				p.SetState(103)
 				p.CombinedField()
 			}
 
-			p.SetState(100)
+			p.SetState(108)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 		}
 		{
-			p.SetState(101)
-			p.Match(RuneParserT__14)
+			p.SetState(109)
+			p.Match(RuneParserT__15)
+		}
+
+	case RuneParserIDENTIFIER:
+		localctx = NewCustomTypeContext(p, localctx)
+		p.EnterOuterAlt(localctx, 7)
+		{
+			p.SetState(110)
+
+			var _m = p.Match(RuneParserIDENTIFIER)
+
+			localctx.(*CustomTypeContext).name = _m
 		}
 
 	default:
@@ -1412,7 +1624,7 @@ func (s *FunctionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) Function() (localctx IFunctionContext) {
 	localctx = NewFunctionContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, RuneParserRULE_function)
+	p.EnterRule(localctx, 12, RuneParserRULE_function)
 	var _la int
 
 	defer func() {
@@ -1433,34 +1645,34 @@ func (p *RuneParser) Function() (localctx IFunctionContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(104)
-		p.Match(RuneParserT__8)
+		p.SetState(113)
+		p.Match(RuneParserT__9)
 	}
 	{
-		p.SetState(105)
+		p.SetState(114)
 
 		var _m = p.Match(RuneParserIDENTIFIER)
 
 		localctx.(*FunctionContext).identifier = _m
 	}
 	{
-		p.SetState(106)
+		p.SetState(115)
 
 		var _x = p.ParamDecl()
 
 		localctx.(*FunctionContext).params = _x
 	}
-	p.SetState(109)
+	p.SetState(118)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	if _la == RuneParserT__2 {
 		{
-			p.SetState(107)
+			p.SetState(116)
 			p.Match(RuneParserT__2)
 		}
 		{
-			p.SetState(108)
+			p.SetState(117)
 
 			var _x = p.TypeName()
 
@@ -1469,7 +1681,7 @@ func (p *RuneParser) Function() (localctx IFunctionContext) {
 
 	}
 	{
-		p.SetState(111)
+		p.SetState(120)
 
 		var _x = p.Scope()
 
@@ -1582,7 +1794,7 @@ func (s *ParamDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) ParamDecl() (localctx IParamDeclContext) {
 	localctx = NewParamDeclContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, RuneParserRULE_paramDecl)
+	p.EnterRule(localctx, 14, RuneParserRULE_paramDecl)
 	var _la int
 
 	defer func() {
@@ -1603,33 +1815,33 @@ func (p *RuneParser) ParamDecl() (localctx IParamDeclContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(113)
-		p.Match(RuneParserT__9)
+		p.SetState(122)
+		p.Match(RuneParserT__10)
 	}
-	p.SetState(122)
+	p.SetState(131)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
 	if _la == RuneParserIDENTIFIER {
 		{
-			p.SetState(114)
+			p.SetState(123)
 
 			var _x = p.CombinedParam()
 
 			localctx.(*ParamDeclContext)._combinedParam = _x
 		}
 		localctx.(*ParamDeclContext).paramGroup = append(localctx.(*ParamDeclContext).paramGroup, localctx.(*ParamDeclContext)._combinedParam)
-		p.SetState(119)
+		p.SetState(128)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		for _la == RuneParserT__10 {
+		for _la == RuneParserT__11 {
 			{
-				p.SetState(115)
-				p.Match(RuneParserT__10)
+				p.SetState(124)
+				p.Match(RuneParserT__11)
 			}
 			{
-				p.SetState(116)
+				p.SetState(125)
 
 				var _x = p.CombinedParam()
 
@@ -1637,15 +1849,15 @@ func (p *RuneParser) ParamDecl() (localctx IParamDeclContext) {
 			}
 			localctx.(*ParamDeclContext).paramGroup = append(localctx.(*ParamDeclContext).paramGroup, localctx.(*ParamDeclContext)._combinedParam)
 
-			p.SetState(121)
+			p.SetState(130)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 		}
 
 	}
 	{
-		p.SetState(124)
-		p.Match(RuneParserT__11)
+		p.SetState(133)
+		p.Match(RuneParserT__12)
 	}
 
 	return localctx
@@ -1760,7 +1972,7 @@ func (s *CombinedParamContext) Accept(visitor antlr.ParseTreeVisitor) interface{
 
 func (p *RuneParser) CombinedParam() (localctx ICombinedParamContext) {
 	localctx = NewCombinedParamContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, RuneParserRULE_combinedParam)
+	p.EnterRule(localctx, 16, RuneParserRULE_combinedParam)
 	var _la int
 
 	defer func() {
@@ -1781,24 +1993,24 @@ func (p *RuneParser) CombinedParam() (localctx ICombinedParamContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(126)
+		p.SetState(135)
 
 		var _m = p.Match(RuneParserIDENTIFIER)
 
 		localctx.(*CombinedParamContext)._IDENTIFIER = _m
 	}
 	localctx.(*CombinedParamContext).names = append(localctx.(*CombinedParamContext).names, localctx.(*CombinedParamContext)._IDENTIFIER)
-	p.SetState(131)
+	p.SetState(140)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == RuneParserT__10 {
+	for _la == RuneParserT__11 {
 		{
-			p.SetState(127)
-			p.Match(RuneParserT__10)
+			p.SetState(136)
+			p.Match(RuneParserT__11)
 		}
 		{
-			p.SetState(128)
+			p.SetState(137)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
@@ -1806,16 +2018,16 @@ func (p *RuneParser) CombinedParam() (localctx ICombinedParamContext) {
 		}
 		localctx.(*CombinedParamContext).names = append(localctx.(*CombinedParamContext).names, localctx.(*CombinedParamContext)._IDENTIFIER)
 
-		p.SetState(133)
+		p.SetState(142)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(134)
+		p.SetState(143)
 		p.Match(RuneParserT__2)
 	}
 	{
-		p.SetState(135)
+		p.SetState(144)
 
 		var _x = p.TypeName()
 
@@ -1934,7 +2146,7 @@ func (s *CombinedFieldContext) Accept(visitor antlr.ParseTreeVisitor) interface{
 
 func (p *RuneParser) CombinedField() (localctx ICombinedFieldContext) {
 	localctx = NewCombinedFieldContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, RuneParserRULE_combinedField)
+	p.EnterRule(localctx, 18, RuneParserRULE_combinedField)
 	var _la int
 
 	defer func() {
@@ -1955,24 +2167,24 @@ func (p *RuneParser) CombinedField() (localctx ICombinedFieldContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(137)
+		p.SetState(146)
 
 		var _m = p.Match(RuneParserIDENTIFIER)
 
 		localctx.(*CombinedFieldContext)._IDENTIFIER = _m
 	}
 	localctx.(*CombinedFieldContext).names = append(localctx.(*CombinedFieldContext).names, localctx.(*CombinedFieldContext)._IDENTIFIER)
-	p.SetState(142)
+	p.SetState(151)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for _la == RuneParserT__10 {
+	for _la == RuneParserT__11 {
 		{
-			p.SetState(138)
-			p.Match(RuneParserT__10)
+			p.SetState(147)
+			p.Match(RuneParserT__11)
 		}
 		{
-			p.SetState(139)
+			p.SetState(148)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
@@ -1980,24 +2192,20 @@ func (p *RuneParser) CombinedField() (localctx ICombinedFieldContext) {
 		}
 		localctx.(*CombinedFieldContext).names = append(localctx.(*CombinedFieldContext).names, localctx.(*CombinedFieldContext)._IDENTIFIER)
 
-		p.SetState(144)
+		p.SetState(153)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(145)
+		p.SetState(154)
 		p.Match(RuneParserT__2)
 	}
 	{
-		p.SetState(146)
+		p.SetState(155)
 
 		var _x = p.TypeName()
 
 		localctx.(*CombinedFieldContext).paramType = _x
-	}
-	{
-		p.SetState(147)
-		p.Match(RuneParserT__0)
 	}
 
 	return localctx
@@ -2106,7 +2314,7 @@ func (s *ScopeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) Scope() (localctx IScopeContext) {
 	localctx = NewScopeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 18, RuneParserRULE_scope)
+	p.EnterRule(localctx, 20, RuneParserRULE_scope)
 	var _la int
 
 	defer func() {
@@ -2127,16 +2335,16 @@ func (p *RuneParser) Scope() (localctx IScopeContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(149)
-		p.Match(RuneParserT__13)
+		p.SetState(157)
+		p.Match(RuneParserT__14)
 	}
-	p.SetState(153)
+	p.SetState(161)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__8)|(1<<RuneParserT__9)|(1<<RuneParserT__15)|(1<<RuneParserT__16)|(1<<RuneParserT__18)|(1<<RuneParserT__26))) != 0) || (((_la-46)&-(0x1f+1)) == 0 && ((1<<uint((_la-46)))&((1<<(RuneParserINTEGER_LITERAL-46))|(1<<(RuneParserREAL_LITERAL-46))|(1<<(RuneParserBOOLEAN_LITERAL-46))|(1<<(RuneParserIDENTIFIER-46)))) != 0) {
+	for (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__4)|(1<<RuneParserT__9)|(1<<RuneParserT__10)|(1<<RuneParserT__16)|(1<<RuneParserT__17)|(1<<RuneParserT__19)|(1<<RuneParserT__27))) != 0) || (((_la-47)&-(0x1f+1)) == 0 && ((1<<uint((_la-47)))&((1<<(RuneParserINTEGER_LITERAL-47))|(1<<(RuneParserREAL_LITERAL-47))|(1<<(RuneParserBOOLEAN_LITERAL-47))|(1<<(RuneParserIDENTIFIER-47)))) != 0) {
 		{
-			p.SetState(150)
+			p.SetState(158)
 
 			var _x = p.Statement()
 
@@ -2144,13 +2352,13 @@ func (p *RuneParser) Scope() (localctx IScopeContext) {
 		}
 		localctx.(*ScopeContext).statements = append(localctx.(*ScopeContext).statements, localctx.(*ScopeContext)._statement)
 
-		p.SetState(155)
+		p.SetState(163)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 	}
 	{
-		p.SetState(156)
-		p.Match(RuneParserT__14)
+		p.SetState(164)
+		p.Match(RuneParserT__15)
 	}
 
 	return localctx
@@ -2235,8 +2443,7 @@ func (s *ReturnStatementContext) Accept(visitor antlr.ParseTreeVisitor) interfac
 
 func (p *RuneParser) ReturnStatement() (localctx IReturnStatementContext) {
 	localctx = NewReturnStatementContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 20, RuneParserRULE_returnStatement)
-	var _la int
+	p.EnterRule(localctx, 22, RuneParserRULE_returnStatement)
 
 	defer func() {
 		p.ExitRule()
@@ -2256,20 +2463,23 @@ func (p *RuneParser) ReturnStatement() (localctx IReturnStatementContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(158)
-		p.Match(RuneParserT__15)
+		p.SetState(166)
+		p.Match(RuneParserT__16)
 	}
-	p.SetState(160)
+	p.SetState(170)
 	p.GetErrorHandler().Sync(p)
-	_la = p.GetTokenStream().LA(1)
 
-	if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__8)|(1<<RuneParserT__9)|(1<<RuneParserT__26))) != 0) || (((_la-46)&-(0x1f+1)) == 0 && ((1<<uint((_la-46)))&((1<<(RuneParserINTEGER_LITERAL-46))|(1<<(RuneParserREAL_LITERAL-46))|(1<<(RuneParserBOOLEAN_LITERAL-46))|(1<<(RuneParserIDENTIFIER-46)))) != 0) {
+	if p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 15, p.GetParserRuleContext()) == 1 {
 		{
-			p.SetState(159)
+			p.SetState(167)
 
 			var _x = p.Expression()
 
 			localctx.(*ReturnStatementContext).retVal = _x
+		}
+		{
+			p.SetState(168)
+			p.Match(RuneParserT__0)
 		}
 
 	}
@@ -2436,7 +2646,7 @@ func (s *IfStatementContext) Accept(visitor antlr.ParseTreeVisitor) interface{} 
 
 func (p *RuneParser) IfStatement() (localctx IIfStatementContext) {
 	localctx = NewIfStatementContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 22, RuneParserRULE_ifStatement)
+	p.EnterRule(localctx, 24, RuneParserRULE_ifStatement)
 	var _la int
 
 	defer func() {
@@ -2459,11 +2669,11 @@ func (p *RuneParser) IfStatement() (localctx IIfStatementContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(162)
-		p.Match(RuneParserT__16)
+		p.SetState(172)
+		p.Match(RuneParserT__17)
 	}
 	{
-		p.SetState(163)
+		p.SetState(173)
 
 		var _x = p.Expression()
 
@@ -2471,29 +2681,29 @@ func (p *RuneParser) IfStatement() (localctx IIfStatementContext) {
 	}
 	localctx.(*IfStatementContext).conditions = append(localctx.(*IfStatementContext).conditions, localctx.(*IfStatementContext)._expression)
 	{
-		p.SetState(164)
+		p.SetState(174)
 
 		var _x = p.Scope()
 
 		localctx.(*IfStatementContext)._scope = _x
 	}
 	localctx.(*IfStatementContext).effects = append(localctx.(*IfStatementContext).effects, localctx.(*IfStatementContext)._scope)
-	p.SetState(172)
+	p.SetState(182)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 16, p.GetParserRuleContext())
 
 	for _alt != 2 && _alt != antlr.ATNInvalidAltNumber {
 		if _alt == 1 {
 			{
-				p.SetState(165)
+				p.SetState(175)
+				p.Match(RuneParserT__18)
+			}
+			{
+				p.SetState(176)
 				p.Match(RuneParserT__17)
 			}
 			{
-				p.SetState(166)
-				p.Match(RuneParserT__16)
-			}
-			{
-				p.SetState(167)
+				p.SetState(177)
 
 				var _x = p.Expression()
 
@@ -2501,7 +2711,7 @@ func (p *RuneParser) IfStatement() (localctx IIfStatementContext) {
 			}
 			localctx.(*IfStatementContext).conditions = append(localctx.(*IfStatementContext).conditions, localctx.(*IfStatementContext)._expression)
 			{
-				p.SetState(168)
+				p.SetState(178)
 
 				var _x = p.Scope()
 
@@ -2510,21 +2720,21 @@ func (p *RuneParser) IfStatement() (localctx IIfStatementContext) {
 			localctx.(*IfStatementContext).effects = append(localctx.(*IfStatementContext).effects, localctx.(*IfStatementContext)._scope)
 
 		}
-		p.SetState(174)
+		p.SetState(184)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 16, p.GetParserRuleContext())
 	}
-	p.SetState(177)
+	p.SetState(187)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == RuneParserT__17 {
+	if _la == RuneParserT__18 {
 		{
-			p.SetState(175)
-			p.Match(RuneParserT__17)
+			p.SetState(185)
+			p.Match(RuneParserT__18)
 		}
 		{
-			p.SetState(176)
+			p.SetState(186)
 
 			var _x = p.Scope()
 
@@ -2647,7 +2857,7 @@ func (s *LoopContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) Loop() (localctx ILoopContext) {
 	localctx = NewLoopContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 24, RuneParserRULE_loop)
+	p.EnterRule(localctx, 26, RuneParserRULE_loop)
 	var _la int
 
 	defer func() {
@@ -2668,23 +2878,23 @@ func (p *RuneParser) Loop() (localctx ILoopContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(179)
-		p.Match(RuneParserT__18)
+		p.SetState(189)
+		p.Match(RuneParserT__19)
 	}
-	p.SetState(182)
+	p.SetState(192)
 	p.GetErrorHandler().Sync(p)
 	_la = p.GetTokenStream().LA(1)
 
-	if _la == RuneParserT__19 {
+	if _la == RuneParserT__20 {
 		{
-			p.SetState(180)
+			p.SetState(190)
 
-			var _m = p.Match(RuneParserT__19)
+			var _m = p.Match(RuneParserT__20)
 
 			localctx.(*LoopContext).kind = _m
 		}
 		{
-			p.SetState(181)
+			p.SetState(191)
 
 			var _x = p.Expression()
 
@@ -2693,7 +2903,7 @@ func (p *RuneParser) Loop() (localctx ILoopContext) {
 
 	}
 	{
-		p.SetState(184)
+		p.SetState(194)
 
 		var _x = p.Scope()
 
@@ -2771,7 +2981,7 @@ func (s *ExpressionContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) Expression() (localctx IExpressionContext) {
 	localctx = NewExpressionContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 26, RuneParserRULE_expression)
+	p.EnterRule(localctx, 28, RuneParserRULE_expression)
 
 	defer func() {
 		p.ExitRule()
@@ -2791,7 +3001,7 @@ func (p *RuneParser) Expression() (localctx IExpressionContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(186)
+		p.SetState(196)
 		p.expression2(0)
 	}
 
@@ -3376,8 +3586,8 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 	localctx = NewExpression2Context(p, p.GetParserRuleContext(), _parentState)
 	var _prevctx IExpression2Context = localctx
 	var _ antlr.ParserRuleContext = _prevctx // TODO: To prevent unused variable warning.
-	_startState := 28
-	p.EnterRecursionRule(localctx, 28, RuneParserRULE_expression2, _p)
+	_startState := 30
+	p.EnterRecursionRule(localctx, 30, RuneParserRULE_expression2, _p)
 	var _la int
 
 	defer func() {
@@ -3399,7 +3609,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 	var _alt int
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(219)
+	p.SetState(229)
 	p.GetErrorHandler().Sync(p)
 	switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 22, p.GetParserRuleContext()) {
 	case 1:
@@ -3408,19 +3618,19 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		_prevctx = localctx
 
 		{
-			p.SetState(189)
-			p.Match(RuneParserT__9)
+			p.SetState(199)
+			p.Match(RuneParserT__10)
 		}
 		{
-			p.SetState(190)
+			p.SetState(200)
 
 			var _x = p.expression2(0)
 
 			localctx.(*ExpressionPassthroughContext).value = _x
 		}
 		{
-			p.SetState(191)
-			p.Match(RuneParserT__11)
+			p.SetState(201)
+			p.Match(RuneParserT__12)
 		}
 
 	case 2:
@@ -3428,40 +3638,40 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(193)
+			p.SetState(203)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
 			localctx.(*FunctionCallContext).name = _m
 		}
 		{
-			p.SetState(194)
-			p.Match(RuneParserT__9)
+			p.SetState(204)
+			p.Match(RuneParserT__10)
 		}
-		p.SetState(203)
+		p.SetState(213)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
-		if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__8)|(1<<RuneParserT__9)|(1<<RuneParserT__26))) != 0) || (((_la-46)&-(0x1f+1)) == 0 && ((1<<uint((_la-46)))&((1<<(RuneParserINTEGER_LITERAL-46))|(1<<(RuneParserREAL_LITERAL-46))|(1<<(RuneParserBOOLEAN_LITERAL-46))|(1<<(RuneParserIDENTIFIER-46)))) != 0) {
+		if (((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__9)|(1<<RuneParserT__10)|(1<<RuneParserT__27))) != 0) || (((_la-47)&-(0x1f+1)) == 0 && ((1<<uint((_la-47)))&((1<<(RuneParserINTEGER_LITERAL-47))|(1<<(RuneParserREAL_LITERAL-47))|(1<<(RuneParserBOOLEAN_LITERAL-47))|(1<<(RuneParserIDENTIFIER-47)))) != 0) {
 			{
-				p.SetState(195)
+				p.SetState(205)
 
 				var _x = p.expression2(0)
 
 				localctx.(*FunctionCallContext)._expression2 = _x
 			}
 			localctx.(*FunctionCallContext).params = append(localctx.(*FunctionCallContext).params, localctx.(*FunctionCallContext)._expression2)
-			p.SetState(200)
+			p.SetState(210)
 			p.GetErrorHandler().Sync(p)
 			_la = p.GetTokenStream().LA(1)
 
-			for _la == RuneParserT__10 {
+			for _la == RuneParserT__11 {
 				{
-					p.SetState(196)
-					p.Match(RuneParserT__10)
+					p.SetState(206)
+					p.Match(RuneParserT__11)
 				}
 				{
-					p.SetState(197)
+					p.SetState(207)
 
 					var _x = p.expression2(0)
 
@@ -3469,15 +3679,15 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				}
 				localctx.(*FunctionCallContext).params = append(localctx.(*FunctionCallContext).params, localctx.(*FunctionCallContext)._expression2)
 
-				p.SetState(202)
+				p.SetState(212)
 				p.GetErrorHandler().Sync(p)
 				_la = p.GetTokenStream().LA(1)
 			}
 
 		}
 		{
-			p.SetState(205)
-			p.Match(RuneParserT__11)
+			p.SetState(215)
+			p.Match(RuneParserT__12)
 		}
 
 	case 3:
@@ -3485,14 +3695,14 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(206)
+			p.SetState(216)
 
 			var _x = p.UnaryOp()
 
 			localctx.(*UnaryExpressionContext).op = _x
 		}
 		{
-			p.SetState(207)
+			p.SetState(217)
 
 			var _x = p.expression2(10)
 
@@ -3504,7 +3714,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(209)
+			p.SetState(219)
 
 			var _x = p.Literal()
 
@@ -3516,27 +3726,27 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(210)
-			p.Match(RuneParserT__8)
+			p.SetState(220)
+			p.Match(RuneParserT__9)
 		}
 		{
-			p.SetState(211)
+			p.SetState(221)
 
 			var _x = p.ParamDecl()
 
 			localctx.(*LambdaContext).params = _x
 		}
-		p.SetState(214)
+		p.SetState(224)
 		p.GetErrorHandler().Sync(p)
 		_la = p.GetTokenStream().LA(1)
 
 		if _la == RuneParserT__2 {
 			{
-				p.SetState(212)
+				p.SetState(222)
 				p.Match(RuneParserT__2)
 			}
 			{
-				p.SetState(213)
+				p.SetState(223)
 
 				var _x = p.TypeName()
 
@@ -3545,7 +3755,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 		}
 		{
-			p.SetState(216)
+			p.SetState(226)
 
 			var _x = p.Scope()
 
@@ -3557,7 +3767,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 		p.SetParserRuleContext(localctx)
 		_prevctx = localctx
 		{
-			p.SetState(218)
+			p.SetState(228)
 
 			var _m = p.Match(RuneParserIDENTIFIER)
 
@@ -3566,7 +3776,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 	}
 	p.GetParserRuleContext().SetStop(p.GetTokenStream().LT(-1))
-	p.SetState(245)
+	p.SetState(255)
 	p.GetErrorHandler().Sync(p)
 	_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 24, p.GetParserRuleContext())
 
@@ -3576,7 +3786,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				p.TriggerExitRuleEvent()
 			}
 			_prevctx = localctx
-			p.SetState(243)
+			p.SetState(253)
 			p.GetErrorHandler().Sync(p)
 			switch p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 23, p.GetParserRuleContext()) {
 			case 1:
@@ -3584,12 +3794,12 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*BinaryExpressionContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(221)
+				p.SetState(231)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 9)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 9)", ""))
 				}
-				p.SetState(222)
+				p.SetState(232)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -3597,7 +3807,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__21)|(1<<RuneParserT__22)|(1<<RuneParserT__23)|(1<<RuneParserT__24))) != 0) {
+				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__22)|(1<<RuneParserT__23)|(1<<RuneParserT__24)|(1<<RuneParserT__25))) != 0) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*BinaryExpressionContext).op = _ri
@@ -3606,7 +3816,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 					p.Consume()
 				}
 				{
-					p.SetState(223)
+					p.SetState(233)
 
 					var _x = p.expression2(10)
 
@@ -3618,12 +3828,12 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*BinaryExpressionContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(224)
+				p.SetState(234)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 8)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 8)", ""))
 				}
-				p.SetState(225)
+				p.SetState(235)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -3631,7 +3841,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__25)|(1<<RuneParserT__26)|(1<<RuneParserT__27)|(1<<RuneParserT__28))) != 0) {
+				if !(((_la)&-(0x1f+1)) == 0 && ((1<<uint(_la))&((1<<RuneParserT__26)|(1<<RuneParserT__27)|(1<<RuneParserT__28)|(1<<RuneParserT__29))) != 0) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*BinaryExpressionContext).op = _ri
@@ -3640,7 +3850,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 					p.Consume()
 				}
 				{
-					p.SetState(226)
+					p.SetState(236)
 
 					var _x = p.expression2(9)
 
@@ -3652,12 +3862,12 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*BinaryExpressionContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(227)
+				p.SetState(237)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 7)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 7)", ""))
 				}
-				p.SetState(228)
+				p.SetState(238)
 
 				var _lt = p.GetTokenStream().LT(1)
 
@@ -3665,7 +3875,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 
 				_la = p.GetTokenStream().LA(1)
 
-				if !(((_la-30)&-(0x1f+1)) == 0 && ((1<<uint((_la-30)))&((1<<(RuneParserT__29-30))|(1<<(RuneParserT__30-30))|(1<<(RuneParserT__31-30))|(1<<(RuneParserT__32-30))|(1<<(RuneParserT__33-30))|(1<<(RuneParserT__34-30)))) != 0) {
+				if !(((_la-31)&-(0x1f+1)) == 0 && ((1<<uint((_la-31)))&((1<<(RuneParserT__30-31))|(1<<(RuneParserT__31-31))|(1<<(RuneParserT__32-31))|(1<<(RuneParserT__33-31))|(1<<(RuneParserT__34-31))|(1<<(RuneParserT__35-31)))) != 0) {
 					var _ri = p.GetErrorHandler().RecoverInline(p)
 
 					localctx.(*BinaryExpressionContext).op = _ri
@@ -3674,7 +3884,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 					p.Consume()
 				}
 				{
-					p.SetState(229)
+					p.SetState(239)
 
 					var _x = p.expression2(8)
 
@@ -3686,20 +3896,20 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*BinaryExpressionContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(230)
+				p.SetState(240)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 6)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 6)", ""))
 				}
 				{
-					p.SetState(231)
+					p.SetState(241)
 
-					var _m = p.Match(RuneParserT__35)
+					var _m = p.Match(RuneParserT__36)
 
 					localctx.(*BinaryExpressionContext).op = _m
 				}
 				{
-					p.SetState(232)
+					p.SetState(242)
 
 					var _x = p.expression2(7)
 
@@ -3711,20 +3921,20 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*BinaryExpressionContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(233)
+				p.SetState(243)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 5)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 5)", ""))
 				}
 				{
-					p.SetState(234)
+					p.SetState(244)
 
-					var _m = p.Match(RuneParserT__36)
+					var _m = p.Match(RuneParserT__37)
 
 					localctx.(*BinaryExpressionContext).op = _m
 				}
 				{
-					p.SetState(235)
+					p.SetState(245)
 
 					var _x = p.expression2(6)
 
@@ -3736,20 +3946,20 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*AssignmentContext).left = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(236)
+				p.SetState(246)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 4)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 4)", ""))
 				}
 				{
-					p.SetState(237)
+					p.SetState(247)
 
 					var _x = p.AssignmentOp()
 
 					localctx.(*AssignmentContext).op = _x
 				}
 				{
-					p.SetState(238)
+					p.SetState(248)
 
 					var _x = p.expression2(5)
 
@@ -3761,17 +3971,17 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 				localctx.(*FieldSelectorContext).base = _prevctx
 
 				p.PushNewRecursionContext(localctx, _startState, RuneParserRULE_expression2)
-				p.SetState(240)
+				p.SetState(250)
 
 				if !(p.Precpred(p.GetParserRuleContext(), 11)) {
 					panic(antlr.NewFailedPredicateException(p, "p.Precpred(p.GetParserRuleContext(), 11)", ""))
 				}
 				{
-					p.SetState(241)
-					p.Match(RuneParserT__20)
+					p.SetState(251)
+					p.Match(RuneParserT__21)
 				}
 				{
-					p.SetState(242)
+					p.SetState(252)
 
 					var _m = p.Match(RuneParserIDENTIFIER)
 
@@ -3781,7 +3991,7 @@ func (p *RuneParser) expression2(_p int) (localctx IExpression2Context) {
 			}
 
 		}
-		p.SetState(247)
+		p.SetState(257)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.GetTokenStream(), 24, p.GetParserRuleContext())
 	}
@@ -3846,7 +4056,7 @@ func (s *UnaryOpContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *RuneParser) UnaryOp() (localctx IUnaryOpContext) {
 	localctx = NewUnaryOpContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 30, RuneParserRULE_unaryOp)
+	p.EnterRule(localctx, 32, RuneParserRULE_unaryOp)
 
 	defer func() {
 		p.ExitRule()
@@ -3866,8 +4076,8 @@ func (p *RuneParser) UnaryOp() (localctx IUnaryOpContext) {
 
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(248)
-		p.Match(RuneParserT__26)
+		p.SetState(258)
+		p.Match(RuneParserT__27)
 	}
 
 	return localctx
@@ -3930,7 +4140,7 @@ func (s *AssignmentOpContext) Accept(visitor antlr.ParseTreeVisitor) interface{}
 
 func (p *RuneParser) AssignmentOp() (localctx IAssignmentOpContext) {
 	localctx = NewAssignmentOpContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 32, RuneParserRULE_assignmentOp)
+	p.EnterRule(localctx, 34, RuneParserRULE_assignmentOp)
 	var _la int
 
 	defer func() {
@@ -3950,10 +4160,10 @@ func (p *RuneParser) AssignmentOp() (localctx IAssignmentOpContext) {
 	}()
 
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(250)
+	p.SetState(260)
 	_la = p.GetTokenStream().LA(1)
 
-	if !(_la == RuneParserT__3 || (((_la-38)&-(0x1f+1)) == 0 && ((1<<uint((_la-38)))&((1<<(RuneParserT__37-38))|(1<<(RuneParserT__38-38))|(1<<(RuneParserT__39-38))|(1<<(RuneParserT__40-38))|(1<<(RuneParserT__41-38))|(1<<(RuneParserT__42-38))|(1<<(RuneParserT__43-38))|(1<<(RuneParserT__44-38)))) != 0)) {
+	if !(_la == RuneParserT__3 || (((_la-39)&-(0x1f+1)) == 0 && ((1<<uint((_la-39)))&((1<<(RuneParserT__38-39))|(1<<(RuneParserT__39-39))|(1<<(RuneParserT__40-39))|(1<<(RuneParserT__41-39))|(1<<(RuneParserT__42-39))|(1<<(RuneParserT__43-39))|(1<<(RuneParserT__44-39))|(1<<(RuneParserT__45-39)))) != 0)) {
 		p.GetErrorHandler().RecoverInline(p)
 	} else {
 		p.GetErrorHandler().ReportMatch(p)
@@ -4126,7 +4336,7 @@ func (s *IntegerLiteralContext) Accept(visitor antlr.ParseTreeVisitor) interface
 
 func (p *RuneParser) Literal() (localctx ILiteralContext) {
 	localctx = NewLiteralContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 34, RuneParserRULE_literal)
+	p.EnterRule(localctx, 36, RuneParserRULE_literal)
 
 	defer func() {
 		p.ExitRule()
@@ -4144,7 +4354,7 @@ func (p *RuneParser) Literal() (localctx ILiteralContext) {
 		}
 	}()
 
-	p.SetState(255)
+	p.SetState(265)
 	p.GetErrorHandler().Sync(p)
 
 	switch p.GetTokenStream().LA(1) {
@@ -4152,7 +4362,7 @@ func (p *RuneParser) Literal() (localctx ILiteralContext) {
 		localctx = NewRealLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 1)
 		{
-			p.SetState(252)
+			p.SetState(262)
 
 			var _m = p.Match(RuneParserREAL_LITERAL)
 
@@ -4163,7 +4373,7 @@ func (p *RuneParser) Literal() (localctx ILiteralContext) {
 		localctx = NewIntegerLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 2)
 		{
-			p.SetState(253)
+			p.SetState(263)
 
 			var _m = p.Match(RuneParserINTEGER_LITERAL)
 
@@ -4174,7 +4384,7 @@ func (p *RuneParser) Literal() (localctx ILiteralContext) {
 		localctx = NewBooleanLiteralContext(p, localctx)
 		p.EnterOuterAlt(localctx, 3)
 		{
-			p.SetState(254)
+			p.SetState(264)
 
 			var _m = p.Match(RuneParserBOOLEAN_LITERAL)
 
@@ -4190,7 +4400,7 @@ func (p *RuneParser) Literal() (localctx ILiteralContext) {
 
 func (p *RuneParser) Sempred(localctx antlr.RuleContext, ruleIndex, predIndex int) bool {
 	switch ruleIndex {
-	case 14:
+	case 15:
 		var t *Expression2Context = nil
 		if localctx != nil {
 			t = localctx.(*Expression2Context)
