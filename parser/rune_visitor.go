@@ -92,6 +92,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#FieldSelector.
 	VisitFieldSelector(ctx *FieldSelectorContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#ArraySelector.
+	VisitArraySelector(ctx *ArraySelectorContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#Lambda.
 	VisitLambda(ctx *LambdaContext) interface{}
 

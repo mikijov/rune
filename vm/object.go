@@ -340,3 +340,50 @@ func (this *struc) Equal(other Object) bool {
 		return reflect.DeepEqual(this.fields, o.fields)
 	}
 }
+
+type array struct {
+	typ   Type
+	value []Object
+}
+
+// Array implements array objects.
+type Array interface {
+	Object
+	Get(index int) Object
+	Set(index int, value Object)
+}
+
+// NewArray creates new array.
+func NewArray(typ Type) Object {
+	retVal := &array{
+		typ:   typ,
+		value: make([]Object, 10),
+	}
+	for i := 0; i < 10; i++ {
+		retVal.value[i] = typ.GetElementType().GetZero()
+	}
+	fmt.Printf("TODO: do proper array sizing\n")
+	return retVal
+}
+func (this *array) Type() Type           { return this.typ }
+func (this *array) String() string       { return string(VOID) }
+func (this *array) Value() reflect.Value { return reflect.ValueOf(Struct(this)) }
+func (this *array) Get(index int) Object { return this.value[index] }
+func (this *array) Set(index int, value Object) {
+	if !this.typ.GetElementType().Equal(value.Type()) {
+		panic(fmt.Sprintf("type mismatch assigning element: %v != %v", this.typ.GetElementType(), value.Type()))
+	}
+	this.value[index] = value
+}
+
+func (this *array) Equal(other Object) bool {
+	if !this.typ.Equal(other.Type()) {
+		return false
+	}
+	o, ok := other.(*array)
+	if !ok {
+		return false
+	} else {
+		return reflect.DeepEqual(this.value, o.value)
+	}
+}

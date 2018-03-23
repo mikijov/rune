@@ -146,6 +146,8 @@ func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 		return this.visitFunctionCall(ctx)
 	case *FieldSelectorContext:
 		return this.visitFieldSelector(ctx)
+	case *ArraySelectorContext:
+		return this.visitArraySelector(ctx)
 	case *LambdaContext:
 		return this.visitLambda(ctx)
 	default:
@@ -299,7 +301,11 @@ func (this *MyVisitor) visitCombinedParam(ctx ICombinedParamContext) (names []st
 func (this *MyVisitor) visitTypeName(ctx interface{}) vm.Type {
 	switch ctx := ctx.(type) {
 	case *TypeNameContext:
-		return this.visitTypeName(ctx.GetChild(0))
+		typ := this.visitTypeName(ctx.GetChild(0))
+		if ctx.GetIsarray() != nil {
+			typ = vm.NewArrayType(typ)
+		}
+		return typ
 	case *SimpleTypeContext:
 		return this.visitSimpleType(ctx)
 	case *FunctionTypeContext:
@@ -665,6 +671,24 @@ func (this *MyVisitor) visitFieldSelector(ctx *FieldSelectorContext) vm.Expressi
 	index := baseType.GetFieldIndex(field)
 
 	return vm.NewFieldSelector(base, index)
+}
+
+func (this *MyVisitor) visitArraySelector(ctx *ArraySelectorContext) vm.Expression {
+	trace(ctx)
+
+	array := this.visitExpression(ctx.GetArray())
+	if array.Type().GetKind() != vm.ARRAY {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(), "not an array")
+	}
+	index := this.visitExpression(ctx.GetIndex())
+	if !index.Type().GetResultType().Equal(vm.NewSimpleType(vm.INTEGER)) {
+		token := ctx.GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("index is not an integer but %v", index.Type().GetResultType()))
+	}
+
+	return vm.NewArraySelector(array, index)
 }
 
 func (this *MyVisitor) visitLambda(ctx *LambdaContext) vm.Expression {

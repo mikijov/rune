@@ -41,7 +41,7 @@ declaration
 typeDeclaration
     : 'type' identifier=IDENTIFIER ':' type_=typeName
     ;
-typeName: typeName2;
+typeName: typeName2 (isarray='[' ']')?;
 typeName2
     : 'int' # SimpleType
     | 'real' # SimpleType
@@ -88,6 +88,7 @@ expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # FunctionCall
     | base=expression2 '.' field=IDENTIFIER # FieldSelector
+    | array=expression2 '[' index=expression2 ']' # ArraySelector
     | op=unaryOp value=expression2 # UnaryExpression
     | left=expression2 op=('*'|'/'|'%'|'&') right=expression2 # BinaryExpression
     | left=expression2 op=('+'|'-'|'|'|'^') right=expression2 # BinaryExpression

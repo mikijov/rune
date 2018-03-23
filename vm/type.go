@@ -14,6 +14,10 @@
 
 package vm
 
+import (
+	"fmt"
+)
+
 // Constants identifying kinds of rune data types.
 const (
 	VOID     Kind = "void"
@@ -23,6 +27,7 @@ const (
 	STRING        = "string"
 	FUNCTION      = "func"
 	STRUCT        = "struct"
+	ARRAY         = "array"
 )
 
 // Kind is a higher level of grouping of data types in rune. E.g. all functions
@@ -35,6 +40,7 @@ type Type interface {
 	GetKind() Kind
 	String() string
 	Equal(other Type) bool
+	GetElementType() Type
 	GetParamCount() int
 	GetParam(i int) Type
 	GetResultType() Type
@@ -71,6 +77,10 @@ func (this *simpleType) Equal(other Type) bool {
 	} else {
 		return this.kind == o.kind
 	}
+}
+
+func (this *simpleType) GetElementType() Type {
+	panic("not an array")
 }
 
 func (this *simpleType) GetParamCount() int {
@@ -117,6 +127,70 @@ func (this *simpleType) GetFieldType(i int) Type {
 }
 
 func (this *simpleType) GetFieldIndex(name string) int {
+	panic("not a struct")
+}
+
+type arrayType struct {
+	element Type
+}
+
+// NewArrayType creates Type that represents an array of elements of specified
+// type.
+func NewArrayType(element Type) Type {
+	return &arrayType{
+		element: element,
+	}
+}
+
+func (this *arrayType) GetKind() Kind {
+	return ARRAY
+}
+
+func (this *arrayType) String() string {
+	return fmt.Sprintf("%v[]", this.element)
+}
+
+func (this *arrayType) Equal(other Type) bool {
+	if o, ok := other.(*arrayType); !ok {
+		return false
+	} else {
+		return this.element == o.element
+	}
+}
+
+func (this *arrayType) GetElementType() Type {
+	return this.element
+}
+
+func (this *arrayType) GetParamCount() int {
+	panic("not a function")
+}
+
+func (this *arrayType) GetParam(i int) Type {
+	panic("not a function")
+}
+
+func (this *arrayType) GetResultType() Type {
+	return this
+}
+
+func (this *arrayType) GetZero() Object {
+	return NewArray(this)
+}
+
+func (this *arrayType) GetFieldCount() int {
+	panic("not a struct")
+}
+
+func (this *arrayType) GetFieldName(i int) string {
+	panic("not a struct")
+}
+
+func (this *arrayType) GetFieldType(i int) Type {
+	panic("not a struct")
+}
+
+func (this *arrayType) GetFieldIndex(name string) int {
 	panic("not a struct")
 }
 
@@ -173,6 +247,10 @@ func (this *functionType) Equal(other Type) bool {
 		}
 		return this.returnType.Equal(o.returnType)
 	}
+}
+
+func (this *functionType) GetElementType() Type {
+	panic("not an array")
 }
 
 func (this *functionType) GetParamCount() int {
@@ -253,6 +331,10 @@ func (this *structType) Equal(other Type) bool {
 		}
 		return true
 	}
+}
+
+func (this *structType) GetElementType() Type {
+	panic("not an array")
 }
 
 func (this *structType) GetParamCount() int {

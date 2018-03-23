@@ -112,6 +112,10 @@ func (v *BaseRuneVisitor) VisitFieldSelector(ctx *FieldSelectorContext) interfac
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseRuneVisitor) VisitArraySelector(ctx *ArraySelectorContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseRuneVisitor) VisitLambda(ctx *LambdaContext) interface{} {
 	return v.VisitChildren(ctx)
 }

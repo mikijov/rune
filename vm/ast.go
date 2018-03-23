@@ -19,6 +19,13 @@ import (
 	"strconv"
 )
 
+const (
+	maxUint = ^uint(0)
+	minUint = 0
+	maxInt  = int(maxUint >> 1)
+	minInt  = -maxInt - 1
+)
+
 // Program is a series of statements.
 type Program interface {
 	AddStatement(s Statement)
@@ -458,6 +465,46 @@ func (this *fieldSelector) String() string {
 func NewFieldSelector(base Expression, index int) Expression {
 	return &fieldSelector{
 		base:  base,
+		index: index,
+	}
+}
+
+type arraySelector struct {
+	array Expression
+	index Expression
+}
+
+func (this *arraySelector) Type() Type {
+	return this.array.Type().GetElementType()
+}
+
+func (this *arraySelector) Execute(env Environment) Object {
+	index := this.index.Execute(env).(Integer).GetValue()
+	if index > int64(maxInt) {
+		panic("index too large")
+	}
+	i := int(index)
+	return this.array.Execute(env).(Array).Get(i)
+}
+
+func (this *arraySelector) Set(env Environment, value Object) {
+	index := this.index.Execute(env).(Integer).GetValue()
+	if index > int64(maxInt) {
+		panic("index too large")
+	}
+	i := int(index)
+	this.array.Execute(env).(Array).Set(i, value)
+}
+
+func (this *arraySelector) String() string {
+	return fmt.Sprintf("%v[%v]", this.array, this.index)
+}
+
+// NewArraySelector creates expression which evaluates to a reference to element
+// in an array.
+func NewArraySelector(array, index Expression) Expression {
+	return &arraySelector{
+		array: array,
 		index: index,
 	}
 }

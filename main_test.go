@@ -352,6 +352,14 @@ func testField(t *testing.T, s vm.Object, field string, expected vm.Object) {
 	}
 }
 
+func testElement(t *testing.T, s vm.Object, index int, expected vm.Object) {
+	array := s.(vm.Array)
+	val := array.Get(index)
+	if !val.Equal(expected) {
+		t.Errorf("invalid value for element %d; expected:%s got:%s", index, expected, val)
+	}
+}
+
 func TestStructZero(t *testing.T) {
 	code := `
 s1 :struct {
@@ -498,6 +506,57 @@ r := s1.r1;
 	testVariable(t, env, "b", vm.NewBoolean(true))
 	testVariable(t, env, "i", vm.NewInteger(1))
 	testVariable(t, env, "r", vm.NewReal(1.1))
+}
+
+func TestArray(t *testing.T) {
+	code := `
+type arrayType :int[]
+
+a1 :int[]
+a2 :arrayType
+
+a1[1] = 1;
+a1[5] = 5;
+
+a2[2] = 1 + a1[1];
+a2[4] = a1[5] - 1;
+`
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	a1 := env.Get("a1")
+	if a1.Type().GetKind() != vm.ARRAY {
+		t.Fatalf("expected array but got %s", a1.Type().GetKind())
+	}
+	testElement(t, a1, 0, vm.NewInteger(0))
+	testElement(t, a1, 1, vm.NewInteger(1))
+	testElement(t, a1, 2, vm.NewInteger(0))
+	testElement(t, a1, 3, vm.NewInteger(0))
+	testElement(t, a1, 4, vm.NewInteger(0))
+	testElement(t, a1, 5, vm.NewInteger(5))
+	testElement(t, a1, 6, vm.NewInteger(0))
+	testElement(t, a1, 7, vm.NewInteger(0))
+	testElement(t, a1, 8, vm.NewInteger(0))
+	testElement(t, a1, 9, vm.NewInteger(0))
+
+	a2 := env.Get("a2")
+	if a2.Type().GetKind() != vm.ARRAY {
+		t.Fatalf("expected array but got %s", a2.Type().GetKind())
+	}
+	testElement(t, a2, 0, vm.NewInteger(0))
+	testElement(t, a2, 1, vm.NewInteger(0))
+	testElement(t, a2, 2, vm.NewInteger(2))
+	testElement(t, a2, 3, vm.NewInteger(0))
+	testElement(t, a2, 4, vm.NewInteger(4))
+	testElement(t, a2, 5, vm.NewInteger(0))
+	testElement(t, a2, 6, vm.NewInteger(0))
+	testElement(t, a2, 7, vm.NewInteger(0))
+	testElement(t, a2, 8, vm.NewInteger(0))
+	testElement(t, a2, 9, vm.NewInteger(0))
 }
 
 func TestFibbonaci(t *testing.T) {

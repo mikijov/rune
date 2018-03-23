@@ -14,8 +14,14 @@ welcome you stopping by and asking a question (make an issue for now)...
 
 - [x] tests
 - [x] structs
+- [ ] arrays
+  - [x] simple array syntax
+  - [ ] allocation
+  - [ ] slices
 - [ ] interfaces
-- [ ] arrays and slices
+  - [ ] method declaration and invocation
+  - [ ] interface declaration
+  - [ ] interface conversion/assignment
 - [ ] error handling
 - [ ] break and continue
 - [ ] string type
@@ -23,6 +29,7 @@ welcome you stopping by and asking a question (make an issue for now)...
 ### Future
 
 - [ ] struct literals
+- [ ] custom zero value for types
 - [ ] imports/modules
 - [ ] allow passing Environment to user functions
 - [ ] implement variadic functions
@@ -30,6 +37,8 @@ welcome you stopping by and asking a question (make an issue for now)...
 - [ ] maps
 
 ## Syntax
+
+### Type definition:
 ```
 type Integer :int
 
@@ -40,6 +49,26 @@ type DemoStruct :struct {
 }
 ```
 
+#### Custom zero value.
+```
+# -1 is the zero value
+type weirdZero :int = -1
+```
+
+### Arrays.
+```
+type myArray :int[]
+
+a1 :int[] = [1, 2]
+
+a2 := [1, 2, 3] # implicit type int[]
+
+a3 := int[33] # allocate array of 33 integers, initilized to zero
+
+v := a2[1] # second item in zero based array, i.e. '2' from a2
+```
+
+### Sample code.
 ```
 console := import("console")
 
