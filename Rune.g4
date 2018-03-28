@@ -54,7 +54,7 @@ typeName2
     ;
 
 function
-    : 'func' identifier=IDENTIFIER params=paramDecl (':' returnType=typeName)? body=scope
+    : 'func' (iface=IDENTIFIER '.')? identifier=IDENTIFIER params=paramDecl (':' returnType=typeName)? body=scope
     ;
 paramDecl
     : '(' (paramGroup+=combinedParam (',' paramGroup+=combinedParam)*)? ')'
@@ -87,6 +87,7 @@ expression: expression2;
 expression2
     : '(' value=expression2 ')' # ExpressionPassthrough
     | name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # FunctionCall
+    | base=expression2 '.' name=IDENTIFIER '(' (params+=expression2 (',' params+=expression2)*)? ')' # MethodCall
     | base=expression2 '.' field=IDENTIFIER # FieldSelector
     | array=expression2 '[' index=expression2 ']' # ArraySelector
     | op=unaryOp value=expression2 # UnaryExpression

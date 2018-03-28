@@ -180,6 +180,8 @@ func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 		return this.visitVariableExpression(ctx)
 	case *FunctionCallContext:
 		return this.visitFunctionCall(ctx)
+	case *MethodCallContext:
+		return this.visitMethodCall(ctx)
 	case *FieldSelectorContext:
 		return this.visitFieldSelector(ctx)
 	case *ArraySelectorContext:
@@ -285,18 +287,51 @@ func (this *MyVisitor) visitFunction(ctx *FunctionContext) (retVal vm.Statement)
 		returnType = vm.NewSimpleType(vm.VOID)
 	}
 
-	typ := vm.NewFunctionType(paramTypes, returnType)
-	if !this.scope.Declare(name, typ) {
-		token := ctx.GetIdentifier()
-		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("'%s' redeclared", name))
-		return nil
-	}
-	defer func() {
-		if retVal == nil {
-			this.scope.Undeclare(name)
+	var typ vm.Type
+	if ctx.GetIface() != nil {
+		iface := this.scope.Get(ctx.GetIface().GetText())
+		if iface == nil {
+			token := ctx.GetIface()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("unknown interface '%s'", token.GetText()))
+			return nil
+		} else if iface.GetKind() != vm.STRUCT {
+			token := ctx.GetIface()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("cannot implement function on non struct type '%s'", token.GetText()))
+			return nil
 		}
-	}()
+
+		paramNames = append([]string{"this"}, paramNames...)
+		paramTypes = append([]vm.Type{iface}, paramTypes...)
+
+		typ = vm.NewFunctionType(paramTypes, returnType)
+		// declaration of this function is made in the proper, interface scope
+		if !iface.AddFunction(name, typ) {
+			token := ctx.GetIface()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("duplicate method %s.%s", token.GetText(), name))
+			return nil
+		}
+		defer func() {
+			if retVal == nil {
+				iface.RemoveFunction(name)
+			}
+		}()
+	} else {
+		typ := vm.NewFunctionType(paramTypes, returnType)
+		if !this.scope.Declare(name, typ) {
+			token := ctx.GetIdentifier()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("'%s' redeclared", name))
+			return nil
+		}
+		defer func() {
+			if retVal == nil {
+				this.scope.Undeclare(name)
+			}
+		}()
+	}
 
 	// now prepare the scope before parsing function body which will reference
 	// parameters etc.
@@ -323,11 +358,15 @@ func (this *MyVisitor) visitFunction(ctx *FunctionContext) (retVal vm.Statement)
 		return nil
 	}
 
-	return vm.NewDeclarationStatement(
-		name, vm.NewLiteral(
-			vm.NewFunction(typ, paramNames, scope),
-		),
-	)
+	if ctx.GetIface() != nil {
+		return vm.NewNop()
+	} else {
+		return vm.NewDeclarationStatement(
+			name, vm.NewLiteral(
+				vm.NewFunction(typ, paramNames, scope),
+			),
+		)
+	}
 }
 
 type param struct {
@@ -771,19 +810,80 @@ func (this *MyVisitor) visitFunctionCall(ctx *FunctionCallContext) vm.Expression
 
 	params := make([]vm.Expression, 0, len(ctx.GetParams()))
 	paramTypes := make([]vm.Type, 0, len(ctx.GetParams()))
-	for _, ectx := range ctx.GetParams() {
+	for i, ectx := range ctx.GetParams() {
 		expression := this.visitExpression(ectx)
+
+		expectedType := typ.GetParam(i)
+
+		if !expectedType.Equal(expression.Type()) {
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("parameter %d mismatch\nExpected: %s\n     Got: %s",
+					i, expectedType, expression.Type()))
+		}
+
 		params = append(params, expression)
 		paramTypes = append(paramTypes, expression.Type())
 	}
 
-	callType := vm.NewFunctionType(paramTypes, returnType)
+	return vm.NewFunctionCall(name, params, returnType)
+}
 
-	if typ != nil && !callType.Equal(typ) {
-		token := ctx.GetStart()
-		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("function parameter mismatch\nExpected: %s\n     Got: %s", typ, callType))
+func (this *MyVisitor) visitMethodCall(ctx *MethodCallContext) vm.Expression {
+	trace(ctx)
+
+	base := this.visitExpression(ctx.GetBase())
+	if base == nil {
 		return nil
+	}
+	baseType := base.Type()
+	if baseType.GetKind() != vm.INTERFACE {
+		token := ctx.GetBase().GetStart()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("cannot call method on non interface type '%s'", token.GetText()))
+		return nil
+	}
+
+	name := ctx.GetName().GetText()
+	index := baseType.GetFunctionIndex(name)
+	if index < 0 {
+		token := ctx.GetName()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("interface does not have function %s", name))
+		return nil
+	}
+
+	_, typ := baseType.GetFunction(index)
+	if typ == nil {
+		panic("this should never happen if we have index")
+	}
+	returnType := typ.GetResultType()
+
+	if typ.GetFunctionCount() != len(ctx.GetParams()) {
+		token := ctx.GetName()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("expected %d params but found %d",
+				typ.GetFunctionCount(), len(ctx.GetParams())))
+		return nil
+	}
+
+	params := []vm.Expression{base}
+	paramTypes := []vm.Type{baseType}
+	for i, ectx := range ctx.GetParams() {
+		expression := this.visitExpression(ectx)
+		if expression == nil {
+			return nil
+		}
+		_, expectedType := typ.GetFunction(i + 1) // +1 accounting for 'this'
+
+		if !expectedType.Equal(expression.Type()) {
+			token := ectx.GetStart()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("parameter %d mismatch\nExpected: %s\n     Got: %s",
+					i, expectedType, expression.Type()))
+		}
+
+		params = append(params, expression)
+		paramTypes = append(paramTypes, expression.Type())
 	}
 
 	return vm.NewFunctionCall(name, params, returnType)

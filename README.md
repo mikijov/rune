@@ -68,6 +68,61 @@ a3 := int[33] # allocate array of 33 integers, initilized to zero
 v := a2[1] # second item in zero based array, i.e. '2' from a2
 ```
 
+### Objects and Interfaces
+```
+struct S1 {
+    f1 :int
+}
+
+func S1.setF1(value :int) {
+    this.f1 = value
+}
+
+func S1.getF1() :int {
+    return this.f1
+
+func S1.add(value :int) {
+    this.f1 += value
+}
+
+# Struct and field definition automatically defines and implements interface.
+# Note that the field name is derived from setter and getter, not from the
+# field name. I.e. the field could have had different name but the same
+# interface would be created.
+interface S1 {
+    f1 :int
+    add(value :int)
+}
+
+S1 implements S1 {
+    f1.get = getF1
+    f1.set = setF1
+    add = add
+}
+
+interface I1 {
+    f1 :int
+    add(value :int)
+}
+
+# Automatically maps S1 methods to I1. Methods are mapped by name. Field setters
+# and getters are mapped with (get|set)(capitalized field name).
+S1 implements I1;
+
+interface I2 {
+    field1 :int # virtual field, but has to be mapped to getter and setter
+    anotherAdd(value :int)
+}
+
+# Manual implementation of interface where methods are assigned to methods and
+# properties.
+S1 implements I2 {
+    field1.get = getF1
+    field1.set = setF1
+    anotherAdd = myAdd
+}
+```
+
 ### Sample code.
 ```
 console := import("console")

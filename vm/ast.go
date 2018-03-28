@@ -99,6 +99,22 @@ func (this *program) String() string {
 // statements
 /////////////
 
+type nop struct {
+}
+
+// NewNop creates nop statement that does nothing.
+func NewNop() Statement {
+	return &nop{}
+}
+
+func (this *nop) Execute(env Environment) {
+	// nop
+}
+
+func (this *nop) String() string {
+	return "// nop"
+}
+
 type declarationStatement struct {
 	name       string
 	expression Expression
@@ -117,7 +133,6 @@ func NewDeclarationStatement(name string, value Expression) Statement {
 func (this *declarationStatement) Execute(env Environment) {
 	value := this.expression.Execute(env)
 	env.Declare(this.name, value)
-	// fmt.Printf("%s :%v = %s;\n", this.name, value.Type(), value.String())
 }
 
 func (this *declarationStatement) String() string {

@@ -20,14 +20,15 @@ import (
 
 // Constants identifying kinds of rune data types.
 const (
-	VOID     Kind = "void"
-	INTEGER       = "int"
-	REAL          = "real"
-	BOOLEAN       = "bool"
-	STRING        = "string"
-	FUNCTION      = "func"
-	STRUCT        = "struct"
-	ARRAY         = "array"
+	VOID      Kind = "void"
+	INTEGER        = "int"
+	REAL           = "real"
+	BOOLEAN        = "bool"
+	STRING         = "string"
+	FUNCTION       = "func"
+	ARRAY          = "array"
+	STRUCT         = "struct"
+	INTERFACE      = "interface"
 )
 
 // Kind is a higher level of grouping of data types in rune. E.g. all functions
@@ -49,6 +50,11 @@ type Type interface {
 	GetFieldName(i int) string
 	GetFieldType(i int) Type
 	GetFieldIndex(name string) int
+	GetFunctionCount() int
+	GetFunction(i int) (name string, typ Type)
+	GetFunctionIndex(name string) int
+	AddFunction(name string, fn Type) bool
+	RemoveFunction(name string) bool
 }
 
 type simpleType struct {
@@ -130,6 +136,26 @@ func (this *simpleType) GetFieldIndex(name string) int {
 	panic("not a struct")
 }
 
+func (this *simpleType) GetFunctionCount() int {
+	panic("not an interface")
+}
+
+func (this *simpleType) GetFunction(i int) (name string, typ Type) {
+	panic("not an interface")
+}
+
+func (this *simpleType) GetFunctionIndex(name string) int {
+	panic("not an interface")
+}
+
+func (this *simpleType) AddFunction(name string, fn Type) bool {
+	panic("not an interface")
+}
+
+func (this *simpleType) RemoveFunction(name string) bool {
+	panic("not an interface")
+}
+
 type arrayType struct {
 	element Type
 }
@@ -192,6 +218,26 @@ func (this *arrayType) GetFieldType(i int) Type {
 
 func (this *arrayType) GetFieldIndex(name string) int {
 	panic("not a struct")
+}
+
+func (this *arrayType) GetFunctionCount() int {
+	panic("not an interface")
+}
+
+func (this *arrayType) GetFunction(i int) (name string, typ Type) {
+	panic("not an interface")
+}
+
+func (this *arrayType) GetFunctionIndex(name string) int {
+	panic("not an interface")
+}
+
+func (this *arrayType) AddFunction(name string, fn Type) bool {
+	panic("not an interface")
+}
+
+func (this *arrayType) RemoveFunction(name string) bool {
+	panic("not an interface")
 }
 
 type functionType struct {
@@ -285,6 +331,26 @@ func (this *functionType) GetFieldIndex(name string) int {
 	panic("not a struct")
 }
 
+func (this *functionType) GetFunctionCount() int {
+	panic("not an interface")
+}
+
+func (this *functionType) GetFunction(i int) (name string, typ Type) {
+	panic("not an interface")
+}
+
+func (this *functionType) GetFunctionIndex(name string) int {
+	panic("not an interface")
+}
+
+func (this *functionType) AddFunction(name string, fn Type) bool {
+	panic("not an interface")
+}
+
+func (this *functionType) RemoveFunction(name string) bool {
+	panic("not an interface")
+}
+
 type structType struct {
 	fieldNames []string
 	fieldTypes []Type
@@ -372,4 +438,130 @@ func (this *structType) GetFieldIndex(name string) int {
 		}
 	}
 	return -1
+}
+
+func (this *structType) GetFunctionCount() int {
+	panic("not an interface")
+}
+
+func (this *structType) GetFunction(i int) (name string, typ Type) {
+	panic("not an interface")
+}
+
+func (this *structType) GetFunctionIndex(name string) int {
+	panic("not an interface")
+}
+
+func (this *structType) AddFunction(name string, fn Type) bool {
+	panic("not an interface")
+}
+
+func (this *structType) RemoveFunction(name string) bool {
+	panic("not an interface")
+}
+
+type interfaceType struct {
+	functionNames []string
+	functions     []Type
+}
+
+// NewInterfaceType creates Type that represents interface.
+func NewInterfaceType(names []string, functions []Type) Type {
+	return &interfaceType{
+		functionNames: names,
+		functions:     functions,
+	}
+}
+
+func (this *interfaceType) GetKind() Kind {
+	return INTERFACE
+}
+
+func (this *interfaceType) String() string {
+	retVal := "interface {"
+
+	for i := 0; i < len(this.functions); i++ {
+		retVal += fmt.Sprintf("%v\n", this.functions[i])
+	}
+
+	retVal += "}"
+
+	return retVal
+}
+
+func (this *interfaceType) Equal(other Type) bool {
+	return this == other
+}
+
+func (this *interfaceType) GetElementType() Type {
+	panic("not an array")
+}
+
+func (this *interfaceType) GetParamCount() int {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetParam(i int) Type {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetResultType() Type {
+	return this
+}
+
+func (this *interfaceType) GetZero() Object {
+	panic("not impelemted")
+	// return NewReference(this)
+}
+
+func (this *interfaceType) GetFieldCount() int {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetFieldName(i int) string {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetFieldType(i int) Type {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetFieldIndex(name string) int {
+	panic("not a struct")
+}
+
+func (this *interfaceType) GetFunctionCount() int {
+	return len(this.functions)
+}
+
+func (this *interfaceType) GetFunction(i int) (name string, typ Type) {
+	return this.functionNames[i], this.functions[i]
+}
+
+func (this *interfaceType) GetFunctionIndex(name string) int {
+	for i, fnName := range this.functionNames {
+		if fnName == name {
+			return i
+		}
+	}
+	return -1
+}
+
+func (this *interfaceType) AddFunction(name string, fn Type) bool {
+	if index := this.GetFunctionIndex(name); index != -1 {
+		return false
+	}
+	this.functionNames = append(this.functionNames, name)
+	this.functions = append(this.functions, fn)
+	return true
+}
+
+func (this *interfaceType) RemoveFunction(name string) bool {
+	index := this.GetFunctionIndex(name)
+	if index == -1 {
+		return false
+	}
+	this.functionNames = append(this.functionNames[:index], this.functionNames[index+1:]...)
+	this.functions = append(this.functions[:index], this.functions[index+1:]...)
+	return true
 }

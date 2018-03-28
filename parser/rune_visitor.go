@@ -98,6 +98,9 @@ type RuneVisitor interface {
 	// Visit a parse tree produced by RuneParser#Lambda.
 	VisitLambda(ctx *LambdaContext) interface{}
 
+	// Visit a parse tree produced by RuneParser#MethodCall.
+	VisitMethodCall(ctx *MethodCallContext) interface{}
+
 	// Visit a parse tree produced by RuneParser#unaryOp.
 	VisitUnaryOp(ctx *UnaryOpContext) interface{}
 
