@@ -12,13 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package parser
 
 import (
 	"fmt"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
+
+// Messages represents generic message handling entity that will collect and
+// keep errors and
+type Messages interface {
+	antlr.ErrorListener
+	ErrorListener
+	GetErrors() []string
+	GetWarrnings() []string
+}
 
 type runeErrorListener struct {
 	Messages

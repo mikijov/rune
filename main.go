@@ -26,15 +26,6 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 )
 
-// Messages represents generic message handling entity that will collect and
-// keep errors and
-type Messages interface {
-	antlr.ErrorListener
-	parser.ErrorListener
-	GetErrors() []string
-	GetWarrnings() []string
-}
-
 func helloWorld() {
 	fmt.Println("test1")
 }
@@ -43,7 +34,7 @@ func add(x, y int64) int64 {
 	return x + y
 }
 
-func compile(input antlr.CharStream, ext vm.Externals) (vm.Program, Messages) {
+func compile(input antlr.CharStream, ext vm.Externals) (vm.Program, parser.Messages) {
 	lexer := parser.NewRuneLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
 
@@ -51,7 +42,7 @@ func compile(input antlr.CharStream, ext vm.Externals) (vm.Program, Messages) {
 	p.BuildParseTrees = true
 
 	p.RemoveErrorListeners()
-	errors := NewRuneErrorListener()
+	errors := parser.NewRuneErrorListener()
 	p.AddErrorListener(errors)
 
 	tree := p.Program()
@@ -69,14 +60,14 @@ func compile(input antlr.CharStream, ext vm.Externals) (vm.Program, Messages) {
 // are recognized as defined symbols in the code. Second return value contains
 // messages produced while compiling the code. If there are any error messages
 // returned, this indicates that the program is not runnable.
-func Compile(code string, ext vm.Externals) (vm.Program, Messages) {
+func Compile(code string, ext vm.Externals) (vm.Program, parser.Messages) {
 	input := antlr.NewInputStream(code)
 	return compile(input, ext)
 }
 
 // CompileFile is identical to the Compile() except that the code is read from
 // the file whose path is passed in the filename parameter.
-func CompileFile(filename string, ext vm.Externals) (vm.Program, Messages) {
+func CompileFile(filename string, ext vm.Externals) (vm.Program, parser.Messages) {
 	input := antlr.NewFileStream(filename)
 	return compile(input, ext)
 }
