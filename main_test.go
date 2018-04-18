@@ -15,6 +15,7 @@
 package main
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/mikijov/rune/vm"
@@ -327,6 +328,60 @@ func TestFunctions(t *testing.T) {
 		a := env.Get("a")
 		if !test.value.Equal(a) {
 			t.Errorf("test %d: %s unexpected value %v != %v", i, test.code, a, test.value)
+		}
+	}
+}
+
+func TestOutOfOrderDeclarations(t *testing.T) {
+	tests := []struct {
+		code  string
+		value vm.Object
+	}{
+		{"a = 1; a : int", vm.NewInteger(1)},
+		{"a = 1; a := 2;", vm.NewInteger(1)},
+		{"a := b; b : int", vm.NewInteger(0)},
+		{"a := b; b := 2;", vm.NewInteger(2)},
+		{"a := b + c; b := c + 2; c := 1;", vm.NewInteger(4)},
+		{"a := f(); func f() :int { return 1; }", vm.NewInteger(1)},
+		{"a := f(); func f() :int { return b; } b := 2;", vm.NewInteger(2)},
+	}
+
+	for i, test := range tests {
+		program, errors := Compile(test.code, nil)
+		if len(errors.GetErrors()) > 0 {
+			t.Errorf("test %d: %s failed to compile %v", i, test.code, errors.GetErrors())
+			continue
+		}
+
+		env := vm.NewEnvironment(nil)
+		program.Execute(env)
+		a := env.Get("a")
+		if !test.value.Equal(a) {
+			t.Errorf("test %d: %s unexpected value %v != %v", i, test.code, a, test.value)
+		}
+	}
+}
+
+func TestOutOfOrderDeclarationErrors(t *testing.T) {
+	tests := []struct {
+		code   string
+		errors []string
+	}{
+		{"a = 1;", []string{"1:0: a: undeclared variable"}},
+		{"a := b; b := a;", []string{"1:5: b: undeclared variable", "1:13: a: undeclared variable"}},
+	}
+
+	for i, test := range tests {
+		_, errors := Compile(test.code, nil)
+		if len(errors.GetErrors()) != len(test.errors) {
+			t.Errorf("test %d: expected %d error(s) but got %d\n%s",
+				i, len(test.errors), len(errors.GetErrors()), strings.Join(errors.GetErrors(), "\n"))
+		} else {
+			for e, err := range errors.GetErrors() {
+				if err != test.errors[e] {
+					t.Errorf("test %d:%d: unexpected error '%s'", i, e, errors.GetErrors()[0])
+				}
+			}
 		}
 	}
 }

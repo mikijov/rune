@@ -22,6 +22,7 @@ import (
 // visibility of variables and types.
 type Scope interface {
 	Declare(name string, typ vm.Type) bool
+	Undeclare(name string)
 	Get(name string) vm.Type
 }
 
@@ -46,6 +47,13 @@ func (this *scope) Declare(name string, typ vm.Type) bool {
 	}
 	this.store[name] = typ
 	return true
+}
+
+func (this *scope) Undeclare(name string) {
+	if _, ok := this.store[name]; !ok {
+		panic("Symbol not declared in this scope.")
+	}
+	delete(this.store, name)
 }
 
 func (this *scope) Get(name string) vm.Type {

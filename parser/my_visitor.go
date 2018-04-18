@@ -103,7 +103,8 @@ func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 		foundAnyStatements := false
 		for i, stmtCtx := range statements {
 			if statements[i] != nil {
-				if done := this.visitTopLevelDeclaration(stmtCtx); done {
+				if stmt := this.visitStatement(stmtCtx); stmt != nil {
+					this.program.AddStatement(stmt)
 					statements[i] = nil
 					foundAnyStatements = true
 				}
@@ -117,20 +118,10 @@ func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 
 	// repeat once more to record all errors
 	this.errors = savedErrors
-	hasErrors := false
 	for i, stmtCtx := range statements {
 		if statements[i] != nil {
-			hasErrors = true // any statement in this state must be an error
-			if done := this.visitTopLevelDeclaration(stmtCtx); done {
+			if stmt := this.visitStatement(stmtCtx); stmt != nil {
 				panic("this should never happen")
-			}
-		}
-	}
-
-	if !hasErrors {
-		for _, stmtCtx := range ctx.GetStatements() {
-			if stmt := this.visitTopLevelImplementation(stmtCtx); stmt != nil {
-				this.program.AddStatement(stmt)
 			}
 		}
 	}
@@ -138,50 +129,16 @@ func (this *MyVisitor) VisitProgram(ctx *ProgramContext) vm.Program {
 	return this.program
 }
 
-func (this *MyVisitor) visitTopLevelDeclaration(ctx IStatementContext) bool {
-	trace(ctx)
-
-	switch child := ctx.GetChild(0).(type) {
-	case *DeclarationContext:
-		return this.visitDeclaration1(child)
-	case *TypeDeclarationContext:
-		return this.visitTypeDeclaration1(child)
-	case *FunctionContext:
-		return this.visitFunction1(child)
-	default:
-		return true
-	}
-}
-
-func (this *MyVisitor) visitTopLevelImplementation(ctx IStatementContext) vm.Statement {
-	trace(ctx)
-
-	switch child := ctx.GetChild(0).(type) {
-	case *DeclarationContext:
-		return this.visitDeclaration2(child)
-	case *TypeDeclarationContext:
-		return this.visitTypeDeclaration2(child)
-	case *FunctionContext:
-		return this.visitFunction2(child)
-	case *ExpressionContext:
-		return vm.NewExpressionStatement(this.visitExpression(child))
-	case *LoopContext:
-		return this.visitLoop(child)
-	case *ReturnStatementContext:
-		return this.visitReturnStatement(child)
-	case *IfStatementContext:
-		return this.visitIfStatement(child)
-	default:
-		panic("unexpected top level construct")
-	}
-}
-
 func (this *MyVisitor) visitStatement(ctx IStatementContext) vm.Statement {
 	trace(ctx)
 
 	switch child := ctx.GetChild(0).(type) {
 	case *ExpressionContext:
-		return vm.NewExpressionStatement(this.visitExpression(child))
+		if value := this.visitExpression(child); value != nil {
+			return vm.NewExpressionStatement(value)
+		} else {
+			return nil
+		}
 	case *DeclarationContext:
 		return this.visitDeclaration(child)
 	case *TypeDeclarationContext:
@@ -234,90 +191,30 @@ func (this *MyVisitor) visitExpression(ctx interface{}) vm.Expression {
 	}
 }
 
-func (this *MyVisitor) visitTypeDeclaration1(ctx *TypeDeclarationContext) bool {
+func (this *MyVisitor) visitTypeDeclaration(ctx *TypeDeclarationContext) vm.Statement {
 	trace(ctx)
 
 	name := ctx.GetIdentifier().GetText()
 
 	typ := this.visitTypeName(ctx.GetType_())
 	if typ == nil {
-		return false
+		return nil
 	}
 
 	if !this.scope.Declare(name, typ) {
 		token := ctx.GetIdentifier()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("type redeclared '%s'", name))
-		return false
+		return nil
 	}
-	return true
-}
-
-func (this *MyVisitor) visitTypeDeclaration2(ctx *TypeDeclarationContext) vm.Statement {
-	trace(ctx)
-
-	name := ctx.GetIdentifier().GetText()
-	typ := this.scope.Get(name)
-	// typ != nil
 
 	return vm.NewTypeDeclarationStatement(name, typ)
 }
 
-func (this *MyVisitor) visitTypeDeclaration(ctx *TypeDeclarationContext) vm.Statement {
-	if !this.visitTypeDeclaration1(ctx) {
-		return nil
-	}
-	return this.visitTypeDeclaration2(ctx)
-}
-
-func (this *MyVisitor) visitDeclaration1(ctx *DeclarationContext) bool {
+func (this *MyVisitor) visitDeclaration(ctx *DeclarationContext) vm.Statement {
 	trace(ctx)
-
-	var typ vm.Type
-	if ctx.GetType_() != nil {
-		typ = this.visitTypeName(ctx.GetType_())
-		if typ == nil {
-			return false
-		}
-	}
-
-	var value vm.Expression
-	if ctx.GetValue() != nil {
-		value = this.visitExpression(ctx.GetValue())
-	}
-
-	if typ != nil && value != nil {
-		if !typ.Equal(value.Type()) {
-			token := ctx.GetIdentifier()
-			this.errors.Error(token.GetLine(), token.GetColumn(),
-				fmt.Sprintf("type mismatch %s != %s", typ, value.Type()))
-			return false
-		}
-	} else if typ != nil {
-		// already have type, nothing to do
-	} else if value != nil {
-		typ = value.Type()
-	} else {
-		// normally grammar should not allow this, probably caused by incomplete top level declaration
-		// but at top level also possible due to incomplete types, declare error just in case
-		token := ctx.GetIdentifier()
-		this.errors.Error(token.GetLine(), token.GetColumn(), "type not provided")
-		return false
-	}
 
 	name := ctx.GetIdentifier().GetText()
-	if !this.scope.Declare(name, typ) {
-		token := ctx.GetIdentifier()
-		this.errors.Error(token.GetLine(), token.GetColumn(),
-			fmt.Sprintf("'%s' redeclared", name))
-		return false
-	}
-
-	return true
-}
-
-func (this *MyVisitor) visitDeclaration2(ctx *DeclarationContext) vm.Statement {
-	trace(ctx)
 
 	var typ vm.Type
 	if ctx.GetType_() != nil {
@@ -347,31 +244,34 @@ func (this *MyVisitor) visitDeclaration2(ctx *DeclarationContext) vm.Statement {
 	} else if value != nil {
 		typ = value.Type()
 	} else {
-		panic("declaration should have taken care of this")
+		// normally grammar should not allow this, probably caused by incomplete top level declaration
+		// but at top level also possible due to incomplete types, declare error just in case
+		token := ctx.GetIdentifier()
+		this.errors.Error(token.GetLine(), token.GetColumn(), "type not provided")
+		return nil
 	}
 
-	name := ctx.GetIdentifier().GetText()
+	if !this.scope.Declare(name, typ) {
+		token := ctx.GetIdentifier()
+		this.errors.Error(token.GetLine(), token.GetColumn(),
+			fmt.Sprintf("'%s' redeclared", name))
+		return nil
+	}
+
 	if value != nil {
 		return vm.NewDeclarationStatement(name, value)
 	}
 	return vm.NewDeclarationStatement(name, vm.NewLiteral(typ.GetZero()))
 }
 
-func (this *MyVisitor) visitDeclaration(ctx *DeclarationContext) vm.Statement {
-	if !this.visitDeclaration1(ctx) {
-		return nil
-	}
-	return this.visitDeclaration2(ctx)
-}
-
-func (this *MyVisitor) visitFunction1(ctx *FunctionContext) bool {
+func (this *MyVisitor) visitFunction(ctx *FunctionContext) (retVal vm.Statement) {
 	trace(ctx)
 
 	name := ctx.GetIdentifier().GetText()
 
 	paramNames, paramTypes := this.visitParams(ctx.GetParams())
 	if paramNames == nil {
-		return false
+		return nil
 	}
 	// len(paramNames) == len(paramTypes)
 
@@ -379,7 +279,7 @@ func (this *MyVisitor) visitFunction1(ctx *FunctionContext) bool {
 	if ctx.GetReturnType() != nil {
 		returnType = this.visitTypeName(ctx.GetReturnType())
 		if returnType == nil {
-			return false
+			return nil
 		}
 	} else {
 		returnType = vm.NewSimpleType(vm.VOID)
@@ -390,18 +290,13 @@ func (this *MyVisitor) visitFunction1(ctx *FunctionContext) bool {
 		token := ctx.GetIdentifier()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("'%s' redeclared", name))
+		return nil
 	}
-	return true
-}
-
-func (this *MyVisitor) visitFunction2(ctx *FunctionContext) vm.Statement {
-	trace(ctx)
-
-	name := ctx.GetIdentifier().GetText()
-	paramNames, paramTypes := this.visitParams(ctx.GetParams())
-	typ := this.scope.Get(name)
-	// assert typ != nil
-	// typ.params == paramTypes
+	defer func() {
+		if retVal == nil {
+			this.scope.Undeclare(name)
+		}
+	}()
 
 	// now prepare the scope before parsing function body which will reference
 	// parameters etc.
@@ -415,7 +310,12 @@ func (this *MyVisitor) visitFunction2(ctx *FunctionContext) vm.Statement {
 	this.scope = NewScope(this.scope)
 	// add parameters as named variables
 	for i := 0; i < len(paramNames); i++ {
-		this.scope.Declare(paramNames[i], paramTypes[i])
+		if !this.scope.Declare(paramNames[i], paramTypes[i]) {
+			token := ctx.GetIdentifier()
+			this.errors.Error(token.GetLine(), token.GetColumn(),
+				fmt.Sprintf("parameter '%s' redeclared", paramNames[i]))
+			return nil
+		}
 	}
 
 	scope := this.visitScope(ctx.GetBody())
@@ -428,13 +328,6 @@ func (this *MyVisitor) visitFunction2(ctx *FunctionContext) vm.Statement {
 			vm.NewFunction(typ, paramNames, scope),
 		),
 	)
-}
-
-func (this *MyVisitor) visitFunction(ctx *FunctionContext) vm.Statement {
-	if !this.visitFunction1(ctx) {
-		return nil
-	}
-	return this.visitFunction2(ctx)
 }
 
 type param struct {
@@ -616,7 +509,11 @@ func (this *MyVisitor) visitScope(ctx IScopeContext) vm.ScopeStatement {
 
 	scope := vm.NewScopeStatement()
 	for _, stmtCtx := range ctx.GetStatements() {
-		scope.AddStatement(this.visitStatement(stmtCtx))
+		if stmt := this.visitStatement(stmtCtx); stmt != nil {
+			scope.AddStatement(stmt)
+		} else {
+			return nil
+		}
 	}
 
 	return scope
@@ -629,6 +526,9 @@ func (this *MyVisitor) visitReturnStatement(ctx *ReturnStatementContext) vm.Stat
 	var retType vm.Type
 	if ctx.GetRetVal() != nil {
 		retVal = this.visitExpression(ctx.GetRetVal())
+		if retVal == nil {
+			return nil
+		}
 		retType = retVal.Type()
 	} else {
 		retType = vm.NewSimpleType(vm.VOID)
@@ -673,6 +573,9 @@ func (this *MyVisitor) visitIfStatement(ctx IIfStatementContext) vm.Statement {
 
 	for i, condCtx := range conditions {
 		condition := this.visitExpression(condCtx)
+		if condition == nil {
+			return nil
+		}
 		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := condCtx.GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
@@ -680,6 +583,9 @@ func (this *MyVisitor) visitIfStatement(ctx IIfStatementContext) vm.Statement {
 		}
 
 		effect := this.visitScope(effects[i])
+		if effect == nil {
+			return nil
+		}
 
 		if retVal == nil {
 			retVal = vm.NewIfStatement(condition, effect, nil)
@@ -693,7 +599,11 @@ func (this *MyVisitor) visitIfStatement(ctx IIfStatementContext) vm.Statement {
 	}
 
 	if ctx.GetAlternative() != nil {
-		previousIf.SetAlternative(this.visitScope(ctx.GetAlternative()))
+		alternative := this.visitScope(ctx.GetAlternative())
+		if alternative == nil {
+			return nil
+		}
+		previousIf.SetAlternative(alternative)
 	}
 
 	return retVal
@@ -713,6 +623,9 @@ func (this *MyVisitor) visitLoop(ctx *LoopContext) vm.Statement {
 		// isWhile = ctx.GetKind().GetText() == "while"
 		//
 		condition = this.visitExpression(ctx.GetCondition())
+		if condition == nil {
+			return nil
+		}
 		if condition.Type().GetKind() != vm.BOOLEAN {
 			token := ctx.GetCondition().GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
@@ -721,6 +634,9 @@ func (this *MyVisitor) visitLoop(ctx *LoopContext) vm.Statement {
 	}
 
 	body := this.visitScope(ctx.GetBody())
+	if body == nil {
+		return nil
+	}
 
 	if condition == nil {
 		return vm.NewLoopStatement(label, body)
