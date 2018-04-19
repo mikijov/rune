@@ -319,7 +319,7 @@ func (this *MyVisitor) visitFunction(ctx *FunctionContext) (retVal vm.Statement)
 			}
 		}()
 	} else {
-		typ := vm.NewFunctionType(paramTypes, returnType)
+		typ = vm.NewFunctionType(paramTypes, returnType)
 		if !this.scope.Declare(name, typ) {
 			token := ctx.GetIdentifier()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
