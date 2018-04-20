@@ -51,9 +51,10 @@ type Type interface {
 	GetFieldType(i int) Type
 	GetFieldIndex(name string) int
 	GetFunctionCount() int
-	GetFunction(i int) (name string, typ Type)
+	GetFunction(i int) Function
+	GetFunctionName(i int) string
 	GetFunctionIndex(name string) int
-	AddFunction(name string, fn Type) bool
+	AddFunction(name string, fn Function) bool
 	RemoveFunction(name string) bool
 }
 
@@ -140,7 +141,11 @@ func (this *simpleType) GetFunctionCount() int {
 	panic("not an interface")
 }
 
-func (this *simpleType) GetFunction(i int) (name string, typ Type) {
+func (this *simpleType) GetFunction(i int) Function {
+	panic("not an interface")
+}
+
+func (this *simpleType) GetFunctionName(i int) name string {
 	panic("not an interface")
 }
 
@@ -148,7 +153,7 @@ func (this *simpleType) GetFunctionIndex(name string) int {
 	panic("not an interface")
 }
 
-func (this *simpleType) AddFunction(name string, fn Type) bool {
+func (this *simpleType) AddFunction(name string, fn Function) bool {
 	panic("not an interface")
 }
 
@@ -224,7 +229,11 @@ func (this *arrayType) GetFunctionCount() int {
 	panic("not an interface")
 }
 
-func (this *arrayType) GetFunction(i int) (name string, typ Type) {
+func (this *arrayType) GetFunction(i int) Function {
+	panic("not an interface")
+}
+
+func (this *arrayType) GetFunctionName(i int) string {
 	panic("not an interface")
 }
 
@@ -232,7 +241,7 @@ func (this *arrayType) GetFunctionIndex(name string) int {
 	panic("not an interface")
 }
 
-func (this *arrayType) AddFunction(name string, fn Type) bool {
+func (this *arrayType) AddFunction(name string, fn Function) bool {
 	panic("not an interface")
 }
 
@@ -335,7 +344,11 @@ func (this *functionType) GetFunctionCount() int {
 	panic("not an interface")
 }
 
-func (this *functionType) GetFunction(i int) (name string, typ Type) {
+func (this *functionType) GetFunction(i int) Function {
+	panic("not an interface")
+}
+
+func (this *functionType) GetFunctionName(i int) string {
 	panic("not an interface")
 }
 
@@ -343,7 +356,7 @@ func (this *functionType) GetFunctionIndex(name string) int {
 	panic("not an interface")
 }
 
-func (this *functionType) AddFunction(name string, fn Type) bool {
+func (this *functionType) AddFunction(name string, fn Function) bool {
 	panic("not an interface")
 }
 
@@ -352,8 +365,10 @@ func (this *functionType) RemoveFunction(name string) bool {
 }
 
 type structType struct {
-	fieldNames []string
-	fieldTypes []Type
+	fieldNames    []string
+	fieldTypes    []Type
+	functionNames []string
+	functions     []Type
 }
 
 // NewStructType creates Type that represents structs.
@@ -441,23 +456,44 @@ func (this *structType) GetFieldIndex(name string) int {
 }
 
 func (this *structType) GetFunctionCount() int {
-	panic("not an interface")
+	return len(this.functions)
 }
 
-func (this *structType) GetFunction(i int) (name string, typ Type) {
-	panic("not an interface")
+func (this *structType) GetFunction(i int) Function {
+	return this.functions[i]
+}
+
+func (this *structType) GetFunctionName(i int) string {
+	return this.functionNames[i]
 }
 
 func (this *structType) GetFunctionIndex(name string) int {
-	panic("not an interface")
+	for i, fnName := range this.functionNames {
+		if fnName == name {
+			return i
+		}
+	}
+	return -1
 }
 
-func (this *structType) AddFunction(name string, fn Type) bool {
-	panic("not an interface")
+func (this *structType) AddFunction(name string, fn Function) bool {
+	if index := this.GetFunctionIndex(name); index != -1 {
+		return false
+	}
+	this.functionNames = append(this.functionNames, name)
+	this.functions = append(this.functions, fn)
+	return true
 }
 
 func (this *structType) RemoveFunction(name string) bool {
-	panic("not an interface")
+	index := this.GetFunctionIndex(name)
+	if index != len(this.functionNames) {
+		panic("can remove only last added method to avoid problem of renumbered indexes")
+		return false
+	}
+	this.functionNames = append(this.functionNames[:index], this.functionNames[index+1:]...)
+	this.functions = append(this.functions[:index], this.functions[index+1:]...)
+	return true
 }
 
 type interfaceType struct {
@@ -534,8 +570,12 @@ func (this *interfaceType) GetFunctionCount() int {
 	return len(this.functions)
 }
 
-func (this *interfaceType) GetFunction(i int) (name string, typ Type) {
-	return this.functionNames[i], this.functions[i]
+func (this *interfaceType) GetFunction(i int) Function {
+	return this.functions[i]
+}
+
+func (this *interfaceType) GetFunctionName(i int) string {
+	return this.functionNames[i]
 }
 
 func (this *interfaceType) GetFunctionIndex(name string) int {
@@ -547,21 +587,10 @@ func (this *interfaceType) GetFunctionIndex(name string) int {
 	return -1
 }
 
-func (this *interfaceType) AddFunction(name string, fn Type) bool {
-	if index := this.GetFunctionIndex(name); index != -1 {
-		return false
-	}
-	this.functionNames = append(this.functionNames, name)
-	this.functions = append(this.functions, fn)
-	return true
+func (this *interfaceType) AddFunction(name string, fn Function) bool {
+	panic("not a struct")
 }
 
 func (this *interfaceType) RemoveFunction(name string) bool {
-	index := this.GetFunctionIndex(name)
-	if index == -1 {
-		return false
-	}
-	this.functionNames = append(this.functionNames[:index], this.functionNames[index+1:]...)
-	this.functions = append(this.functions[:index], this.functions[index+1:]...)
-	return true
+	panic("not a struct")
 }

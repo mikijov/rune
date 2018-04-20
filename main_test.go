@@ -563,6 +563,39 @@ r := s1.r1;
 	testVariable(t, env, "r", vm.NewReal(1.1))
 }
 
+func TestMethod(t *testing.T) {
+	code := `
+type t1 :struct {
+	x :int
+}
+func t1.set(x_:int) {
+	this.x = x_;
+}
+func t1.get() :int {
+	return this.x;
+}
+v1 :t1
+before := v1.get();
+v1.set(1);
+after := v1.get();
+`
+	program, errors := Compile(code, nil)
+	if len(errors.GetErrors()) > 0 {
+		t.Fatalf("failed to compile %v", errors.GetErrors())
+	}
+
+	env := vm.NewEnvironment(nil)
+	program.Execute(env)
+	v1 := env.Get("v1")
+	if v1.Type().GetKind() != vm.STRUCT {
+		t.Fatalf("expected struct but got %s", v1.Type().GetKind())
+	}
+
+	testVariable(t, env, "before", vm.NewInteger(0))
+	testVariable(t, env, "after", vm.NewInteger(1))
+	testField(t, v1, "x", vm.NewInteger(1))
+}
+
 func TestArray(t *testing.T) {
 	code := `
 type arrayType :int[]

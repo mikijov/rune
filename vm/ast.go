@@ -566,6 +566,55 @@ func NewFunctionCall(name string, params []Expression, returnType Type) Expressi
 	}
 }
 
+type methodCall struct {
+	Expression
+	base        Expression
+	methodIndex int
+	params      []Expression
+	returnType  Type
+}
+
+// NewMethodCall creates new expression which evaluates to the return value of
+// the method it is calling.
+func NewMethodCall(base Expression, methodIndex int, params []Expression, returnType Type) Expression {
+	return &methodCall{
+		base:        base,
+		medhodIndex: methodIndex,
+		params:      params,
+		returnType:  returnType,
+	}
+}
+
+func (this *methodCall) Type() Type {
+	return this.returnType
+}
+
+func (this *methodCall) Execute(env Environment) Object {
+	base := this.base.Execute(env)
+	if env.IsReturning() {
+		return nil
+	}
+
+	return env.Get(this.name).(Function).Call(env, this.params)
+}
+
+func (this *methodCall) String() string {
+	retVal := this.name + "("
+
+	first := true
+	for _, param := range this.params {
+		if first {
+			first = false
+		} else {
+			retVal += ", "
+		}
+		retVal += param.String()
+	}
+	retVal += ")"
+
+	return retVal
+}
+
 // literals
 ///////////
 

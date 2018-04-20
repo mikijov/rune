@@ -305,6 +305,10 @@ type Struct interface {
 	Object
 	Get(index int) Object
 	Set(index int, value Object)
+	Call(env Environment, index int, params []Expression) Object
+
+	- type has to have actual pointers to functions
+
 }
 
 // NewStruct creates new struct value and initializes all fields to zero.
@@ -327,6 +331,9 @@ func (this *struc) Set(index int, value Object) {
 		panic(fmt.Sprintf("type mismatch assigning: %s. %v != %v", this.typ.GetFieldName(index), this.fields[index].Type(), value.Type()))
 	}
 	this.fields[index] = value
+}
+func (this *struc) Call(env Environment, index int, params []Expression) Object {
+	...
 }
 
 func (this *struc) Equal(other Object) bool {

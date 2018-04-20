@@ -306,7 +306,12 @@ func (this *MyVisitor) visitFunction(ctx *FunctionContext) (retVal vm.Statement)
 		paramTypes = append([]vm.Type{iface}, paramTypes...)
 
 		typ = vm.NewFunctionType(paramTypes, returnType)
-		// declaration of this function is made in the proper, interface scope
+		fn = vm.NewFunction(typ, paramNames, scope),
+
+
+		... AddFunction should take fully prepared function from the bottom
+
+
 		if !iface.AddFunction(name, typ) {
 			token := ctx.GetIface()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
@@ -836,7 +841,7 @@ func (this *MyVisitor) visitMethodCall(ctx *MethodCallContext) vm.Expression {
 		return nil
 	}
 	baseType := base.Type()
-	if baseType.GetKind() != vm.INTERFACE {
+	if baseType.GetKind() != vm.INTERFACE && baseType.GetKind() != vm.STRUCT {
 		token := ctx.GetBase().GetStart()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("cannot call method on non interface type '%s'", token.GetText()))
@@ -858,11 +863,11 @@ func (this *MyVisitor) visitMethodCall(ctx *MethodCallContext) vm.Expression {
 	}
 	returnType := typ.GetResultType()
 
-	if typ.GetFunctionCount() != len(ctx.GetParams()) {
+	if typ.GetParamCount() != len(ctx.GetParams())+1 { // +1 accounting for 'this'
 		token := ctx.GetName()
 		this.errors.Error(token.GetLine(), token.GetColumn(),
 			fmt.Sprintf("expected %d params but found %d",
-				typ.GetFunctionCount(), len(ctx.GetParams())))
+				typ.GetParamCount(), len(ctx.GetParams())))
 		return nil
 	}
 
@@ -873,20 +878,21 @@ func (this *MyVisitor) visitMethodCall(ctx *MethodCallContext) vm.Expression {
 		if expression == nil {
 			return nil
 		}
-		_, expectedType := typ.GetFunction(i + 1) // +1 accounting for 'this'
+		expectedType := typ.GetParam(i + 1) // +1 accounting for 'this'
 
 		if !expectedType.Equal(expression.Type()) {
 			token := ectx.GetStart()
 			this.errors.Error(token.GetLine(), token.GetColumn(),
 				fmt.Sprintf("parameter %d mismatch\nExpected: %s\n     Got: %s",
 					i, expectedType, expression.Type()))
+			return nil
 		}
 
 		params = append(params, expression)
 		paramTypes = append(paramTypes, expression.Type())
 	}
 
-	return vm.NewFunctionCall(name, params, returnType)
+	return vm.NewMethodCall(base, index, params, returnType)
 }
 
 func (this *MyVisitor) visitFieldSelector(ctx *FieldSelectorContext) vm.Expression {
